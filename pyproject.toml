@@ -1,0 +1,44 @@
+[tool.poetry]
+name = "pymx"
+version = "0.1.0"
+description = ""
+authors = ["Pavel Dedik <dedikx@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.8.0"
+pytest = "^8.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+select = [
+    "E",     # flake8 rules
+    "F",     # flake8 rules
+    "B",     # flake8-bugbear
+    "C4",    # flake8-comprehensions
+    "I",     # isort
+    "D2",    # pydocstyle
+    "C901",  # maccabe complexity
+    "S",     # flake8-bandit
+    "UP",    # pyupgrade
+    "T10",   # flake8-debugger
+]
+ignore = [
+    "S101",
+    "D211",
+    "D213",
+]
+fixable = ["ALL"]
+
+[tool.mypy]
+python_version = "3.12"
+exclude = []
