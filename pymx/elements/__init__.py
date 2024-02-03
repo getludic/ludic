@@ -1,101 +1,107 @@
-from .base import Element
+from typing import Never
+
+from .base import Element, Elements, HTMXAttributes
 
 
-class Div(Element):
-    html_name = "div"
+class div(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class Span(Element):
-    html_name = "span"
+class span(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class Paragraph(Element):
-    html_name = "p"
+class p(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class Link(Element):
-    html_name = "a"
+class a(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class Form(Element):
-    html_name = "form"
+class br(Element[Never, HTMXAttributes]):
+    ...
 
 
-class Button(Element):
-    html_name = "button"
+class form(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class Label(Element):
-    html_name = "label"
+class button(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class TableCell(Element):
-    html_name = "td"
+class label(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class TableHeadCell(Element):
-    html_name = "th"
+class td(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class TableRow(Element[TableHeadCell | TableCell]):
-    html_name = "tr"
+class th(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class TableHead(Element[TableRow]):
-    html_name = "thead"
+class tr(Element[th | td, HTMXAttributes]):
+    ...
 
 
-class TableBody(Element[TableRow]):
-    html_name = "tbody"
+class thead(Element[tr, HTMXAttributes]):
+    ...
 
 
-class Table(Element[TableHead | TableBody]):
-    html_name = "table"
+class tbody(Element[tr, HTMXAttributes]):
+    ...
 
 
-class ListItem(Element):
-    html_name = "li"
+class table(Element[thead | tbody, HTMXAttributes]):
+    ...
 
 
-class List(Element[ListItem]):
-    html_name = "ul"
+class li(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class OrderedList(Element[ListItem]):
-    html_name = "ol"
+class ul(Element[li, HTMXAttributes]):
+    ...
 
 
-class Section(Element):
-    html_name = "section"
+class ol(Element[li, HTMXAttributes]):
+    ...
 
 
-class Input(Element):
-    html_name = "input"
+class section(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class Image(Element[str]):
-    html_name = "img"
+class input(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class H1(Element):
-    html_name = "h1"
+class img(Element[Never, HTMXAttributes]):
+    ...
 
 
-class H2(Element):
-    html_name = "h2"
+class h1(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class H3(Element):
-    html_name = "h3"
+class h2(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class H4(Element):
-    html_name = "h4"
+class h3(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class H5(Element):
-    html_name = "h5"
+class h4(Element[Elements, HTMXAttributes]):
+    ...
 
 
-class H6(Element):
-    html_name = "h6"
+class h5(Element[Elements, HTMXAttributes]):
+    ...
+
+
+class h6(Element[Elements, HTMXAttributes]):
+    ...
