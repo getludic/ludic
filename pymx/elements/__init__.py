@@ -1,107 +1,105 @@
-from typing import Never
-
-from .base import Element, Elements, HTMXAttributes
+from .base import Complex, Element, HTMXAttributes
 
 
-class div(Element[Elements, HTMXAttributes]):
-    ...
+class div(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "div"
 
 
-class span(Element[Elements, HTMXAttributes]):
-    ...
+class span(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "span"
 
 
-class p(Element[Elements, HTMXAttributes]):
-    ...
+class p(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "p"
 
 
-class a(Element[Elements, HTMXAttributes]):
-    ...
+class a(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "a"
 
 
-class br(Element[Never, HTMXAttributes]):
-    ...
+class br(Element, HTMXAttributes):
+    html_name = "br"
 
 
-class form(Element[Elements, HTMXAttributes]):
-    ...
+class form(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "form"
 
 
-class button(Element[Elements, HTMXAttributes]):
-    ...
+class button(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "button"
 
 
-class label(Element[Elements, HTMXAttributes]):
-    ...
+class label(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "label"
 
 
-class td(Element[Elements, HTMXAttributes]):
-    ...
+class td(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "td"
 
 
-class th(Element[Elements, HTMXAttributes]):
-    ...
+class th(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "th"
 
 
-class tr(Element[th | td, HTMXAttributes]):
-    ...
+class tr(Element[*tuple[th | td, ...]], HTMXAttributes):
+    html_name = "tr"
 
 
-class thead(Element[tr, HTMXAttributes]):
-    ...
+class thead(Element[*tuple[tr, ...]], HTMXAttributes):
+    html_name = "thead"
 
 
-class tbody(Element[tr, HTMXAttributes]):
-    ...
+class tbody(Element[*tuple[tr, ...]], HTMXAttributes):
+    html_name = "tbody"
 
 
-class table(Element[thead | tbody, HTMXAttributes]):
-    ...
+class table(Element[thead, tbody], HTMXAttributes):
+    html_name = "table"
 
 
-class li(Element[Elements, HTMXAttributes]):
-    ...
+class li(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "li"
 
 
-class ul(Element[li, HTMXAttributes]):
-    ...
+class ul(Element[*tuple[li, ...]], HTMXAttributes):
+    html_name = "ul"
 
 
-class ol(Element[li, HTMXAttributes]):
-    ...
+class ol(Element[*tuple[li, ...]], HTMXAttributes):
+    html_name = "ol"
 
 
-class section(Element[Elements, HTMXAttributes]):
-    ...
+class section(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "section"
 
 
-class input(Element[Elements, HTMXAttributes]):
-    ...
+class input(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "input"
 
 
-class img(Element[Never, HTMXAttributes]):
-    ...
+class img(Element, HTMXAttributes):
+    html_name = "img"
 
 
-class h1(Element[Elements, HTMXAttributes]):
-    ...
+class h1(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "h1"
 
 
-class h2(Element[Elements, HTMXAttributes]):
-    ...
+class h2(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "h2"
 
 
-class h3(Element[Elements, HTMXAttributes]):
-    ...
+class h3(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "h3"
 
 
-class h4(Element[Elements, HTMXAttributes]):
-    ...
+class h4(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "h4"
 
 
-class h5(Element[Elements, HTMXAttributes]):
-    ...
+class h5(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "h5"
 
 
-class h6(Element[Elements, HTMXAttributes]):
-    ...
+class h6(Element[*tuple[Complex, ...]], HTMXAttributes):
+    html_name = "h6"

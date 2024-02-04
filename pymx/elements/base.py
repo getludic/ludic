@@ -3,28 +3,47 @@ from typing import (
     Any,
     Generic,
     Literal,
+    Never,
     Self,
-    TypedDict,
-    TypeVar,
     Union,
 )
+
+from typing_extensions import TypeVar, TypeVarTuple
 
 from .styles import Styles
 from .utils import format_attribute, format_html_attribute
 
-Primitives = str | bool | int | float
-Elements = Union["Element", Primitives]
+Text = str | bool | int | float
+Complex = Union["Element", Text]
 
-TElement = TypeVar("TElement", bound=Elements)
-TElements = list[TElement]
-
-
-class Attributes(TypedDict, total=False):
-    ...
+TElement = TypeVar("TElement", bound=Text, default=Never)
+TElements = TypeVarTuple("TElements")
 
 
-class HTMLAttributes(Attributes, total=False):
+class Attributes:
     id: str
+
+    def __init__(self, **kwargs: Any) -> None:
+        members = {}
+        for cls in type(self).__mro__:
+            if cls is not Generic and issubclass(cls, Attributes):
+                members.update(cls.__annotations__)
+
+        for key, value in kwargs.items():
+            if key not in members:
+                raise TypeError(f"{key} is not a valid attribute")
+            if members[key].__name__ == "Literal":
+                if value not in members[key].__args__:
+                    raise TypeError(f"{key} must be one of {members[key].__args__}")
+            elif dict in getattr(members[key], "__mro__", []):
+                if not isinstance(value, dict):
+                    raise TypeError(f"{key} must be of type {members[key]}")
+            elif not isinstance(value, members[key]):
+                raise TypeError(f"{key} must be of type {members[key]}")
+            setattr(self, key, value)
+
+
+class HTMLAttributes(Attributes):
     class_: str
     href: str
     name: str
@@ -32,7 +51,7 @@ class HTMLAttributes(Attributes, total=False):
     value: str
 
 
-class HTMXAttributes(HTMLAttributes, total=False):
+class HTMXAttributes(HTMLAttributes):
     hx_get: str
     hx_post: str
     hx_put: str
@@ -40,7 +59,7 @@ class HTMXAttributes(HTMLAttributes, total=False):
     hx_patch: str
 
     hx_trigger: str
-    hx_target: Literal["this", "next", "previous"] | str
+    hx_target: str
     hx_swap: Literal[
         "innerHTML",
         "outerHTML",
@@ -53,56 +72,57 @@ class HTMXAttributes(HTMLAttributes, total=False):
     ]
 
 
-TAttributes = TypeVar("TAttributes", bound=Attributes)
+TAttributes = TypeVar("TAttributes", bound=Attributes, default=Attributes)
 
 
-class Element(Generic[TElement, TAttributes]):
+class Element(Generic[*TElements]):
+    html_name: str
+
+    _children: tuple[*TElements]
+    _attributes: list[str]
+
     @property
-    def html_name(self) -> str:
-        return self.__class__.__name__.lower()
+    def attrs(self) -> dict[str, Any]:
+        return {key: getattr(self, key) for key in self._attributes}
 
     def __init__(
         self,
-        *children: TElement,
+        *children: *TElements,
         **attributes: Any,
     ) -> None:
-        self._children = list(children)
-        self._attributes = attributes
+        self._children = children
+        self._attributes = list(attributes.keys())
+        super().__init__(**attributes)
 
-    def __call__(self, *children: TElement) -> Self:
-        self._children += children
+    def __call__(self, *children: *TElements) -> Self:
+        self._children = children
         return self
 
-    def __getitem__(self, index: int) -> TElement:
+    def __getitem__(self, index: int):
         return self._children[index]
-
-    def __getattr__(self, name: str) -> Any:
-        if name in self._attributes:
-            return self._attributes.__getitem__(name)
-        else:
-            return super().__getattribute__(name)
 
     def __str__(self) -> str:
         return self.to_string()
 
+    def __len__(self) -> int:
+        return len(self._children)
+
+    def __iter__(self):
+        return iter(self._children)
+
     def _format_attributes(
         self, formatter: Callable[[str, Any], str] = format_attribute
     ) -> str:
-        return " ".join(
-            formatter(key, value) for key, value in self._attributes.items()
-        )
+        return " ".join(formatter(key, getattr(self, key)) for key in self._attributes)
 
     def _format_children(self, formatter: Callable[[TElement], str] = str) -> str:
-        return "".join(formatter(child) for child in self._children)
+        return "".join(formatter(child) for child in self)
 
     def is_simple(self) -> bool:
-        return len(self._children) == 1 and isinstance(self._children[0], str)
+        return len(self) == 1 and isinstance(self[0], str)
 
     def has_attributes(self) -> bool:
         return bool(self._attributes)
-
-    def append(self, element: TElement) -> None:
-        self._children.append(element)
 
     def to_string(self, level: int = 0) -> str:
         dom = self.render()
@@ -118,7 +138,7 @@ class Element(Generic[TElement, TAttributes]):
         if dom._children:
             children_str = dom._format_children(
                 lambda child: child.to_string(level + 1)
-                if isinstance(child, Element)
+                if hasattr(child, "to_string")
                 else str(child),
             )
 
@@ -147,7 +167,7 @@ class Element(Generic[TElement, TAttributes]):
         if dom._children:
             children_str = dom._format_children(
                 lambda child: (
-                    child.to_html() if isinstance(child, Element) else str(child)
+                    child.to_html() if hasattr(child, "to_html") else str(child)
                 ),
             )
             element_tag += f">{children_str}</{dom.html_name}>"

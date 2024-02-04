@@ -1,14 +1,13 @@
-from typing import Literal, NotRequired, TypedDict
+from typing import Literal, TypedDict
 
 Styles = TypedDict(
     "Styles",
     {
-        "color": NotRequired[str],
-        "direction": NotRequired[Literal["row", "column"]],
-        "height": NotRequired[str],
-        "justify-content": NotRequired[
-            Literal["start", "end", "center", "equally-spaced"]
-        ],
-        "width": NotRequired[str],
+        "color": str,
+        "direction": Literal["row", "column"],
+        "height": str,
+        "justify-content": Literal["start", "end", "center", "equally-spaced"],
+        "width": str,
     },
+    total=False,
 )
