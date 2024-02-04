@@ -7,6 +7,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
+typeguard = "^4.1.5"
+typing-extensions = "^4.9.0"
+typing-inspect = "^0.9.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -34,6 +37,7 @@ select = [
 ]
 ignore = [
     "S101",
+    "D203",
     "D211",
     "D213",
 ]

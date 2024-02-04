@@ -1,7 +1,9 @@
 from pymx.elements import (
     a,
+    b,
     button,
     div,
+    i,
     label,
     p,
     table,
@@ -11,14 +13,17 @@ from pymx.elements import (
     thead,
     tr,
 )
+from pymx.elements.html import HTMLStyles
 
 
 def test_paragraph():
-    paragraph = p("Hello, World!")
-    assert paragraph.to_html() == "<p>Hello, World!</p>"
+    paragraph = p("Hello, World! ", b("Something bold"), " and ", i("Something italic"))
+    assert paragraph.to_html() == (
+        "<p>Hello, World! <b>Something bold</b> and <i>Something italic</i></p>"
+    )
 
 
-def test_link():
+def test_html_link():
     link = a(href="https://example.com")("A link!")
     assert link.to_html() == '<a href="https://example.com">A link!</a>'
 
@@ -34,7 +39,7 @@ def test_table():
         ),
         tbody(
             tr(
-                td(style={"color": "red", "height": "100px"})("Cell 1"),
+                td(style=HTMLStyles(color="red", height="100px"))("Cell 1"),
                 td("Cell 2"),
                 td("Cell 3"),
             ),
@@ -69,9 +74,9 @@ def test_button_get():
         button(hx_get="/contact/1/edit", class_="btn btn-primary")("Click To Edit"),
     )
 
-    assert dom[3].hx_get == "/contact/1/edit"  # type: ignore
-    assert dom[3][0] == "Click To Edit"  # type: ignore
-    assert dom.hx_target == "this"
+    assert dom[3].attrs["hx_get"] == "/contact/1/edit"
+    assert dom[3][0] == "Click To Edit"
+    assert dom.attrs["hx_target"] == "this"
     assert dom.to_html() == (
         '<div hx-target="this" hx-swap="outerHTML">'
             "<div><label>First Name</label>: Joe</div>"

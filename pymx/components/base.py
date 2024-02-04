@@ -1,12 +1,12 @@
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 
 from ..elements import Element
-from ..elements.base import Attributes, TElements
+from ..elements.base import AnyElement, TAttributes, TElements
 
 
-class Component(Element[*TElements], Attributes):
-    html_name = "div"
+class Component(Element[*TElements, TAttributes], metaclass=ABCMeta):
+    """Base class for components."""
 
     @abstractmethod
-    def render(self) -> Element:
-        ...
+    def render(self) -> AnyElement:
+        """Render the component as an instance of :class:`Element`."""

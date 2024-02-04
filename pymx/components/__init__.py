@@ -1,5 +1,14 @@
-from ..elements import a, li, ul
-from ..elements.base import Attributes, Element, HTMLAttributes, Text
+from typing import NotRequired, override
+
+from ..elements import a, body, head, html, li, link, meta, p, title, ul
+from ..elements.base import (
+    AnyChildren,
+    AnyElement,
+    Attributes,
+    NoChildren,
+    SimpleChildren,
+)
+from ..elements.html import HTMLAttributes
 from .base import Component
 
 
@@ -7,20 +16,44 @@ class LinkAttributes(Attributes):
     to: str
 
 
+class Link(Component[*SimpleChildren, LinkAttributes]):
+    @override
+    def render(self) -> AnyElement:
+        return a(href=self.attrs["to"])(self[0])
+
+
+class Paragraph(Component[*SimpleChildren, LinkAttributes]):
+    @override
+    def render(self) -> AnyElement:
+        return p(**self.attrs)(*self.children)
+
+
 class NavigationAttributes(HTMLAttributes):
     items: dict[str, str]
 
 
-class Link(Component[*tuple[Text, ...]], LinkAttributes):
-    def render(self) -> Element:
-        return a(href=self.to)(self[0])
+class Navigation(Component[*NoChildren, NavigationAttributes]):
+    @override
+    def render(self) -> AnyElement:
+        return ul(**self.attrs_for(ul))(
+            *(li(Link(to=link)(name)) for name, link in self.attrs["items"].items())
+        )
 
 
-class Navigation(Component, NavigationAttributes):
-    def render(self) -> Element:
-        attrs = self.attrs
-        attrs.pop("items")
+class PageAttributes(HTMLAttributes):
+    title: str
+    metadata: NotRequired[list[meta]]
+    links: NotRequired[list[link]]
 
-        return ul(**attrs)(
-            *(li(Link(to=link)(name)) for name, link in self.items.items())
+
+class Page(Component[*AnyChildren, PageAttributes]):
+    @override
+    def render(self) -> AnyElement:
+        return html(
+            head(
+                title(self.attrs["title"]),
+                *self.attrs.get("metadata", []),
+                *self.attrs.get("links", []),
+            ),
+            body(*self.children),
         )
