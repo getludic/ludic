@@ -8,7 +8,7 @@ from ..elements.base import (
     NoChildren,
     SimpleChildren,
 )
-from ..elements.html import HTMLAttributes
+from ..elements.html import HtmlAttributes
 from .base import Component
 
 
@@ -28,7 +28,7 @@ class Paragraph(Component[*SimpleChildren, LinkAttributes]):
         return p(**self.attrs)(*self.children)
 
 
-class NavigationAttributes(HTMLAttributes):
+class NavigationAttributes(HtmlAttributes):
     items: dict[str, str]
 
 
@@ -40,8 +40,7 @@ class Navigation(Component[*NoChildren, NavigationAttributes]):
         )
 
 
-class PageAttributes(HTMLAttributes):
-    title: str
+class PageAttributes(HtmlAttributes):
     metadata: NotRequired[list[meta]]
     links: NotRequired[list[link]]
 
