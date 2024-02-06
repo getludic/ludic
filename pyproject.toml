@@ -13,8 +13,8 @@ typing-inspect = "^0.9.0"
 
 
 [tool.poetry.group.dev.dependencies]
-mypy = "^1.8.0"
 pytest = "^8.0.0"
+pyright = "^1.1.350"
 
 [build-system]
 requires = ["poetry-core"]
@@ -42,7 +42,3 @@ ignore = [
     "D213",
 ]
 fixable = ["ALL"]
-
-[tool.mypy]
-python_version = "3.12"
-exclude = []

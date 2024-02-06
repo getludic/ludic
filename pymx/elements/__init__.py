@@ -63,23 +63,23 @@ class th(Element[*AnyChildren, ThAttributes]):
     html_name: str = "th"
 
 
-class tr(Element[*tuple[th | td, ...], GlobalAttributes]):
+class tr(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "tr"
 
 
-class thead(Element[*tuple[tr, ...], GlobalAttributes]):
+class thead(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "thead"
 
 
-class tbody(Element[*tuple[tr, ...], GlobalAttributes]):
+class tbody(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "tbody"
 
 
-class tfoot(Element[*tuple[tr, ...], GlobalAttributes]):
+class tfoot(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "tfoot"
 
 
-class table(Element[*tuple[thead | tbody | tfoot, ...], GlobalAttributes]):
+class table(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "table"
 
 
@@ -87,11 +87,11 @@ class li(Element[*AnyChildren, LiAttributes]):
     html_name: str = "li"
 
 
-class ul(Element[*tuple[li, ...], GlobalAttributes]):
+class ul(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "ul"
 
 
-class ol(Element[*tuple[li, ...], GlobalAttributes]):
+class ol(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "ol"
 
 
@@ -103,7 +103,7 @@ class dd(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "dd"
 
 
-class dl(Element[*tuple[dt | dd, ...], GlobalAttributes]):
+class dl(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "dl"
 
 
@@ -127,11 +127,11 @@ class option(Element[*TextChildren, OptionAttributes]):
     html_name: str = "option"
 
 
-class optgroup(Element[*tuple[option, ...], OptgroupAttributes]):
+class optgroup(Element[*AnyChildren, OptgroupAttributes]):
     html_name: str = "optgroup"
 
 
-class select(Element[*tuple[option | optgroup, ...], SelectAttributes]):
+class select(Element[*AnyChildren, SelectAttributes]):
     html_name: str = "select"
 
 
@@ -139,29 +139,11 @@ class textarea(Element[*TextChildren, TextareaAttributes]):
     html_name: str = "textarea"
 
 
-class fieldset(Element[*tuple[legend | label | input, ...], FieldsetAttributes]):
+class fieldset(Element[*AnyChildren, FieldsetAttributes]):
     html_name: str = "fieldset"
 
 
-class form(
-    Element[
-        *tuple[
-            input
-            | textarea
-            | select
-            | option
-            | button
-            | label
-            | output
-            | fieldset
-            | optgroup
-            | span
-            | div,
-            ...,
-        ],
-        FormAttributes,
-    ]
-):
+class form(Element[*AnyChildren, FormAttributes]):
     html_name: str = "form"
 
 
@@ -241,7 +223,7 @@ class meta(Element[*TextChildren, MetaAttributes]):
     html_name: str = "meta"
 
 
-class head(Element[*tuple[title | link | style | meta, ...], NoAttributes]):
+class head(Element[*AnyChildren, NoAttributes]):
     html_name: str = "head"
 
 

@@ -1,7 +1,6 @@
 from collections.abc import Callable
 from typing import (
     Any,
-    Self,
     TypedDict,
     cast,
 )
@@ -15,8 +14,10 @@ from .utils import (
 )
 
 
-class Attributes(TypedDict):
+class Attributes(TypedDict, total=False):
     """Attributes of an element."""
+
+    id: str
 
 
 class Element[*Te, Ta: Attributes]:
@@ -38,11 +39,6 @@ class Element[*Te, Ta: Attributes]:
 
         self._attrs = cast(Ta, attributes)
         self._children = children
-
-    def __call__(self, *children: *Te) -> Self:
-        validate_elements(self, children)
-        self._children = children
-        return self
 
     def __str__(self) -> str:
         return self.to_html()
@@ -164,9 +160,9 @@ class Element[*Te, Ta: Attributes]:
         return cast(AnyElement, self)
 
 
-type TextChild = str | bool | int | float
-type AnyChild = TextChild | Element[*tuple[AnyChild, ...], Attributes]
+TextChild = str | bool | int | float
+AnyChild = TextChild | Element[*tuple["AnyChild", ...], Attributes]
 
-type TextChildren = tuple[TextChild, ...]
-type AnyChildren = tuple[AnyChild, ...]
-type AnyElement = Element[*AnyChildren, Attributes]
+TextChildren = tuple[TextChild, ...]
+AnyChildren = tuple[AnyChild, ...]
+AnyElement = Element[*AnyChildren, Attributes]

@@ -24,7 +24,7 @@ def test_paragraph():
 
 
 def test_html_link():
-    link = a(href="https://example.com")("A link!")
+    link = a("A link!", href="https://example.com")
     assert link.to_html() == '<a href="https://example.com">A link!</a>'
 
 
@@ -39,7 +39,7 @@ def test_table():
         ),
         tbody(
             tr(
-                td(style=CSSProperties(color="red", height="100px"))("Cell 1"),
+                td("Cell 1", style=CSSProperties(color="red", height="100px")),
                 td("Cell 2"),
                 td("Cell 3"),
             ),
@@ -67,11 +67,17 @@ def test_table():
 
 
 def test_button_get():
-    dom = div(hx_target="this", hx_swap="outerHTML")(
+    dom = div(
         div(label("First Name"), ": Joe"),
         div(label("Last Name"), ": Blow"),
         div(label("Email"), ": joe@blow.com"),
-        button(hx_get="/contact/1/edit", class_="btn btn-primary")("Click To Edit"),
+        button(
+            "Click To Edit",
+            class_="btn btn-primary",
+            hx_get="/contact/1/edit",
+        ),
+        hx_target="this",
+        hx_swap="outerHTML",
     )
 
     assert dom.children[3].attrs["hx_get"] == "/contact/1/edit"  # type: ignore
@@ -82,7 +88,7 @@ def test_button_get():
             "<div><label>First Name</label>: Joe</div>"
             "<div><label>Last Name</label>: Blow</div>"
             "<div><label>Email</label>: joe@blow.com</div>"
-            '<button hx-get="/contact/1/edit" class="btn btn-primary">'
+            '<button class="btn btn-primary" hx-get="/contact/1/edit">'
                 "Click To Edit"
             "</button>"
         "</div>"

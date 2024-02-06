@@ -1,19 +1,19 @@
-from pymx.components import Link, Navigation
+from pymx.components import Link, Navigation, NavItem
 
 
 def test_link():
-    link = Link(to="https://example.com")("A link!")
+    link = Link("A link!", to="https://example.com")
     assert link.to_html() == '<a href="https://example.com">A link!</a>'
 
 
 def test_navigation():
     navigation = Navigation(
-        class_="nav",
-        items={"Home": "https://example.com", "About": "https://example.com/about"},
+        NavItem("Home", to="/"),
+        NavItem("About", to="/about"),
     )
     assert navigation.to_html() == (
-        '<ul class="nav">'
-            '<li><a href="https://example.com">Home</a></li>'
-            '<li><a href="https://example.com/about">About</a></li>'
+        '<ul class="navigation">'
+            '<li id="home"><a href="/">Home</a></li>'
+            '<li id="about"><a href="/about">About</a></li>'
         "</ul>"
     )  # fmt: skip
