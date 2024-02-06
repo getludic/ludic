@@ -1,14 +1,8 @@
-from typing import NotRequired, override
+from typing import override
 
-from ..elements import a, body, head, html, li, link, meta, p, title, ul
-from ..elements.base import (
-    AnyChildren,
-    AnyElement,
-    Attributes,
-    NoChildren,
-    SimpleChildren,
-)
-from ..elements.html import HtmlAttributes
+from ..elements import a, li, p, ul
+from ..elements.attrs import HtmlAttributes, HyperlinkAttributes
+from ..elements.base import Attributes, TextChildren
 from .base import Component
 
 
@@ -16,15 +10,15 @@ class LinkAttributes(Attributes):
     to: str
 
 
-class Link(Component[*SimpleChildren, LinkAttributes]):
+class Link(Component[*TextChildren, LinkAttributes]):
     @override
-    def render(self) -> AnyElement:
-        return a(href=self.attrs["to"])(self[0])
+    def render(self) -> a:
+        return a(href=self.attrs["to"])(self.children[0])
 
 
-class Paragraph(Component[*SimpleChildren, LinkAttributes]):
+class Paragraph(Component[*TextChildren, HyperlinkAttributes]):
     @override
-    def render(self) -> AnyElement:
+    def render(self) -> p:
         return p(**self.attrs)(*self.children)
 
 
@@ -32,27 +26,9 @@ class NavigationAttributes(HtmlAttributes):
     items: dict[str, str]
 
 
-class Navigation(Component[*NoChildren, NavigationAttributes]):
+class Navigation(Component[NavigationAttributes]):
     @override
-    def render(self) -> AnyElement:
-        return ul(**self.attrs_for(ul))(
+    def render(self) -> ul:
+        return ul(**self.attrs_for(cls=ul))(
             *(li(Link(to=link)(name)) for name, link in self.attrs["items"].items())
-        )
-
-
-class PageAttributes(HtmlAttributes):
-    metadata: NotRequired[list[meta]]
-    links: NotRequired[list[link]]
-
-
-class Page(Component[*AnyChildren, PageAttributes]):
-    @override
-    def render(self) -> AnyElement:
-        return html(
-            head(
-                title(self.attrs["title"]),
-                *self.attrs.get("metadata", []),
-                *self.attrs.get("links", []),
-            ),
-            body(*self.children),
         )

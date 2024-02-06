@@ -13,8 +13,7 @@ repos:
       - id: ruff
         args: ["--fix", "--exit-non-zero-on-fix", "--config", "pyproject.toml"]
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.350
     hooks:
-      - id: mypy
-        args: ["--ignore-missing-imports", "--check-untyped-defs"]
+      - id: pyright

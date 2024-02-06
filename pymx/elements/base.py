@@ -1,17 +1,10 @@
 from collections.abc import Callable
 from typing import (
     Any,
-    Generic,
-    Never,
     Self,
-    TypeAlias,
     TypedDict,
-    Union,
-    Unpack,
     cast,
 )
-
-from typing_extensions import TypeVar, TypeVarTuple
 
 from .utils import (
     format_attribute,
@@ -21,58 +14,35 @@ from .utils import (
     validate_elements,
 )
 
-NoChild: TypeAlias = Never
-SimpleChild: TypeAlias = str | bool | int | float
-AnyChild: TypeAlias = Union["Element[*TElements, TAttributes]", SimpleChild]
-
-NoChildren: TypeAlias = tuple[NoChild, ...]
-SimpleChildren: TypeAlias = tuple[SimpleChild, ...]
-AnyChildren: TypeAlias = tuple[AnyChild, ...]
-AnyElement: TypeAlias = "Element[*tuple[Any, ...], Any]"
-
-TElement = TypeVar("TElement", bound=AnyChild, default=AnyChild)
-TElements = TypeVarTuple("TElements", default=Unpack[SimpleChildren])
-TAttributes = TypeVar(
-    "TAttributes", bound="Attributes", default="Attributes", covariant=True
-)
-
 
 class Attributes(TypedDict):
     """Attributes of an element."""
 
 
-class Element(Generic[*TElements, TAttributes]):
+class Element[*Te, Ta: Attributes]:
     """Base class for PyMX elements.
 
     Args:
-        *children (*TElements): The children of the element.
-        **attributes (**TAttributes): The attributes of the element.
+        *children (*Te): The children of the element.
+        **attributes (**Ta): The attributes of the element.
     """
 
     html_name: str
 
-    _children: tuple[*TElements]
-    _attrs: TAttributes
+    _children: tuple[*Te]
+    _attrs: Ta
 
-    def __init__(
-        self,
-        *children: *TElements,
-        # **attributes should be typed as Unpack[TAttributes]
-        # see https://github.com/python/typing/issues/1399
-        **attributes: Any,
-    ) -> None:
+    def __init__(self, *children: *Te, **attributes: Any) -> None:
         validate_attributes(self, attributes)
         validate_elements(self, children)
 
+        self._attrs = cast(Ta, attributes)
         self._children = children
-        self._attrs = cast(TAttributes, attributes)
 
-    def __call__(self, *children: *TElements) -> Self:
+    def __call__(self, *children: *Te) -> Self:
+        validate_elements(self, children)
         self._children = children
         return self
-
-    def __getitem__(self, index: int):
-        return self.children[index]
 
     def __str__(self) -> str:
         return self.to_html()
@@ -100,20 +70,23 @@ class Element(Generic[*TElements, TAttributes]):
     ) -> str:
         return " ".join(formatter(key, value) for key, value in self.attrs.items())
 
-    def _format_children(self, formatter: Callable[[TElement], str] = str) -> str:
-        return "".join(formatter(child) for child in self if child is not None)
+    def _format_children(
+        self,
+        formatter: Callable[[Any], str] = str,
+    ) -> str:
+        return "".join(formatter(child) for child in self.children)
 
     @property
-    def children(self) -> tuple[*TElements]:
-        return cast(tuple[*TElements], getattr(self, "_children", []))
+    def children(self) -> tuple[*Te]:
+        return cast(tuple[*Te], getattr(self, "_children", []))
 
     @property
-    def attrs(self) -> TAttributes:
-        return cast(TAttributes, getattr(self, "_attrs", {}))
+    def attrs(self) -> Ta:
+        return cast(Ta, getattr(self, "_attrs", {}))
 
     def is_simple(self) -> bool:
         """Check if the element is simple (i.e. contains only primitive types)."""
-        return len(self) == 1 and isinstance(self[0], str | bool | int | float)
+        return len(self) == 1 and isinstance(self.children[0], str | bool | int | float)
 
     def has_attributes(self) -> bool:
         """Check if the element has any attributes."""
@@ -172,7 +145,7 @@ class Element(Generic[*TElements, TAttributes]):
 
         return element_tag
 
-    def attrs_for(self, cls: type[AnyElement]) -> dict[str, Any]:
+    def attrs_for(self, cls: type["AnyElement"]) -> dict[str, Any]:
         """Get the attributes of this component that are defined in the given element.
 
         This is useful so that you can pass common attributes to an element
@@ -187,5 +160,13 @@ class Element(Generic[*TElements, TAttributes]):
             if key in get_element_attributes(cls)
         }
 
-    def render(self) -> AnyElement:
-        return self
+    def render(self) -> "AnyElement":
+        return cast(AnyElement, self)
+
+
+type TextChild = str | bool | int | float
+type AnyChild = TextChild | Element[*tuple[AnyChild, ...], Attributes]
+
+type TextChildren = tuple[TextChild, ...]
+type AnyChildren = tuple[AnyChild, ...]
+type AnyElement = Element[*AnyChildren, Attributes]

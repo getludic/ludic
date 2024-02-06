@@ -44,7 +44,6 @@ def test_table():
                 td("Cell 3"),
             ),
         ),
-        None,
     )
 
     assert dom.to_html() == (
@@ -75,9 +74,9 @@ def test_button_get():
         button(hx_get="/contact/1/edit", class_="btn btn-primary")("Click To Edit"),
     )
 
-    assert dom[3].attrs["hx_get"] == "/contact/1/edit"
-    assert dom[3][0] == "Click To Edit"
-    assert dom.attrs["hx_target"] == "this"
+    assert dom.children[3].attrs["hx_get"] == "/contact/1/edit"  # type: ignore
+    assert dom.children[3].children[0] == "Click To Edit"  # type: ignore
+    assert dom.attrs["hx_target"] == "this"  # type: ignore
     assert dom.to_html() == (
         '<div hx-target="this" hx-swap="outerHTML">'
             "<div><label>First Name</label>: Joe</div>"

@@ -261,7 +261,7 @@ class FormAttributes(GlobalAttributes, total=False):
     target: str
 
 
-class LinkAttributes(GlobalAttributes, total=False):
+class HyperlinkAttributes(GlobalAttributes, total=False):
     download: str
     href: str
     hreflang: str

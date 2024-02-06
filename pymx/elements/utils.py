@@ -1,14 +1,12 @@
+# pyright: reportMissingImports=false, reportMissingTypeStubs=false
+# pyright: reportUnknownVariableType=false, reportGeneralTypeIssues=false
+
 import random
 import string
-import warnings
 from typing import Any
 
 from typeguard import TypeCheckError, check_type
-from typing_inspect import (  # type: ignore
-    get_args,
-    get_generic_bases,
-    get_origin,
-)
+from typing_inspect import get_args, get_generic_bases, get_origin, is_union_type
 
 
 def random_string(n: int) -> str:
@@ -62,7 +60,7 @@ def get_element_generic_args(cls_or_obj: Any) -> tuple[type, ...] | None:
     from pymx.elements import Element
 
     for base in get_generic_bases(cls_or_obj):
-        if issubclass(get_origin(base), Element):
+        if issubclass(get_origin(base), Element):  # type: ignore
             return get_args(base)
     return None
 
@@ -100,15 +98,21 @@ def validate_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None:
         elements (tuple[Any, ...]): The elements to check.
     """
     if (args := get_element_generic_args(cls_or_obj)) is not None:
-        element_types = args[:-1]
-        has_infinite_children = get_args(args[0]) and get_args(args[0])[-1] is Ellipsis
-
-        try:
-            if not has_infinite_children:
-                for idx, element in enumerate(elements):
-                    check_type(element, element_types[idx])
-            else:
-                with warnings.catch_warnings(action="ignore"):
-                    check_type(elements, element_types)
-        except TypeCheckError as err:
-            raise TypeError(f"Invalid children for {cls_or_obj}.") from err
+        types = args[:-1]
+        if len(types) == 0:
+            if len(elements) != 0:
+                raise TypeError(
+                    f"The element {cls_or_obj!r} doesn't expect any elements."
+                )
+        elif len(types) > 1 or is_union_type(types[0]):
+            if len(types) != len(elements):
+                raise TypeError(
+                    f"The element {cls_or_obj!r} got an invalid number of elements."
+                )
+            for element, type_ in zip(elements, types, strict=True):
+                check_type(element, type_)
+        else:
+            try:
+                check_type(elements, types)
+            except TypeCheckError as err:
+                raise TypeError(f"Invalid elements for {cls_or_obj!r}.") from err

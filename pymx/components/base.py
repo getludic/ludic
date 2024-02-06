@@ -1,10 +1,9 @@
 from abc import ABCMeta, abstractmethod
 
-from ..elements import Element
-from ..elements.base import AnyElement, TAttributes, TElements
+from ..elements.base import AnyElement, Attributes, Element
 
 
-class Component(Element[*TElements, TAttributes], metaclass=ABCMeta):
+class Component[*Te, Ta: Attributes](Element[*Te, Ta], metaclass=ABCMeta):
     """Base class for components."""
 
     @abstractmethod

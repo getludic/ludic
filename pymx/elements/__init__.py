@@ -1,17 +1,16 @@
-from .base import AnyChildren, Element, NoChildren, SimpleChildren
-from .html import (
+from .attrs import (
     ButtonAttributes,
     FieldsetAttributes,
     FormAttributes,
     GlobalAttributes,
     HeadLinkAttributes,
     HtmlTagAttributes,
+    HyperlinkAttributes,
     IframeAttributes,
     ImgAttributes,
     InputAttributes,
     LabelAttributes,
     LiAttributes,
-    LinkAttributes,
     MetaAttributes,
     NoAttributes,
     OptgroupAttributes,
@@ -25,6 +24,7 @@ from .html import (
     TextareaAttributes,
     ThAttributes,
 )
+from .base import AnyChildren, Element, TextChildren
 
 
 class div(Element[*AnyChildren, GlobalAttributes]):
@@ -39,11 +39,11 @@ class p(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "p"
 
 
-class a(Element[*AnyChildren, LinkAttributes]):
+class a(Element[*AnyChildren, HyperlinkAttributes]):
     html_name: str = "a"
 
 
-class br(Element[*NoChildren, GlobalAttributes]):
+class br(Element[GlobalAttributes]):
     html_name: str = "br"
 
 
@@ -79,7 +79,7 @@ class tfoot(Element[*tuple[tr, ...], GlobalAttributes]):
     html_name: str = "tfoot"
 
 
-class table(Element[thead | None, tbody | None, tfoot | None, GlobalAttributes]):
+class table(Element[*tuple[thead | tbody | tfoot, ...], GlobalAttributes]):
     html_name: str = "table"
 
 
@@ -95,7 +95,7 @@ class ol(Element[*tuple[li, ...], GlobalAttributes]):
     html_name: str = "ol"
 
 
-class dt(Element[*SimpleChildren, GlobalAttributes]):
+class dt(Element[*TextChildren, GlobalAttributes]):
     html_name: str = "dt"
 
 
@@ -111,19 +111,19 @@ class section(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "section"
 
 
-class input(Element[*NoChildren, InputAttributes]):
+class input(Element[InputAttributes]):
     html_name: str = "input"
 
 
-class output(Element[*NoChildren, OutputAttributes]):
+class output(Element[OutputAttributes]):
     html_name: str = "output"
 
 
-class legend(Element[*SimpleChildren, GlobalAttributes]):
+class legend(Element[*TextChildren, GlobalAttributes]):
     html_name: str = "legend"
 
 
-class option(Element[*SimpleChildren, OptionAttributes]):
+class option(Element[*TextChildren, OptionAttributes]):
     html_name: str = "option"
 
 
@@ -135,7 +135,7 @@ class select(Element[*tuple[option | optgroup, ...], SelectAttributes]):
     html_name: str = "select"
 
 
-class textarea(Element[*SimpleChildren, TextareaAttributes]):
+class textarea(Element[*TextChildren, TextareaAttributes]):
     html_name: str = "textarea"
 
 
@@ -165,7 +165,7 @@ class form(
     html_name: str = "form"
 
 
-class img(Element[*NoChildren, ImgAttributes]):
+class img(Element[ImgAttributes]):
     html_name: str = "img"
 
 
@@ -173,19 +173,19 @@ class svg(Element[*AnyChildren, SvgAttributes]):
     html_name: str = "svg"
 
 
-class b(Element[*SimpleChildren, GlobalAttributes]):
+class b(Element[*TextChildren, GlobalAttributes]):
     html_name: str = "b"
 
 
-class i(Element[*SimpleChildren, GlobalAttributes]):
+class i(Element[*TextChildren, GlobalAttributes]):
     html_name: str = "i"
 
 
-class s(Element[*SimpleChildren, GlobalAttributes]):
+class s(Element[*TextChildren, GlobalAttributes]):
     html_name: str = "s"
 
 
-class u(Element[*SimpleChildren, GlobalAttributes]):
+class u(Element[*TextChildren, GlobalAttributes]):
     html_name: str = "u"
 
 
@@ -193,51 +193,51 @@ class header(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "header"
 
 
-class small(Element[*SimpleChildren, GlobalAttributes]):
+class small(Element[*TextChildren, GlobalAttributes]):
     html_name: str = "small"
 
 
-class h1(Element[*SimpleChildren, GlobalAttributes]):
+class h1(Element[*TextChildren, GlobalAttributes]):
     html_name: str = "h1"
 
 
-class h2(Element[*SimpleChildren, GlobalAttributes]):
+class h2(Element[*TextChildren, GlobalAttributes]):
     html_name: str = "h2"
 
 
-class h3(Element[*SimpleChildren, GlobalAttributes]):
+class h3(Element[*TextChildren, GlobalAttributes]):
     html_name: str = "h3"
 
 
-class h4(Element[*SimpleChildren, GlobalAttributes]):
+class h4(Element[*TextChildren, GlobalAttributes]):
     html_name: str = "h4"
 
 
-class h5(Element[*SimpleChildren, GlobalAttributes]):
+class h5(Element[*TextChildren, GlobalAttributes]):
     html_name: str = "h5"
 
 
-class h6(Element[*SimpleChildren, GlobalAttributes]):
+class h6(Element[*TextChildren, GlobalAttributes]):
     html_name: str = "h6"
 
 
-class title(Element[*SimpleChildren, NoAttributes]):
+class title(Element[*TextChildren, NoAttributes]):
     html_name: str = "title"
 
 
-class link(Element[*SimpleChildren, HeadLinkAttributes]):
+class link(Element[*TextChildren, HeadLinkAttributes]):
     html_name: str = "link"
 
 
-class style(Element[*SimpleChildren, StyleAttributes]):
+class style(Element[*TextChildren, StyleAttributes]):
     html_name: str = "style"
 
 
-class script(Element[*SimpleChildren, ScriptAttributes]):
+class script(Element[*TextChildren, ScriptAttributes]):
     html_name: str = "script"
 
 
-class meta(Element[*SimpleChildren, MetaAttributes]):
+class meta(Element[*TextChildren, MetaAttributes]):
     html_name: str = "meta"
 
 
@@ -257,5 +257,5 @@ class html(Element[head, body, HtmlTagAttributes]):
     html_name: str = "html"
 
 
-class iframe(Element[*NoChildren, IframeAttributes]):
+class iframe(Element[IframeAttributes]):
     html_name: str = "iframe"
