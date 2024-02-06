@@ -1,18 +1,7 @@
-from typing import Literal, TypedDict
+from typing import Literal
 
 from .base import Attributes
-
-HTMLStyles = TypedDict(
-    "HTMLStyles",
-    {
-        "color": str,
-        "direction": Literal["row", "column"],
-        "height": str,
-        "justify-content": Literal["start", "end", "center", "equally-spaced"],
-        "width": str,
-    },
-    total=False,
-)
+from .css import CSSProperties
 
 
 class NoAttributes(Attributes):
@@ -37,7 +26,7 @@ class HtmlAttributes(Attributes, total=False):
     lang: str
     popover: bool
     spellcheck: Literal["true", "false"]
-    style: HTMLStyles
+    style: CSSProperties
     tabindex: int
     title: str
     translate: Literal["yes", "no"]

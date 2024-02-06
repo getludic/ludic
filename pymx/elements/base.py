@@ -101,7 +101,7 @@ class Element(Generic[*TElements, TAttributes]):
         return " ".join(formatter(key, value) for key, value in self.attrs.items())
 
     def _format_children(self, formatter: Callable[[TElement], str] = str) -> str:
-        return "".join(formatter(child) for child in self)
+        return "".join(formatter(child) for child in self if child is not None)
 
     @property
     def children(self) -> tuple[*TElements]:

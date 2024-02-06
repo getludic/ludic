@@ -13,7 +13,7 @@ from pymx.elements import (
     thead,
     tr,
 )
-from pymx.elements.html import HTMLStyles
+from pymx.elements.css import CSSProperties
 
 
 def test_paragraph():
@@ -39,11 +39,12 @@ def test_table():
         ),
         tbody(
             tr(
-                td(style=HTMLStyles(color="red", height="100px"))("Cell 1"),
+                td(style=CSSProperties(color="red", height="100px"))("Cell 1"),
                 td("Cell 2"),
                 td("Cell 3"),
             ),
         ),
+        None,
     )
 
     assert dom.to_html() == (
