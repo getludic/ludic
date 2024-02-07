@@ -18,7 +18,7 @@ def test_text_only():
 def test_single_self_closing_element():
     string = "<element />"
     parsed = parse_elements(string)
-    assert parsed == [{"tag": "element", "attributes": {}, "children": []}]
+    assert parsed == [{"tag": "element", "attrs": {}, "children": []}]
 
 
 def test_single_element_with_attributes():
@@ -28,7 +28,7 @@ def test_single_element_with_attributes():
         "before ",
         {
             "tag": "element",
-            "attributes": {"attribute": "value"},
+            "attrs": {"attribute": "value"},
             "children": ["content"],
         },
         " after",
@@ -38,7 +38,7 @@ def test_single_element_with_attributes():
 def test_single_element_with_nested_text():
     string = "<element>content</element>"
     parsed = parse_elements(string)
-    assert parsed == [{"tag": "element", "attributes": {}, "children": ["content"]}]
+    assert parsed == [{"tag": "element", "attrs": {}, "children": ["content"]}]
 
 
 def test_single_element_with_nested_element():
@@ -51,9 +51,9 @@ def test_multiple_elements():
     string = "<first />Some text<second attribute='value' />More text"
     parsed = parse_elements(string)
     assert parsed == [
-        {"tag": "first", "attributes": {}, "children": []},
+        {"tag": "first", "attrs": {}, "children": []},
         "Some text",
-        {"tag": "second", "attributes": {"attribute": "value"}, "children": []},
+        {"tag": "second", "attrs": {"attribute": "value"}, "children": []},
         "More text",
     ]
 
@@ -64,11 +64,11 @@ def test_multiple_pair_elements():
     )
     parsed = parse_elements(string)
     assert parsed == [
-        {"tag": "first", "attributes": {}, "children": []},
+        {"tag": "first", "attrs": {}, "children": []},
         "Some text",
         {
             "tag": "second",
-            "attributes": {"attribute": "value"},
+            "attrs": {"attribute": "value"},
             "children": ["Another text"],
         },
         "More text",

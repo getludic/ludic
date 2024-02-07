@@ -43,7 +43,7 @@ class Safe(str):
                 )
             else:
                 element_type = _ELEMENT_REGISTRY[child["tag"]]
-                element = element_type(*child["children"], **child["attributes"])
+                element = element_type(*child["children"], **child["attrs"])
                 new_children.append(element)
         return tuple(new_children)
 
@@ -85,6 +85,12 @@ class Element[*Te, Ta: Attributes]:
     _attrs: Ta
 
     def __init_subclass__(cls) -> None:
+        if cls.__name__ in _ELEMENT_REGISTRY:
+            raise ImportWarning(
+                f"Element or component with the name {cls.__name__!r} is already used. "
+                "This means that parsing PyMX elements might not work correctly when "
+                "rendered."
+            )
         _ELEMENT_REGISTRY[cls.__name__] = cls
 
     def __init__(self, *children: *Te, **attributes: Any) -> None:

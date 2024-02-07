@@ -4,23 +4,18 @@
 
 import html
 import random
-import re
 import string
 from typing import Any, TypedDict
+from xml.etree.ElementTree import XMLParser
 
 from typeguard import TypeCheckError, check_type
 from typing_inspect import get_args, get_generic_bases, get_origin, is_union_type
-
-ELEMENTS_REGEX = re.compile(
-    r"([^<]*)<(\w+)(\s+[^>]*)?/>([^<]*)|([^<]*)<(\w+)(\s+[^>]*)?>(.*?)</\6>([^<]*)"
-)
-ATTRIBUTES_REGEX = re.compile(r'(\w+)\s*=\s*(?:"([^"]*)"|\'([^\']*)\')')
 
 
 class ParsedElement(TypedDict):
     tag: str
     children: list[str]
-    attributes: dict[str, str]
+    attrs: dict[str, str]
 
 
 def random_string(n: int) -> str:
@@ -35,6 +30,40 @@ def random_string(n: int) -> str:
     )
 
 
+class _PyMXHandler:
+    """Parse HTML elements from a string and collects them as ParsedElement's."""
+
+    elements: list[ParsedElement | str]
+    current_element: ParsedElement
+
+    def __init__(self) -> None:
+        self.elements = []
+        self.current_element = ParsedElement(tag="", children=[], attrs={})
+
+    def start(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "ROOT":
+            return
+        if self.current_element["tag"]:
+            raise TypeError("You cannot use nested elements when using f-strings.")
+        self.current_element["tag"] = tag
+        self.current_element["attrs"] = dict(attrs)
+
+    def end(self, tag: str) -> None:
+        if tag == "ROOT":
+            return
+        self.elements.append(ParsedElement(**self.current_element))
+        self.current_element = ParsedElement(tag="", children=[], attrs={})
+
+    def data(self, data: str) -> None:
+        if self.current_element["tag"]:
+            self.current_element["children"].append(data)
+        else:
+            self.elements.append(data)
+
+    def close(self) -> list[ParsedElement | str]:
+        return self.elements
+
+
 def parse_elements(string: str) -> list[ParsedElement | str]:
     """Parse HTML elements from a string.
 
@@ -44,42 +73,9 @@ def parse_elements(string: str) -> list[ParsedElement | str]:
     Returns:
         list[ParsedElement | str]: A list of parsed elements and text.
     """
-    matches = ELEMENTS_REGEX.findall(string)
-    if not matches:
-        return [string] if string else []
-
-    elements: list[ParsedElement | str] = []
-    for match in matches:
-        if match[1]:  # self-closing tag
-            tag = match[1]
-            raw_attributes = match[2]
-            before_text = match[0]
-            children = []
-            after_text = match[3]
-        else:  # tag with content
-            tag = match[5]
-            raw_attributes = match[6]
-            before_text = match[4]
-            if ELEMENTS_REGEX.match(match[7]):
-                raise TypeError("Nested elements are not allowed.")
-            children = [match[7]]
-            after_text = match[8]
-
-        attributes = {}
-        if raw_attributes:
-            attribute_matches = ATTRIBUTES_REGEX.findall(raw_attributes)
-            attributes = {
-                attr[0]: attr[1] if attr[1] else attr[2] for attr in attribute_matches
-            }
-
-        if before_text:
-            elements.append(before_text)
-        element = ParsedElement(tag=tag, attributes=attributes, children=children)
-        elements.append(element)
-        if after_text:
-            elements.append(after_text)
-
-    return elements
+    parser = XMLParser(target=_PyMXHandler())  # noqa
+    parser.feed(f"<ROOT>{string}</ROOT>")
+    return parser.close()
 
 
 def format_html_attribute(key: str, value: Any) -> str:
