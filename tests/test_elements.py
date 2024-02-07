@@ -13,11 +13,14 @@ from pymx.elements import (
     thead,
     tr,
 )
+from pymx.elements.base import Safe
 from pymx.elements.css import CSSProperties
 
 
 def test_paragraph():
-    paragraph = p("Hello, World! ", b("Something bold"), " and ", i("Something italic"))
+    paragraph = p(
+        Safe(f"Hello, World! {b("Something bold")} and {i("Something italic")}")
+    )
     assert paragraph.to_html() == (
         "<p>Hello, World! <b>Something bold</b> and <i>Something italic</i></p>"
     )
@@ -80,9 +83,10 @@ def test_button_get():
         hx_swap="outerHTML",
     )
 
-    assert dom.children[3].attrs["hx_get"] == "/contact/1/edit"  # type: ignore
-    assert dom.children[3].children[0] == "Click To Edit"  # type: ignore
-    assert dom.attrs["hx_target"] == "this"  # type: ignore
+    assert isinstance(dom.children[3], button)
+    assert dom.children[3].attrs.get("hx_get") == "/contact/1/edit"
+    assert dom.children[3].children[0] == "Click To Edit"
+    assert dom.attrs.get("hx_target") == "this"
     assert dom.to_html() == (
         '<div hx-target="this" hx-swap="outerHTML">'
             "<div><label>First Name</label>: Joe</div>"

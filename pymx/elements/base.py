@@ -1,21 +1,72 @@
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from typing import (
     Any,
+    TypeAlias,
     TypedDict,
     cast,
 )
 
 from .utils import (
+    default_html_formatter,
     format_attribute,
     format_html_attribute,
     get_element_attributes,
+    parse_elements,
     validate_attributes,
     validate_elements,
 )
 
+_ELEMENT_REGISTRY: dict[str, type[Any]] = {}
+
+
+class Safe(str):
+    """Marker for a safe string.
+
+    The marker makes it possible to use e.g. f-string notation to render
+    elements like here:
+
+        >>> Paragraph(Safe(f"Hello, how {b('are you')}?")).to_html()
+        >>> <p>Hello, how <b>are you</b>?</p>
+    """
+
+    @staticmethod
+    def parse(string: str) -> "AnyChildren":
+        parsed_children = parse_elements(string)
+        new_children: list[AnyChild] = []
+        for child in parsed_children:
+            if isinstance(child, str):
+                new_children.append(child)
+            elif child["tag"] not in _ELEMENT_REGISTRY:
+                raise TypeError(
+                    f"Element or component {child["tag"]!r} not found, "
+                    "maybe you forgot to import it?"
+                )
+            else:
+                element_type = _ELEMENT_REGISTRY[child["tag"]]
+                element = element_type(*child["children"], **child["attributes"])
+                new_children.append(element)
+        return tuple(new_children)
+
 
 class Attributes(TypedDict, total=False):
-    """Attributes of an element."""
+    """Attributes of an element or component.
+
+    Example usage::
+
+        class PersonAttributes(Attributes):
+            name: str
+            age: NotRequired[int]
+
+        class Person(Component[PersonAttributes]):
+            @override
+            def render(self) -> dl:
+                return dl(
+                    dt("Name"),
+                    dd(self.attrs["name"]),
+                    dt("Age"),
+                    dd(self.attrs.get("age", "N/A")),
+                )
+    """
 
     id: str
 
@@ -33,33 +84,42 @@ class Element[*Te, Ta: Attributes]:
     _children: tuple[*Te]
     _attrs: Ta
 
+    def __init_subclass__(cls) -> None:
+        _ELEMENT_REGISTRY[cls.__name__] = cls
+
     def __init__(self, *children: *Te, **attributes: Any) -> None:
         validate_attributes(self, attributes)
-        validate_elements(self, children)
-
         self._attrs = cast(Ta, attributes)
-        self._children = children
+
+        if len(children) == 1 and isinstance(children[0], Safe):
+            new_children = Safe.parse(children[0])
+            validate_elements(self, new_children)
+            self._children = cast(tuple[*Te], new_children)
+
+        else:
+            validate_elements(self, children)
+            self._children = children
 
     def __str__(self) -> str:
         return self.to_html()
 
+    def __format__(self, _: str) -> str:
+        for child in self.children:
+            if not isinstance(child, PrimitiveChild):
+                raise TypeError(
+                    "Only elements with textual children can be used "
+                    f"within an f-string, {self!r} contains {child!r}."
+                )
+        return self.to_string(pretty=False)
+
     def __len__(self) -> int:
         return len(self.children)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Any]:
         return iter(self.children)
 
     def __repr__(self) -> str:
-        name = self.__class__.__name__
-        attrs = f" {self._format_attributes()}" if self.has_attributes() else ""
-
-        if self.children:
-            if len(self) == 1:
-                return f"<{name}{attrs}>.. 1 child ..</{name}>"
-            else:
-                return f"<{name}{attrs}>.. {len(self)} children ..</{name}>"
-        else:
-            return f"<{name}{attrs} />"
+        return f"<{type(self).__name__} />"
 
     def _format_attributes(
         self, formatter: Callable[[str, Any], str] = format_attribute
@@ -68,7 +128,7 @@ class Element[*Te, Ta: Attributes]:
 
     def _format_children(
         self,
-        formatter: Callable[[Any], str] = str,
+        formatter: Callable[[Any], str] = default_html_formatter,
     ) -> str:
         return "".join(formatter(child) for child in self.children)
 
@@ -82,39 +142,48 @@ class Element[*Te, Ta: Attributes]:
 
     def is_simple(self) -> bool:
         """Check if the element is simple (i.e. contains only primitive types)."""
-        return len(self) == 1 and isinstance(self.children[0], str | bool | int | float)
+        return len(self) == 1 and isinstance(self.children[0], PrimitiveChild)
 
     def has_attributes(self) -> bool:
         """Check if the element has any attributes."""
         return bool(self.attrs)
 
-    def to_string(self, _level: int = 0) -> str:
-        """Convert the element tree to a string representation."""
-        dom = self.render()
-        indent = "  " * _level
+    def to_string(self, pretty: bool = True, _level: int = 0) -> str:
+        """Convert the element tree to a string representation.
+
+        Args:
+            pretty (bool, optional): Whether to indent the string. Defaults to True.
+
+        Returns:
+            str: The string representation of the element tree.
+        """
+        indent = "  " * _level if pretty else ""
         name = self.__class__.__name__
         element = f"{indent}<{name}"
 
-        if _level > 0:
+        if _level > 0 and pretty:
             element = f"\n{element}"
 
-        if dom.has_attributes():
-            element += f" {dom._format_attributes()}"
+        if self.has_attributes():
+            element += f" {self._format_attributes()}"
 
-        if dom.children:
-            children_str = dom._format_children(
-                lambda child: child.to_string(_level + 1)
-                if hasattr(child, "to_string")
-                else str(child),
+        if self.children:
+            children_str = self._format_children(
+                lambda child: str(child)
+                if isinstance(child, PrimitiveChild)
+                else child.to_string(pretty=pretty, _level=_level + 1),
             )
 
-            if dom.is_simple():
-                if dom.has_attributes():
-                    element += f">\n{indent}  {children_str}\n{indent}</{name}>"
+            if pretty:
+                if self.is_simple():
+                    if self.has_attributes():
+                        element += f">\n{indent}  {children_str}\n{indent}</{name}>"
+                    else:
+                        element += f">{children_str}</{name}>"
                 else:
-                    element += f">{children_str}</{name}>"
+                    element += f">{indent}  {children_str}\n{indent}</{name}>"
             else:
-                element += f">{indent}  {children_str}\n{indent}</{name}>"
+                element += f">{children_str}</{name}>"
         else:
             element += " />"
 
@@ -130,11 +199,7 @@ class Element[*Te, Ta: Attributes]:
             element_tag += f" {attributes_str}"
 
         if dom.children:
-            children_str = dom._format_children(
-                lambda child: (
-                    child.to_html() if hasattr(child, "to_html") else str(child)
-                ),
-            )
+            children_str = dom._format_children()
             element_tag += f">{children_str}</{dom.html_name}>"
         else:
             element_tag += " />"
@@ -160,9 +225,9 @@ class Element[*Te, Ta: Attributes]:
         return cast(AnyElement, self)
 
 
-TextChild = str | bool | int | float
-AnyChild = TextChild | Element[*tuple["AnyChild", ...], Attributes]
+PrimitiveChild: TypeAlias = Safe | str | bool | int | float
+AnyChild: TypeAlias = PrimitiveChild | Element[*tuple["AnyChild", ...], Attributes]
 
-TextChildren = tuple[TextChild, ...]
-AnyChildren = tuple[AnyChild, ...]
-AnyElement = Element[*AnyChildren, Attributes]
+PrimitiveChildren: TypeAlias = tuple[PrimitiveChild, ...]
+AnyChildren: TypeAlias = tuple[AnyChild, ...]
+AnyElement: TypeAlias = Element[*AnyChildren, Attributes]

@@ -42,3 +42,6 @@ ignore = [
     "D213",
 ]
 fixable = ["ALL"]
+
+[tool.pyright]
+reportMissingImports = false

@@ -2,7 +2,7 @@ from typing import override
 
 from ..elements import a, li, p, ul
 from ..elements.attrs import HtmxAttributes, HyperlinkAttributes
-from ..elements.base import Attributes, TextChild, TextChildren
+from ..elements.base import AnyChildren, Attributes, PrimitiveChild
 from .base import Component
 
 
@@ -10,13 +10,13 @@ class LinkAttributes(Attributes):
     to: str
 
 
-class Link(Component[TextChild, LinkAttributes]):
+class Link(Component[PrimitiveChild, LinkAttributes]):
     @override
     def render(self) -> a:
         return a(self.children[0], href=self.attrs["to"])
 
 
-class Paragraph(Component[*TextChildren, HyperlinkAttributes]):
+class Paragraph(Component[*AnyChildren, HyperlinkAttributes]):
     @override
     def render(self) -> p:
         return p(*self.children, **self.attrs)
@@ -26,7 +26,7 @@ class NavItemAttributes(HtmxAttributes):
     to: str
 
 
-class NavItem(Component[TextChild, NavItemAttributes]):
+class NavItem(Component[PrimitiveChild, NavItemAttributes]):
     @override
     def render(self) -> li:
         label = str(self.children[0])
