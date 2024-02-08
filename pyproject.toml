@@ -22,7 +22,9 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 line-length = 88
-target-version = "py310"
+target-version = "py312"
+
+[tool.ruff.lint]
 select = [
     "E",     # flake8 rules
     "F",     # flake8 rules
@@ -40,6 +42,7 @@ ignore = [
     "D203",
     "D211",
     "D213",
+    "UP040",
 ]
 fixable = ["ALL"]
 
