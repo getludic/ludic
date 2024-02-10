@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, TypedDict
 
 from .base import Attributes
 from .css import CSSProperties
@@ -8,7 +8,24 @@ class NoAttributes(Attributes):
     """Placeholder for element with no attributes."""
 
 
-class HtmlAttributes(Attributes, total=False):
+_HtmlAttributesAlt = TypedDict(
+    "_HtmlAttributesAlt",
+    {
+        "class": str,
+    },
+    total=False,
+)
+
+_LabelAttributesAlt = TypedDict(
+    "_LabelAttributesAlt",
+    {
+        "for": str,
+    },
+    total=False,
+)
+
+
+class HtmlAttributes(Attributes, _HtmlAttributesAlt, total=False):
     """Common attributes for HTML elements."""
 
     accesskey: str
@@ -32,7 +49,32 @@ class HtmlAttributes(Attributes, total=False):
     translate: Literal["yes", "no"]
 
 
-class HtmxAttributes(Attributes, total=False):
+_HtmxAttributesAlt = TypedDict(
+    "_HtmxAttributesAlt",
+    {
+        "hx-get": str,
+        "hx-post": str,
+        "hx-put": str,
+        "hx-delete": str,
+        "hx-patch": str,
+        "hx-trigger": str,
+        "hx-target": str,
+        "hx-swap": Literal[
+            "innerHTML",
+            "outerHTML",
+            "beforebegin",
+            "afterbegin",
+            "beforeend",
+            "afterend",
+            "delete",
+            "none",
+        ],
+    },
+    total=False,
+)
+
+
+class HtmxAttributes(Attributes, _HtmxAttributesAlt, total=False):
     """HTMX attributes for HTML elements.
 
     See: https://htmx.org/
@@ -91,9 +133,10 @@ class HtmlTagAttributes(Attributes, total=False):
     xmlns: str
 
 
-class MetaAttributes(HtmlAttributes):
+class MetaAttributes(HtmlAttributes, total=False):
     name: str
     content: str
+    charset: str
 
 
 class StyleAttributes(HtmlAndEventAttributes, total=False):
@@ -122,12 +165,14 @@ class ScriptAttributes(HtmlAttributes, total=False):
 
 
 class HeadLinkAttributes(HtmlAttributes, total=False):
-    rel: Literal["canonical", "alternate"]
+    rel: Literal["canonical", "alternate", "stylesheet"]
+    crossorigin: Literal["anonymous", "use-credentials"]
     hreflang: str
     href: str
+    integrity: str
 
 
-class InputAttributes(HtmxAttributes, total=False):
+class InputAttributes(GlobalAttributes, total=False):
     accept: str
     alt: str
     autcomplete: Literal["on", "off"]
@@ -187,7 +232,7 @@ class InputAttributes(HtmxAttributes, total=False):
     width: int
 
 
-class OutputAttributes(GlobalAttributes, total=False):
+class OutputAttributes(GlobalAttributes, _LabelAttributesAlt, total=False):
     for_: str
     form: str
     name: str
@@ -314,7 +359,7 @@ class ButtonAttributes(GlobalAttributes, total=False):
     value: str
 
 
-class LabelAttributes(GlobalAttributes, total=False):
+class LabelAttributes(GlobalAttributes, _LabelAttributesAlt, total=False):
     for_: str
     name: str
 

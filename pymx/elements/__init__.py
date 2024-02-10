@@ -35,6 +35,10 @@ class span(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "span"
 
 
+class main(Element[*AnyChildren, GlobalAttributes]):
+    html_name: str = "main"
+
+
 class p(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "p"
 
@@ -155,19 +159,19 @@ class svg(Element[*AnyChildren, SvgAttributes]):
     html_name: str = "svg"
 
 
-class b(Element[*PrimitiveChildren, GlobalAttributes]):
+class b(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "b"
 
 
-class i(Element[*PrimitiveChildren, GlobalAttributes]):
+class i(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "i"
 
 
-class s(Element[*PrimitiveChildren, GlobalAttributes]):
+class s(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "s"
 
 
-class u(Element[*PrimitiveChildren, GlobalAttributes]):
+class u(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "u"
 
 
@@ -175,31 +179,31 @@ class header(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "header"
 
 
-class small(Element[*PrimitiveChildren, GlobalAttributes]):
+class small(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "small"
 
 
-class h1(Element[*PrimitiveChildren, GlobalAttributes]):
+class h1(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "h1"
 
 
-class h2(Element[*PrimitiveChildren, GlobalAttributes]):
+class h2(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "h2"
 
 
-class h3(Element[*PrimitiveChildren, GlobalAttributes]):
+class h3(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "h3"
 
 
-class h4(Element[*PrimitiveChildren, GlobalAttributes]):
+class h4(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "h4"
 
 
-class h5(Element[*PrimitiveChildren, GlobalAttributes]):
+class h5(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "h5"
 
 
-class h6(Element[*PrimitiveChildren, GlobalAttributes]):
+class h6(Element[*AnyChildren, GlobalAttributes]):
     html_name: str = "h6"
 
 
@@ -217,6 +221,12 @@ class style(Element[*PrimitiveChildren, StyleAttributes]):
 
 class script(Element[*PrimitiveChildren, ScriptAttributes]):
     html_name: str = "script"
+    always_pair: bool = True
+
+
+class noscript(Element[*AnyChildren, GlobalAttributes]):
+    html_name: str = "noscript"
+    always_pair: bool = True
 
 
 class meta(Element[*PrimitiveChildren, MetaAttributes]):

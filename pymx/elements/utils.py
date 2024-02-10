@@ -2,7 +2,6 @@
 # pyright: reportUnknownVariableType=false
 # pyright: reportGeneralTypeIssues=false
 
-import html
 import random
 import string
 from typing import Any, TypedDict
@@ -58,7 +57,10 @@ class _PyMXHandler:
         if self.current_element["tag"]:
             self.current_element["children"].append(data)
         else:
-            self.elements.append(data)
+            if self.elements and isinstance(self.elements[-1], str):
+                self.elements[-1] += data
+            else:
+                self.elements.append(data)
 
     def close(self) -> list[ParsedElement | str]:
         return self.elements
@@ -173,15 +175,3 @@ def validate_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None:
                 check_type(elements, types)
             except TypeCheckError as err:
                 raise TypeError(f"Invalid elements for {cls_or_obj!r}.") from err
-
-
-def default_html_formatter(child: Any) -> str:
-    """Default HTML formatter.
-
-    Args:
-        child (Any): The HTML element or text to format.
-    """
-    if isinstance(child, str):
-        return html.escape(child)
-    else:
-        return str(child)

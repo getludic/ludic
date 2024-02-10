@@ -1,3 +1,4 @@
+import html
 from collections.abc import Callable, Iterator
 from typing import (
     Any,
@@ -7,7 +8,6 @@ from typing import (
 )
 
 from .utils import (
-    default_html_formatter,
     format_attribute,
     format_html_attribute,
     get_element_attributes,
@@ -17,6 +17,18 @@ from .utils import (
 )
 
 _ELEMENT_REGISTRY: dict[str, type[Any]] = {}
+
+
+def default_html_formatter(child: "AnyChild") -> str:
+    """Default HTML formatter.
+
+    Args:
+        child (AnyChild): The HTML element or text to format.
+    """
+    if isinstance(child, str) and not isinstance(child, Safe):
+        return html.escape(child)
+    else:
+        return str(child)
 
 
 class Safe(str):
@@ -35,7 +47,7 @@ class Safe(str):
         new_children: list[AnyChild] = []
         for child in parsed_children:
             if isinstance(child, str):
-                new_children.append(child)
+                new_children.append(Safe(child))
             elif child["tag"] not in _ELEMENT_REGISTRY:
                 raise TypeError(
                     f"Element or component {child["tag"]!r} not found, "
@@ -80,6 +92,7 @@ class Element[*Te, Ta: Attributes]:
     """
 
     html_name: str
+    always_pair: bool = False
 
     _children: tuple[*Te]
     _attrs: Ta
@@ -197,14 +210,17 @@ class Element[*Te, Ta: Attributes]:
 
     def to_html(self) -> str:
         """Convert the element tree to an HTML string."""
-        dom = self.render()
+        dom = self
+        while not hasattr(dom, "html_name"):
+            dom = dom.render()
+
         element_tag = f"<{dom.html_name}"
 
         if dom.has_attributes():
             attributes_str = dom._format_attributes(format_html_attribute)
             element_tag += f" {attributes_str}"
 
-        if dom.children:
+        if dom.children or dom.always_pair:
             children_str = dom._format_children()
             element_tag += f">{children_str}</{dom.html_name}>"
         else:

@@ -4,6 +4,7 @@ from pymx.elements import (
     button,
     div,
     i,
+    input,
     label,
     p,
     table,
@@ -92,6 +93,27 @@ def test_button_get():
             "<div><label>First Name</label>: Joe</div>"
             "<div><label>Last Name</label>: Blow</div>"
             "<div><label>Email</label>: joe@blow.com</div>"
+            '<button class="btn btn-primary" hx-get="/contact/1/edit">'
+                "Click To Edit"
+            "</button>"
+        "</div>"
+    )  # fmt: skip
+
+
+def test_alternative_attributes():
+    dom = div(
+        label("First Name", **{"for": "first_name", "name": "first_name"}),
+        input(**{"class": "form-control", "id": "first_name", "name": "first_name"}),
+        button(
+            "Click To Edit", **{"class": "btn btn-primary", "hx-get": "/contact/1/edit"}
+        ),
+        **{"hx-target": "this", "hx-swap": "outerHTML"},
+    )
+
+    assert dom.to_html() == (
+        '<div hx-target="this" hx-swap="outerHTML">'
+            '<label for="first_name" name="first_name">First Name</label>'
+            '<input class="form-control" id="first_name" name="first_name" />'
             '<button class="btn btn-primary" hx-get="/contact/1/edit">'
                 "Click To Edit"
             "</button>"
