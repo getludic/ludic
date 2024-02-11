@@ -28,6 +28,7 @@ _LabelAttributesAlt = TypedDict(
 class HtmlAttributes(Attributes, _HtmlAttributesAlt, total=False):
     """Common attributes for HTML elements."""
 
+    id: str
     accesskey: str
     class_: str
     contenteditable: Literal["true", "false"]
