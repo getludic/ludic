@@ -4,11 +4,9 @@ from typeguard import check_type
 
 from ludic.attrs import FormAttrs, GlobalAttrs
 from ludic.base import AnyChildren, AnyElement, BaseAttrs, Component
-from ludic.html import div, form, input, label, textarea
+from ludic.html import div, form, input, label, select, textarea
 
-
-def attr_to_camel(name: str) -> str:
-    return " ".join(value.title() for value in name.split("_"))
+from .utils import attr_to_camel
 
 
 class FieldAttrs(BaseAttrs, total=False):
@@ -17,7 +15,7 @@ class FieldAttrs(BaseAttrs, total=False):
     attrs: GlobalAttrs
 
 
-class FormField(Component[*AnyChildren, GlobalAttrs]):
+class FormField(Component[*tuple[label, input | textarea | select], GlobalAttrs]):
     @override
     def render(self) -> div:
         return div(*self.children, **self.attrs)
@@ -29,7 +27,7 @@ class Form(Component[*AnyChildren, FormAttrs]):
         return form(*self.children, **self.attrs)
 
 
-def form_fields(attrs: BaseAttrs) -> list[FormField]:
+def form_fields[Ta: BaseAttrs](attrs_type: type[Ta], attrs: Ta) -> list[FormField]:
     """Create form fields from the given attributes.
 
     Example:
@@ -41,12 +39,16 @@ def form_fields(attrs: BaseAttrs) -> list[FormField]:
                 FieldAttrs(label="Customer Name", type="input"),
             ]
 
-        fields = form_fields(CustomerAttrs)
+        attrs = {"id": 1, "name": "John Doe"}
+        fields = form_fields(CustomerAttrs, attrs)
+
+        form = Form(*fields)
 
     Args:
-        attrs (BaseAttrs): The attributes to create the form fields from.
+        attrs_type (type[Ta]): The type of the attributes.
+        attrs (Ta): The attributes to create the form fields from.
     """
-    hints = get_type_hints(attrs, include_extras=True)
+    hints = get_type_hints(attrs_type, include_extras=True)
     elements: list[FormField] = []
 
     for name, annotation in hints.items():

@@ -155,6 +155,13 @@ class Element[*Te, Ta: BaseAttrs]:
         return cast(tuple[*Te], getattr(self, "_children", []))
 
     @property
+    def text(self) -> str:
+        return "".join(
+            child.text if isinstance(child, Element) else str(child)
+            for child in self.children
+        )
+
+    @property
     def attrs(self) -> Ta:
         return cast(Ta, getattr(self, "_attrs", {}))
 
@@ -298,7 +305,8 @@ class Component[*Te, Ta: BaseAttrs](Element[*Te, Ta], metaclass=ABCMeta):
 
 PrimitiveChild: TypeAlias = Safe | str | bool | int | float
 AnyChild: TypeAlias = PrimitiveChild | Element[*tuple["AnyChild", ...], BaseAttrs]
+AnyElement: TypeAlias = Element[*tuple[AnyChild, ...], BaseAttrs]
 
 PrimitiveChildren: TypeAlias = tuple[PrimitiveChild, ...]
 AnyChildren: TypeAlias = tuple[AnyChild, ...]
-AnyElement: TypeAlias = Element[*AnyChildren, BaseAttrs]
+ComplexChildren: TypeAlias = tuple[AnyElement, ...]

@@ -24,7 +24,7 @@ from .attrs import (
     TextareaAttrs,
     ThAttrs,
 )
-from .base import AnyChildren, Element, PrimitiveChildren
+from .base import AnyChildren, ComplexChildren, Element, PrimitiveChildren
 
 
 class div(Element[*AnyChildren, GlobalAttrs]):
@@ -67,23 +67,23 @@ class th(Element[*AnyChildren, ThAttrs]):
     html_name: str = "th"
 
 
-class tr(Element[*AnyChildren, GlobalAttrs]):
+class tr(Element[*ComplexChildren, GlobalAttrs]):
     html_name: str = "tr"
 
 
-class thead(Element[*AnyChildren, GlobalAttrs]):
+class thead(Element[*ComplexChildren, GlobalAttrs]):
     html_name: str = "thead"
 
 
-class tbody(Element[*AnyChildren, GlobalAttrs]):
+class tbody(Element[*ComplexChildren, GlobalAttrs]):
     html_name: str = "tbody"
 
 
-class tfoot(Element[*AnyChildren, GlobalAttrs]):
+class tfoot(Element[*ComplexChildren, GlobalAttrs]):
     html_name: str = "tfoot"
 
 
-class table(Element[*AnyChildren, GlobalAttrs]):
+class table(Element[*ComplexChildren, GlobalAttrs]):
     html_name: str = "table"
 
 
@@ -91,15 +91,15 @@ class li(Element[*AnyChildren, LiAttrs]):
     html_name: str = "li"
 
 
-class ul(Element[*AnyChildren, GlobalAttrs]):
+class ul(Element[*ComplexChildren, GlobalAttrs]):
     html_name: str = "ul"
 
 
-class ol(Element[*AnyChildren, GlobalAttrs]):
+class ol(Element[*ComplexChildren, GlobalAttrs]):
     html_name: str = "ol"
 
 
-class dt(Element[*PrimitiveChildren, GlobalAttrs]):
+class dt(Element[*AnyChildren, GlobalAttrs]):
     html_name: str = "dt"
 
 
@@ -107,7 +107,7 @@ class dd(Element[*AnyChildren, GlobalAttrs]):
     html_name: str = "dd"
 
 
-class dl(Element[*AnyChildren, GlobalAttrs]):
+class dl(Element[*ComplexChildren, GlobalAttrs]):
     html_name: str = "dl"
 
 
