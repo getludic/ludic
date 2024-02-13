@@ -1,6 +1,6 @@
 from starlette.responses import HTMLResponse
 
-from ..base import AnyElement
+from ludic.base import AnyElement
 
 
 class LudicResponse(HTMLResponse):

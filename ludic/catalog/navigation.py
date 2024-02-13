@@ -37,4 +37,4 @@ class Navigation(Component[*tuple[NavItem, ...], HtmxAttrs]):
 
     @override
     def render(self) -> ul:
-        return ul(*self.children, class_="navigation", **self.attrs_for(cls=ul))
+        return ul(*self.children, class_="navigation", **self.attrs_for(ul))

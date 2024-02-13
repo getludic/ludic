@@ -38,9 +38,9 @@ def create_items[Ta: BaseAttrs](attrs_type: type[Ta], attrs: Ta) -> list[Key | V
             ]
 
         attrs = {"id": 1, "name": "John Doe"}
-        fields = create_items(CustomerAttrs, attrs)
+        data = create_items(CustomerAttrs, attrs)
 
-        items = Items(*fields)
+        items = Items(*data)
 
     Args:
         attrs_type (type[Ta]): The type of the attributes.

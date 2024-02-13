@@ -1,4 +1,5 @@
 from .attrs import (
+    BlockquoteAttrs,
     ButtonAttrs,
     FieldsetAttrs,
     FormAttrs,
@@ -181,6 +182,18 @@ class header(Element[*AnyChildren, GlobalAttrs]):
 
 class small(Element[*AnyChildren, GlobalAttrs]):
     html_name: str = "small"
+
+
+class code(Element[*AnyChildren, GlobalAttrs]):
+    html_name: str = "code"
+
+
+class pre(Element[*AnyChildren, GlobalAttrs]):
+    html_name: str = "pre"
+
+
+class blockquote(Element[*AnyChildren, BlockquoteAttrs]):
+    html_name: str = "blockquote"
 
 
 class h1(Element[*AnyChildren, GlobalAttrs]):

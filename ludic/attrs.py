@@ -1,4 +1,4 @@
-from typing import Literal, TypedDict
+from typing import Literal
 
 from .base import BaseAttrs
 from .css import CSSProperties
@@ -8,24 +8,7 @@ class NoAttrs(BaseAttrs):
     """Placeholder for element with no attributes."""
 
 
-_HtmlAttrsAlt = TypedDict(
-    "_HtmlAttrsAlt",
-    {
-        "class": str,
-    },
-    total=False,
-)
-
-_LabelAttrsAlt = TypedDict(
-    "_LabelAttrsAlt",
-    {
-        "for": str,
-    },
-    total=False,
-)
-
-
-class HtmlAttrs(BaseAttrs, _HtmlAttrsAlt, total=False):
+class HtmlAttrs(BaseAttrs, total=False):
     """Common attributes for HTML elements."""
 
     id: str
@@ -50,32 +33,7 @@ class HtmlAttrs(BaseAttrs, _HtmlAttrsAlt, total=False):
     translate: Literal["yes", "no"]
 
 
-_HtmxAttrsAlt = TypedDict(
-    "_HtmxAttrsAlt",
-    {
-        "hx-get": str,
-        "hx-post": str,
-        "hx-put": str,
-        "hx-delete": str,
-        "hx-patch": str,
-        "hx-trigger": str,
-        "hx-target": str,
-        "hx-swap": Literal[
-            "innerHTML",
-            "outerHTML",
-            "beforebegin",
-            "afterbegin",
-            "beforeend",
-            "afterend",
-            "delete",
-            "none",
-        ],
-    },
-    total=False,
-)
-
-
-class HtmxAttrs(BaseAttrs, _HtmxAttrsAlt, total=False):
+class HtmxAttrs(BaseAttrs, total=False):
     """HTMX attributes for HTML elements.
 
     See: https://htmx.org/
@@ -101,7 +59,7 @@ class HtmxAttrs(BaseAttrs, _HtmxAttrsAlt, total=False):
     ]
 
 
-class EventAttrs(BaseAttrs, total=False):
+class WindowEventAttrs(BaseAttrs, total=False):
     """Event Attributes for HTML elements."""
 
     onafterprint: str
@@ -120,6 +78,75 @@ class EventAttrs(BaseAttrs, total=False):
     onstorage: str
     onunhandledrejection: str
     onunload: str
+
+
+class FormEventAttrs(BaseAttrs, total=False):
+    """Event Attributes for HTML Form elements."""
+
+    onblur: str
+    onchange: str
+    oncontextmenu: str
+    onfocus: str
+    oninput: str
+    oninvalid: str
+    onreset: str
+    onsearch: str
+    onselect: str
+    onsubmit: str
+
+
+class KeyboardEventAttrs(BaseAttrs, total=False):
+    """Event Attributes for Keyboard events."""
+
+    onkeydown: str
+    onkeypress: str
+    onkeyup: str
+
+
+class MouseEventAttrs(BaseAttrs, total=False):
+    """Event Attributes for Mouse events."""
+
+    onclick: str
+    ondblclick: str
+    onmousedown: str
+    onmousemove: str
+    onmouseout: str
+    onmouseover: str
+    onmouseup: str
+    onmousewheel: str  # Deprecated, use onwheel instead
+    onwheel: str
+
+
+class DragEventAttrs(BaseAttrs, total=False):
+    """Event Attributes for Drag events."""
+
+    ondrag: str
+    ondragend: str
+    ondragenter: str
+    ondragleave: str
+    ondragover: str
+    ondragstart: str
+    ondrop: str
+
+
+class ClipboardEventAttrs(BaseAttrs, total=False):
+    """Event Attributes for Clipboard events."""
+
+    oncopy: str
+    oncut: str
+    onpaste: str
+
+
+class EventAttrs(
+    WindowEventAttrs,
+    FormEventAttrs,
+    KeyboardEventAttrs,
+    MouseEventAttrs,
+    DragEventAttrs,
+    ClipboardEventAttrs,
+    total=False,
+):
+    """Event Attributes for HTML elements."""
 
 
 class HtmlAndEventAttrs(HtmlAttrs, EventAttrs, total=False):
@@ -233,7 +260,7 @@ class InputAttrs(GlobalAttrs, total=False):
     width: int
 
 
-class OutputAttrs(GlobalAttrs, _LabelAttrsAlt, total=False):
+class OutputAttrs(GlobalAttrs, total=False):
     for_: str
     form: str
     name: str
@@ -280,6 +307,10 @@ class FieldsetAttrs(GlobalAttrs, total=False):
     disabled: bool
     form: str
     name: str
+
+
+class BlockquoteAttrs(GlobalAttrs, total=False):
+    cite: str
 
 
 class FormAttrs(GlobalAttrs, total=False):
@@ -360,7 +391,7 @@ class ButtonAttrs(GlobalAttrs, total=False):
     value: str
 
 
-class LabelAttrs(GlobalAttrs, _LabelAttrsAlt, total=False):
+class LabelAttrs(GlobalAttrs, total=False):
     for_: str
     name: str
 
