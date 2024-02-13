@@ -5,29 +5,35 @@ from ludic.html import button
 
 class Button(Component[PrimitiveChild, ButtonAttrs]):
     def render(self) -> AnyElement:
-        return button(self.children[0], class_=self.attrs.get("class_", "btn"))
+        self.attrs.setdefault("class_", "btn")
+        return button(self.children[0], **self.attrs_for(button))
 
 
 class ButtonPrimary(Button):
     def render(self) -> Button:
-        return Button(self.children[0], class_="btn btn-primary")
+        self.attrs.setdefault("class_", "btn btn-primary")
+        return Button(self.children[0], **self.attrs_for(Button))
 
 
 class ButtonSecondary(Button):
     def render(self) -> Button:
-        return Button(self.children[0], class_="btn btn-primary")
+        self.attrs.setdefault("class_", "btn btn-secondary")
+        return Button(self.children[0], **self.attrs_for(Button))
 
 
 class ButtonDanger(Button):
     def render(self) -> Button:
-        return Button(self.children[0], class_="btn btn-danger")
+        self.attrs.setdefault("class_", "btn btn-danger")
+        return Button(self.children[0], **self.attrs_for(Button))
 
 
 class ButtonWarning(Button):
     def render(self) -> Button:
-        return Button(self.children[0], class_="btn btn-warning")
+        self.attrs.setdefault("class_", "btn btn-warning")
+        return Button(self.children[0], **self.attrs_for(Button))
 
 
 class ButtonInfo(Button):
     def render(self) -> Button:
-        return Button(self.children[0], class_="btn btn-info")
+        self.attrs.setdefault("class_", "btn btn-info")
+        return Button(self.children[0], **self.attrs_for(Button))

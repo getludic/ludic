@@ -1,17 +1,10 @@
 from typing import Annotated, cast, get_type_hints, override
 
-from typeguard import check_type
-
 from ludic.attrs import BaseAttrs, GlobalAttrs
 from ludic.base import ComplexChildren, Component, PrimitiveChild, PrimitiveChildren
 from ludic.html import table, tbody, td, th, thead, tr
 
 from .utils import attr_to_camel
-
-
-class ColumnAttrs(BaseAttrs, total=False):
-    label: str
-    attrs: GlobalAttrs
 
 
 class TableRow(Component[*ComplexChildren, GlobalAttrs]):
@@ -90,30 +83,26 @@ def create_table[Ta: BaseAttrs](
     hints = get_type_hints(attrs_type, include_extras=True)
 
     header_names: list[str] = []
-    annotations: dict[str, tuple[str, GlobalAttrs]] = {}
+    annotations: dict[str, str] = {}
     rows: list[TableRow] = []
 
     for name, annotation in hints.items():
         label_text: str = attr_to_camel(name)
-        column_attrs: GlobalAttrs = {}
 
         if isinstance(annotation, Annotated):
-            check_type(annotation.__metadata__, ColumnAttrs)
-            metadata = annotation.__metadata__
-            label_text = metadata.get("label", label_text)
-            if metadata.get("attrs"):
-                column_attrs.update(metadata.attrs)
+            for metadata in annotation.__metadata__:
+                label_text = metadata.get("label", label_text)
 
-        annotations[name] = (label_text, column_attrs)
+        annotations[label_text] = name
         header_names.append(label_text)
 
     header = TableHead(*map(th, header_names))
 
     for attrs in attrs_list:
         values: list[td] = []
-        for key, value in attrs.items():
-            label_text, column_attrs = annotations[key]
-            values.append(td(str(value), **column_attrs))
+        for name in header_names:
+            value = attrs.get(annotations[name], "")
+            values.append(td(str(value)))
         rows.append(TableRow(*values))
 
     return (header, rows)

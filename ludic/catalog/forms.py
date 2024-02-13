@@ -1,18 +1,10 @@
-from typing import Annotated, Any, Literal, get_type_hints, override
-
-from typeguard import check_type
+from typing import Annotated, get_origin, get_type_hints, override
 
 from ludic.attrs import FormAttrs, GlobalAttrs
 from ludic.base import AnyChildren, AnyElement, BaseAttrs, Component
 from ludic.html import div, form, input, label, select, textarea
 
 from .utils import attr_to_camel
-
-
-class FieldAttrs(BaseAttrs, total=False):
-    label: str
-    type: Literal["input", "textarea"]
-    attrs: GlobalAttrs
 
 
 class FormField(Component[*tuple[label, input | textarea | select], GlobalAttrs]):
@@ -27,7 +19,7 @@ class Form(Component[*AnyChildren, FormAttrs]):
         return form(*self.children, **self.attrs)
 
 
-def form_fields[Ta: BaseAttrs](attrs_type: type[Ta], attrs: Ta) -> list[FormField]:
+def create_fields[Ta: BaseAttrs](attrs_type: type[Ta], attrs: Ta) -> list[FormField]:
     """Create form fields from the given attributes.
 
     Example:
@@ -40,7 +32,7 @@ def form_fields[Ta: BaseAttrs](attrs_type: type[Ta], attrs: Ta) -> list[FormFiel
             ]
 
         attrs = {"id": 1, "name": "John Doe"}
-        fields = form_fields(CustomerAttrs, attrs)
+        fields = create_fields(CustomerAttrs, attrs)
 
         form = Form(*fields)
 
@@ -58,26 +50,17 @@ def form_fields[Ta: BaseAttrs](attrs_type: type[Ta], attrs: Ta) -> list[FormFiel
         label_text: str = attr_to_camel(name)
         value: str = str(attrs[name])  # type: ignore
         element: AnyElement = input(value=value, name=name, id=name)
-        field_attrs: dict[str, Any] = {}
 
-        if isinstance(annotation, Annotated):
-            check_type(annotation.__metadata__, FieldAttrs)
-            metadata = annotation.__metadata__
-            label_text = metadata.get("label", label_text)
-            if metadata.get("attrs"):
-                field_attrs.update(metadata.attrs)
-
-            match metadata.get("type"):
-                case "textarea":
+        if get_origin(annotation) is Annotated:
+            for metadata in annotation.__metadata__:
+                label_text = metadata.get("label", label_text)
+                if metadata.get("type", "input") == "textarea":
                     element = textarea(value, name=name, id=name)
-                case _:
-                    break
 
         elements.append(
             FormField(
                 label(label_text, for_=name),
                 element,
-                **field_attrs,
             )
         )
 
