@@ -1,4 +1,5 @@
 import html
+from abc import ABCMeta, abstractmethod
 from collections.abc import Callable, Iterator
 from typing import (
     Any,
@@ -60,16 +61,16 @@ class Safe(str):
         return tuple(new_children)
 
 
-class Attributes(TypedDict, total=False):
+class BaseAttrs(TypedDict, total=False):
     """Attributes of an element or component.
 
     Example usage::
 
-        class PersonAttributes(Attributes):
+        class PersonAttrs(Attributes):
             name: str
             age: NotRequired[int]
 
-        class Person(Component[PersonAttributes]):
+        class Person(Component[PersonAttrs]):
             @override
             def render(self) -> dl:
                 return dl(
@@ -80,10 +81,8 @@ class Attributes(TypedDict, total=False):
                 )
     """
 
-    id: str
 
-
-class Element[*Te, Ta: Attributes]:
+class Element[*Te, Ta: BaseAttrs]:
     """Base class for PyMX elements.
 
     Args:
@@ -247,9 +246,59 @@ class Element[*Te, Ta: Attributes]:
         return cast(AnyElement, self)
 
 
+class Component[*Te, Ta: BaseAttrs](Element[*Te, Ta], metaclass=ABCMeta):
+    """Base class for components.
+
+    A component subclasses an :class:`Element` and represents any element
+    that can be rendered in PyMX.
+
+    Example usage:
+
+        class PersonAttrs(Attributes):
+            age: NotRequired[int]
+
+        class Person(Component[PersonAttrs]):
+            @override
+            def render(self) -> dl:
+                return dl(
+                    dt("Name"),
+                    dd(self.attrs["name"]),
+                    dt("Age"),
+                    dd(self.attrs.get("age", "N/A")),
+                )
+
+    Now the component can be used in any other component or element:
+
+        >>> div(Person(name="John Doe", age=30), id="person-detail")
+
+    You can also make the component take children:
+
+        class PersonAttrs(Attributes):
+            age: NotRequired[int]
+
+        class Person(Component[str, str, PersonAttrs]):
+            @override
+            def render(self) -> dl:
+                return dl(
+                    dt("Name"),
+                    dd(" ".join(self.children)),
+                    dt("Age"),
+                    dd(self.attrs.get("age", "N/A")),
+                )
+
+    Valid usage would now look like this:
+
+        >>> div(Person("John", "Doe", age=30), id="person-detail")
+    """
+
+    @abstractmethod
+    def render(self) -> "AnyElement":
+        """Render the component as an instance of :class:`Element`."""
+
+
 PrimitiveChild: TypeAlias = Safe | str | bool | int | float
-AnyChild: TypeAlias = PrimitiveChild | Element[*tuple["AnyChild", ...], Attributes]
+AnyChild: TypeAlias = PrimitiveChild | Element[*tuple["AnyChild", ...], BaseAttrs]
 
 PrimitiveChildren: TypeAlias = tuple[PrimitiveChild, ...]
 AnyChildren: TypeAlias = tuple[AnyChild, ...]
-AnyElement: TypeAlias = Element[*AnyChildren, Attributes]
+AnyElement: TypeAlias = Element[*AnyChildren, BaseAttrs]

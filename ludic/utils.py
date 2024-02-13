@@ -116,7 +116,7 @@ def get_element_generic_args(cls_or_obj: Any) -> tuple[type, ...] | None:
     Returns:
         dict[str, Any] | None: The generic arguments or :obj:`None`.
     """
-    from pymx.elements import Element
+    from ludic.base import Element
 
     for base in get_generic_bases(cls_or_obj):
         if issubclass(get_origin(base), Element):  # type: ignore

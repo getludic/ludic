@@ -12,9 +12,10 @@ from starlette.responses import PlainTextResponse, Response
 from starlette.routing import Route, get_name
 from starlette.types import Receive, Scope, Send
 
-from ..elements.base import Element
+from ludic.base import Element
+
 from .endpoints import Endpoint
-from .response import PyMXResponse
+from .response import LudicResponse
 
 
 class _FunctionHandler:
@@ -29,7 +30,7 @@ class _FunctionHandler:
         else:
             response = await run_in_threadpool(self.handler, request)
         if isinstance(response, Element):
-            response = PyMXResponse(response)
+            response = LudicResponse(response)
         await response(scope, receive, send)
 
 
@@ -61,7 +62,8 @@ class _EndpointHandler:
 
         for name, param in parameters.items():
             if issubclass(param.annotation, FormData):
-                handler_kwargs[name] = await request.form()
+                async with request.form() as form:
+                    handler_kwargs[name] = form
             if issubclass(param.annotation, Request):
                 handler_kwargs[name] = request
 
@@ -71,7 +73,7 @@ class _EndpointHandler:
         else:
             response = await run_in_threadpool(handler, **handler_kwargs)
         if isinstance(response, Element):
-            response = PyMXResponse(response)
+            response = LudicResponse(response)
         await response(scope, receive, send)
 
     def method_not_allowed(self, scope: Scope) -> Callable[..., Any]:
@@ -90,16 +92,16 @@ class _EndpointHandler:
         return make_response
 
 
-class PyMXApp(Starlette):
-    """Starlette application with PyMX methods.
+class LudicApp(Starlette):
+    """Starlette application with Ludic methods.
 
     Example:
 
         async def homepage(request: Request) -> html:
             return html(...)
 
-        app = PyMXApp(debug=True)
-        app.add_pymx_route("/", homepage)
+        app = LudicApp(debug=True)
+        app.add_route("/", homepage)
 
     You can also use a method decorator to register a PyMX endpoint:
 

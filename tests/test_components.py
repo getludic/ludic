@@ -1,8 +1,9 @@
 import pytest
 
-from pymx.components import Link, Navigation, NavItem, Paragraph
-from pymx.elements import b, li
-from pymx.elements.base import Safe
+from ludic.base import Safe
+from ludic.catalog.navigation import Navigation, NavItem
+from ludic.catalog.typography import Link, Paragraph
+from ludic.html import b, li
 
 
 def test_link():

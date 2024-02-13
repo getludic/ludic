@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "pymx"
+name = "ludic"
 version = "0.1.0"
 description = ""
 authors = ["Pavel Dedik <dedikx@gmail.com>"]
@@ -49,6 +49,9 @@ ignore = [
     "UP040",
 ]
 fixable = ["ALL"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ludic"]
 
 [tool.pyright]
 reportMissingImports = false

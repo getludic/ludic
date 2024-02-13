@@ -1,6 +1,6 @@
 import pytest
 
-from pymx.elements.utils import parse_elements
+from ludic.utils import parse_elements
 
 
 def test_empty_string():

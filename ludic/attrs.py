@@ -1,23 +1,23 @@
 from typing import Literal, TypedDict
 
-from .base import Attributes
+from .base import BaseAttrs
 from .css import CSSProperties
 
 
-class NoAttributes(Attributes):
+class NoAttrs(BaseAttrs):
     """Placeholder for element with no attributes."""
 
 
-_HtmlAttributesAlt = TypedDict(
-    "_HtmlAttributesAlt",
+_HtmlAttrsAlt = TypedDict(
+    "_HtmlAttrsAlt",
     {
         "class": str,
     },
     total=False,
 )
 
-_LabelAttributesAlt = TypedDict(
-    "_LabelAttributesAlt",
+_LabelAttrsAlt = TypedDict(
+    "_LabelAttrsAlt",
     {
         "for": str,
     },
@@ -25,7 +25,7 @@ _LabelAttributesAlt = TypedDict(
 )
 
 
-class HtmlAttributes(Attributes, _HtmlAttributesAlt, total=False):
+class HtmlAttrs(BaseAttrs, _HtmlAttrsAlt, total=False):
     """Common attributes for HTML elements."""
 
     id: str
@@ -50,8 +50,8 @@ class HtmlAttributes(Attributes, _HtmlAttributesAlt, total=False):
     translate: Literal["yes", "no"]
 
 
-_HtmxAttributesAlt = TypedDict(
-    "_HtmxAttributesAlt",
+_HtmxAttrsAlt = TypedDict(
+    "_HtmxAttrsAlt",
     {
         "hx-get": str,
         "hx-post": str,
@@ -75,7 +75,7 @@ _HtmxAttributesAlt = TypedDict(
 )
 
 
-class HtmxAttributes(Attributes, _HtmxAttributesAlt, total=False):
+class HtmxAttrs(BaseAttrs, _HtmxAttrsAlt, total=False):
     """HTMX attributes for HTML elements.
 
     See: https://htmx.org/
@@ -101,7 +101,7 @@ class HtmxAttributes(Attributes, _HtmxAttributesAlt, total=False):
     ]
 
 
-class EventAttributes(Attributes, total=False):
+class EventAttrs(BaseAttrs, total=False):
     """Event Attributes for HTML elements."""
 
     onafterprint: str
@@ -122,30 +122,30 @@ class EventAttributes(Attributes, total=False):
     onunload: str
 
 
-class HtmlAndEventAttributes(HtmlAttributes, EventAttributes, total=False):
+class HtmlAndEventAttrs(HtmlAttrs, EventAttrs, total=False):
     """Common HTML and event attributes."""
 
 
-class GlobalAttributes(HtmxAttributes, HtmlAndEventAttributes, total=False):
+class GlobalAttrs(HtmxAttrs, HtmlAndEventAttrs, total=False):
     """Global attributes for HTML elements."""
 
 
-class HtmlTagAttributes(Attributes, total=False):
+class HtmlTagAttrs(BaseAttrs, total=False):
     xmlns: str
 
 
-class MetaAttributes(HtmlAttributes, total=False):
+class MetaAttrs(HtmlAttrs, total=False):
     name: str
     content: str
     charset: str
 
 
-class StyleAttributes(HtmlAndEventAttributes, total=False):
+class StyleAttrs(HtmlAndEventAttrs, total=False):
     media: str
     type: Literal["text/css"]
 
 
-class ScriptAttributes(HtmlAttributes, total=False):
+class ScriptAttrs(HtmlAttrs, total=False):
     async_: bool
     crossorigin: Literal["anonymous", "use-credentials"]
     defer: bool
@@ -165,7 +165,7 @@ class ScriptAttributes(HtmlAttributes, total=False):
     type: str
 
 
-class HeadLinkAttributes(HtmlAttributes, total=False):
+class HeadLinkAttrs(HtmlAttrs, total=False):
     rel: Literal["canonical", "alternate", "stylesheet"]
     crossorigin: Literal["anonymous", "use-credentials"]
     hreflang: str
@@ -173,7 +173,7 @@ class HeadLinkAttributes(HtmlAttributes, total=False):
     integrity: str
 
 
-class InputAttributes(GlobalAttributes, total=False):
+class InputAttrs(GlobalAttrs, total=False):
     accept: str
     alt: str
     autcomplete: Literal["on", "off"]
@@ -233,25 +233,25 @@ class InputAttributes(GlobalAttributes, total=False):
     width: int
 
 
-class OutputAttributes(GlobalAttributes, _LabelAttributesAlt, total=False):
+class OutputAttrs(GlobalAttrs, _LabelAttrsAlt, total=False):
     for_: str
     form: str
     name: str
 
 
-class OptionAttributes(GlobalAttributes, total=False):
+class OptionAttrs(GlobalAttrs, total=False):
     disabled: bool
     label: str
     selected: bool
     value: str
 
 
-class OptgroupAttributes(GlobalAttributes, total=False):
+class OptgroupAttrs(GlobalAttrs, total=False):
     disabled: bool
     label: str
 
 
-class SelectAttributes(GlobalAttributes, total=False):
+class SelectAttrs(GlobalAttrs, total=False):
     autofocus: bool
     disabled: bool
     form: str
@@ -261,7 +261,7 @@ class SelectAttributes(GlobalAttributes, total=False):
     size: int
 
 
-class TextareaAttributes(GlobalAttributes, total=False):
+class TextareaAttrs(GlobalAttrs, total=False):
     autofocus: bool
     cols: int
     dirname: str
@@ -276,13 +276,13 @@ class TextareaAttributes(GlobalAttributes, total=False):
     wrap: Literal["hard", "soft"]
 
 
-class FieldsetAttributes(GlobalAttributes, total=False):
+class FieldsetAttrs(GlobalAttrs, total=False):
     disabled: bool
     form: str
     name: str
 
 
-class FormAttributes(GlobalAttributes, total=False):
+class FormAttrs(GlobalAttrs, total=False):
     accept_charset: str
     action: str
     autocomplete: Literal["on", "off"]
@@ -307,7 +307,7 @@ class FormAttributes(GlobalAttributes, total=False):
     target: str
 
 
-class HyperlinkAttributes(GlobalAttributes, total=False):
+class HyperlinkAttrs(GlobalAttrs, total=False):
     download: str
     href: str
     hreflang: str
@@ -342,7 +342,7 @@ class HyperlinkAttributes(GlobalAttributes, total=False):
     type: str
 
 
-class ButtonAttributes(GlobalAttributes, total=False):
+class ButtonAttrs(GlobalAttrs, total=False):
     autofocus: bool
     disabled: bool
     form: str
@@ -360,18 +360,18 @@ class ButtonAttributes(GlobalAttributes, total=False):
     value: str
 
 
-class LabelAttributes(GlobalAttributes, _LabelAttributesAlt, total=False):
+class LabelAttrs(GlobalAttrs, _LabelAttrsAlt, total=False):
     for_: str
     name: str
 
 
-class TdAttributes(GlobalAttributes, total=False):
+class TdAttrs(GlobalAttrs, total=False):
     colspan: int
     headers: str
     rowspan: int
 
 
-class ThAttributes(GlobalAttributes, total=False):
+class ThAttrs(GlobalAttrs, total=False):
     abbr: str
     colspan: int
     headers: str
@@ -379,11 +379,11 @@ class ThAttributes(GlobalAttributes, total=False):
     scope: Literal["col", "colgroup", "row", "rowgroup"]
 
 
-class LiAttributes(GlobalAttributes, total=False):
+class LiAttrs(GlobalAttrs, total=False):
     value: int
 
 
-class ImgAttributes(GlobalAttributes, total=False):
+class ImgAttrs(GlobalAttrs, total=False):
     alt: str
     crossorigin: Literal["anonymous", "use-credentials"]
     height: int
@@ -404,12 +404,12 @@ class ImgAttributes(GlobalAttributes, total=False):
     width: int
 
 
-class SvgAttributes(GlobalAttributes, total=False):
+class SvgAttrs(GlobalAttrs, total=False):
     height: int
     width: int
 
 
-class IframeAttributes(GlobalAttributes, total=False):
+class IframeAttrs(GlobalAttrs, total=False):
     allow: str
     allowfullscreen: bool
     allowpaymentrequest: bool

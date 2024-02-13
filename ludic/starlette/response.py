@@ -1,9 +1,9 @@
 from starlette.responses import HTMLResponse
 
-from ..elements.base import AnyElement
+from ..base import AnyElement
 
 
-class PyMXResponse(HTMLResponse):
+class LudicResponse(HTMLResponse):
     """Response class for PyMX components."""
 
     def render(self, content: AnyElement) -> bytes:

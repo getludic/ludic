@@ -1,20 +1,21 @@
 from collections.abc import Callable
-from typing import Any
+from typing import Any, ClassVar
 
 from starlette._utils import is_async_callable
 from starlette.concurrency import run_in_threadpool
-from starlette.endpoints import HTTPEndpoint
+from starlette.endpoints import HTTPEndpoint as BaseEndpoint
 from starlette.requests import Request
 from starlette.routing import Route
 from typing_extensions import TypeVar
 
-from ..components.base import Component
-from ..elements.attrs import Attributes
-from ..elements.base import Element
-from .response import PyMXResponse
+from ..attrs import BaseAttrs
+from ..base import Component, Element
+from .response import LudicResponse
+
+_Ta = TypeVar("_Ta", bound=BaseAttrs, default=BaseAttrs)
 
 
-class PyMXEndpoint(HTTPEndpoint):  # type: ignore
+class HTTPEndpoint(BaseEndpoint):  # type: ignore
     """Endpoint class for PyMX components.
 
     Usage:
@@ -41,17 +42,14 @@ class PyMXEndpoint(HTTPEndpoint):  # type: ignore
         else:
             response = await run_in_threadpool(handler, request)
         if isinstance(response, Element):
-            response = PyMXResponse(response)
+            response = LudicResponse(response)
         await response(self.scope, self.receive, self.send)
 
 
-Ta = TypeVar("Ta", bound=Attributes, default=Attributes)
-
-
-class Endpoint(Component[Ta]):
+class Endpoint(Component[_Ta]):
     """Base class for PyMX endpoints."""
 
-    route: Route
+    route: ClassVar[Route]
 
     def url_for(self, endpoint: type["Endpoint"], **kwargs: Any) -> str:
         url_kwargs: dict[str, Any] = {}

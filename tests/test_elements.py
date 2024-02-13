@@ -1,4 +1,6 @@
-from pymx.elements import (
+from ludic.base import Safe
+from ludic.css import CSSProperties
+from ludic.html import (
     a,
     b,
     button,
@@ -14,8 +16,6 @@ from pymx.elements import (
     thead,
     tr,
 )
-from pymx.elements.base import Safe
-from pymx.elements.css import CSSProperties
 
 
 def test_paragraph():
