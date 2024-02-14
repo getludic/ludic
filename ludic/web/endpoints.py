@@ -10,6 +10,7 @@ from typing_extensions import TypeVar
 
 from ludic.attrs import BaseAttrs
 from ludic.base import Component, Element
+from ludic.utils import get_element_generic_args
 
 from .response import LudicResponse
 from .utils import extract_from_request
@@ -90,4 +91,14 @@ class Endpoint(Component[Ta]):
         Returns:
             The URL.
         """
-        return url_for(endpoint, **{**self.attrs, **kwargs})
+        endpoint_generic_args = get_element_generic_args(endpoint)
+        self_generic_args = get_element_generic_args(self)
+
+        if (
+            endpoint_generic_args
+            and self_generic_args
+            and endpoint_generic_args[-1] is self_generic_args[-1]
+        ):
+            kwargs = {**self.attrs, **kwargs}
+
+        return url_for(endpoint, **kwargs)

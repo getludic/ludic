@@ -42,6 +42,7 @@ select = [
     "T10",   # flake8-debugger
 ]
 ignore = [
+    "B904",
     "S101",
     "D203",
     "D211",

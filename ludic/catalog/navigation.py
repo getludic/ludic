@@ -1,13 +1,13 @@
 from typing import override
 
-from ludic.attrs import HtmxAttrs
+from ludic.attrs import GlobalAttrs
 from ludic.base import Component, PrimitiveChild
 from ludic.html import li, ul
 
 from .typography import Link
 
 
-class NavItemAttrs(HtmxAttrs):
+class NavItemAttrs(GlobalAttrs):
     to: str
 
 
@@ -24,7 +24,7 @@ class NavItem(Component[PrimitiveChild, NavItemAttrs]):
         return li(Link(label, to=self.attrs["to"]), id=label.lower())
 
 
-class Navigation(Component[*tuple[NavItem, ...], HtmxAttrs]):
+class Navigation(Component[*tuple[NavItem, ...], GlobalAttrs]):
     """Simple component simulating a navigation bar.
 
     Example usage:

@@ -4,11 +4,11 @@
 
 import random
 import string
-from typing import Any, TypedDict
+from typing import Annotated, Any, TypedDict, get_args, get_origin, get_type_hints
 from xml.etree.ElementTree import XMLParser
 
 from typeguard import TypeCheckError, check_type
-from typing_inspect import get_args, get_generic_bases, get_origin, is_union_type
+from typing_inspect import get_generic_bases, is_union_type
 
 
 class ParsedElement(TypedDict):
@@ -29,7 +29,7 @@ def random_string(n: int) -> str:
     )
 
 
-class _PyMXHandler:
+class _LudicElementHandler:
     """Parse HTML elements from a string and collects them as ParsedElement's."""
 
     elements: list[ParsedElement | str]
@@ -75,7 +75,7 @@ def parse_elements(string: str) -> list[ParsedElement | str]:
     Returns:
         list[ParsedElement | str]: A list of parsed elements and text.
     """
-    parser = XMLParser(target=_PyMXHandler())  # noqa
+    parser = XMLParser(target=_LudicElementHandler())  # noqa
     parser.feed(f"<ROOT>{string}</ROOT>")
     return parser.close()
 
@@ -91,7 +91,7 @@ def format_html_attribute(key: str, value: Any) -> str:
     """
     if isinstance(value, dict):
         value = ";".join(f"{dkey}:{dvalue}" for dkey, dvalue in value.items())
-    return f'{key.rstrip("_").replace("_", "-")}="{value}"'
+    return f'{key}="{value}"'
 
 
 def format_attribute(key: str, value: Any) -> str:
@@ -104,7 +104,7 @@ def format_attribute(key: str, value: Any) -> str:
     Returns:
         str: The formatted attribute string.
     """
-    return f'{key.rstrip("_").replace("_", "-")}="{value}"'
+    return f'{key}="{value}"'
 
 
 def get_element_generic_args(cls_or_obj: Any) -> tuple[type, ...] | None:
@@ -124,14 +124,20 @@ def get_element_generic_args(cls_or_obj: Any) -> tuple[type, ...] | None:
     return None
 
 
-def get_element_attributes(cls_or_obj: Any) -> dict[str, Any]:
+def get_element_attrs_annotations(
+    cls_or_obj: Any, include_extras: bool = False
+) -> dict[str, Any]:
     """Get the annotations of the element.
 
     Args:
-        cls (type[Any]): The element to get the annotations of.
+        cls_or_obj (type[Any]): The element to get the annotations of.
+        include_extras (bool): Whether to include extra annotation info.
+
+    Returns:
+        dict[str, Any]: The attributes' annotations of the element.
     """
     if (args := get_element_generic_args(cls_or_obj)) is not None:
-        return args[-1].__annotations__
+        return get_type_hints(args[-1], include_extras=include_extras)
     return {}
 
 
@@ -146,7 +152,7 @@ def validate_attributes(cls_or_obj: Any, values: dict[str, Any]) -> None:
         try:
             check_type(values, args[-1])
         except TypeCheckError as err:
-            raise TypeError(f"Invalid attributes for {cls_or_obj}.") from err
+            raise TypeError(f"Invalid attributes for {cls_or_obj!r}: {err}.")
 
 
 def validate_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None:
@@ -161,12 +167,14 @@ def validate_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None:
         if len(types) == 0:
             if len(elements) != 0:
                 raise TypeError(
-                    f"The element {cls_or_obj!r} doesn't expect any elements."
+                    f"The element {cls_or_obj!r} doesn't expect any elements. "
+                    f"Got {len(elements)} elements."
                 )
         elif len(types) > 1 or is_union_type(types[0]):
             if len(types) != len(elements):
                 raise TypeError(
-                    f"The element {cls_or_obj!r} got an invalid number of elements."
+                    f"The element {cls_or_obj!r} got an invalid number of elements. "
+                    f"Expected {len(types)} but got {len(elements)}."
                 )
             for element, type_ in zip(elements, types, strict=True):
                 check_type(element, type_)
@@ -174,4 +182,32 @@ def validate_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None:
             try:
                 check_type(elements, types)
             except TypeCheckError as err:
-                raise TypeError(f"Invalid elements for {cls_or_obj!r}.") from err
+                raise TypeError(f"Invalid elements for {cls_or_obj!r}: {err}.")
+
+
+def unalias_attrs(cls: Any, attrs: dict[str, Any]) -> dict[str, Any]:
+    """Unalias the given attributes according to the element's annotations.
+
+    Args:
+        cls (type): The element class.
+        attrs (dict[str, Any]): The attributes to unalias.
+
+    Returns:
+        dict[str, Any]: The unaliased attributes.
+    """
+
+    def _get_key(annotation: Any, default: str) -> str:
+        if get_origin(annotation) is Annotated:
+            args = get_args(annotation)
+            if len(args) > 1 and isinstance(args[1], str):
+                return args[1]
+        return default
+
+    lookup = {
+        _get_key(annotation, key): key
+        for key, annotation in get_element_attrs_annotations(
+            cls, include_extras=True
+        ).items()
+    }
+
+    return {lookup[key]: value for key, value in attrs.items()}

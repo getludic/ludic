@@ -9,6 +9,12 @@ from starlette.requests import Request
 async def extract_from_request(
     handler: Callable[..., Any], request: Request
 ) -> dict[str, Any]:
+    """Extracts parameters for given handler from the request.
+
+    This function scans the signature of the handler and tries to extract
+    the parameters from the request. It passes them to the handler as
+    keyword arguments.
+    """
     parameters = inspect.signature(handler).parameters
     handler_kwargs: dict[str, Any] = {}
 

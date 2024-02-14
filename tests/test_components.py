@@ -45,9 +45,10 @@ def test_navigation():
     navigation = Navigation(
         NavItem("Home", to="/"),
         NavItem("About", to="/about"),
+        id="nav",
     )
     assert navigation.to_html() == (
-        '<ul class="navigation">'
+        '<ul class="navigation" id="nav">'
             '<li id="home"><a href="/">Home</a></li>'
             '<li id="about"><a href="/about">About</a></li>'
         "</ul>"

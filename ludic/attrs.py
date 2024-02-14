@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from .base import BaseAttrs
 from .css import CSSProperties
@@ -13,7 +13,7 @@ class HtmlAttrs(BaseAttrs, total=False):
 
     id: str
     accesskey: str
-    class_: str
+    class_: Annotated[str, "class"]
     contenteditable: Literal["true", "false"]
     dir: Literal["ltr", "rtl"]
     draggable: Literal["true", "false"]
@@ -39,23 +39,26 @@ class HtmxAttrs(BaseAttrs, total=False):
     See: https://htmx.org/
     """
 
-    hx_get: str
-    hx_post: str
-    hx_put: str
-    hx_delete: str
-    hx_patch: str
+    hx_get: Annotated[str, "hx-get"]
+    hx_post: Annotated[str, "hx-post"]
+    hx_put: Annotated[str, "hx-put"]
+    hx_delete: Annotated[str, "hx-delete"]
+    hx_patch: Annotated[str, "hx-patch"]
 
-    hx_trigger: str
-    hx_target: str
-    hx_swap: Literal[
-        "innerHTML",
-        "outerHTML",
-        "beforebegin",
-        "afterbegin",
-        "beforeend",
-        "afterend",
-        "delete",
-        "none",
+    hx_trigger: Annotated[str, "hx-trigger"]
+    hx_target: Annotated[str, "hx-target"]
+    hx_swap: Annotated[
+        Literal[
+            "innerHTML",
+            "outerHTML",
+            "beforebegin",
+            "afterbegin",
+            "beforeend",
+            "afterend",
+            "delete",
+            "none",
+        ],
+        "hx-swap",
     ]
 
 
@@ -261,7 +264,7 @@ class InputAttrs(GlobalAttrs, total=False):
 
 
 class OutputAttrs(GlobalAttrs, total=False):
-    for_: str
+    for_: Annotated[str, "for"]
     form: str
     name: str
 
@@ -392,7 +395,7 @@ class ButtonAttrs(GlobalAttrs, total=False):
 
 
 class LabelAttrs(GlobalAttrs, total=False):
-    for_: str
+    for_: Annotated[str, "for"]
     name: str
 
 
