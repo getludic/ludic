@@ -1,14 +1,10 @@
-# pyright: reportMissingTypeStubs=false
-# pyright: reportUnknownVariableType=false
-# pyright: reportGeneralTypeIssues=false
-
 import random
 import string
+from types import UnionType
 from typing import Annotated, Any, TypedDict, get_args, get_origin, get_type_hints
 from xml.etree.ElementTree import XMLParser
 
 from typeguard import TypeCheckError, check_type
-from typing_inspect import get_generic_bases, is_union_type
 
 
 class ParsedElement(TypedDict):
@@ -39,13 +35,13 @@ class _LudicElementHandler:
         self.elements = []
         self.current_element = ParsedElement(tag="", children=[], attrs={})
 
-    def start(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+    def start(self, tag: str, attrs: dict[str, str]) -> None:
         if tag == "ROOT":
             return
         if self.current_element["tag"]:
             raise TypeError("You cannot use nested elements when using f-strings.")
         self.current_element["tag"] = tag
-        self.current_element["attrs"] = dict(attrs)
+        self.current_element["attrs"] = attrs
 
     def end(self, tag: str) -> None:
         if tag == "ROOT":
@@ -90,7 +86,7 @@ def format_html_attribute(key: str, value: Any) -> str:
         str: The formatted HTML attribute.
     """
     if isinstance(value, dict):
-        value = ";".join(f"{dkey}:{dvalue}" for dkey, dvalue in value.items())
+        value = ";".join(f"{dkey}:{dvalue}" for dkey, dvalue in value.items())  # type: ignore
     return f'{key}="{value}"'
 
 
@@ -118,8 +114,8 @@ def get_element_generic_args(cls_or_obj: Any) -> tuple[type, ...] | None:
     """
     from ludic.base import Element
 
-    for base in get_generic_bases(cls_or_obj):
-        if issubclass(get_origin(base), Element):  # type: ignore
+    for base in getattr(cls_or_obj, "__orig_bases__", []):
+        if issubclass(get_origin(base), Element):
             return get_args(base)
     return None
 
@@ -170,7 +166,7 @@ def validate_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None:
                     f"The element {cls_or_obj!r} doesn't expect any elements. "
                     f"Got {len(elements)} elements."
                 )
-        elif len(types) > 1 or is_union_type(types[0]):
+        elif len(types) > 1 or get_origin(types[0]) is UnionType:
             if len(types) != len(elements):
                 raise TypeError(
                     f"The element {cls_or_obj!r} got an invalid number of elements. "
@@ -187,6 +183,21 @@ def validate_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None:
 
 def unalias_attrs(cls: Any, attrs: dict[str, Any]) -> dict[str, Any]:
     """Unalias the given attributes according to the element's annotations.
+
+    Here is an example of TypedDict definition:
+
+        class PersonAttrs(TypedDict):
+            name: str
+            class_: Annotated[str, "class"]
+
+    And here is the attrs that will be unaliased:
+
+        attrs = {"name": "John", "class": "person"}
+
+    The result will be:
+
+        >>> unalias_attrs(PersonAttrs, attrs)
+        >>> {"name": "John", "class_": "person"}
 
     Args:
         cls (type): The element class.

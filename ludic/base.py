@@ -99,7 +99,7 @@ class BaseAttrs(TypedDict, total=False):
     """
 
 
-class Element[*Te, Ta: BaseAttrs]:
+class Element[*Te, Ta: BaseAttrs](metaclass=ABCMeta):
     """Base class for PyMX elements.
 
     Args:
