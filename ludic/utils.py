@@ -1,15 +1,26 @@
+import os
 import random
 import string
 from types import UnionType
-from typing import Annotated, Any, TypedDict, get_args, get_origin, get_type_hints
-from xml.etree.ElementTree import XMLParser
+from typing import (
+    Annotated,
+    Any,
+    Final,
+    TypedDict,
+    get_args,
+    get_origin,
+    get_type_hints,
+)
+from xml.etree.ElementTree import ParseError, XMLParser
 
 from typeguard import TypeCheckError, check_type
 
+LUDIC_MAX_ELEMENT_DEPTH: Final[int] = int(os.getenv("LUDIC_MAX_ELEMENT_DEPTH", 50))
 
-class ParsedElement(TypedDict):
+
+class _ParsedElement[T](TypedDict):
     tag: str
-    children: list[str]
+    children: list[T | str]
     attrs: dict[str, str]
 
 
@@ -25,82 +36,61 @@ def random_string(n: int) -> str:
     )
 
 
-class _LudicElementHandler:
+class _LudicElementHandler[T]:
     """Parse HTML elements from a string and collects them as ParsedElement's."""
 
-    elements: list[ParsedElement | str]
-    current_element: ParsedElement
-
-    def __init__(self) -> None:
-        self.elements = []
-        self.current_element = ParsedElement(tag="", children=[], attrs={})
+    def __init__(self, registry: dict[str, type[T]]) -> None:
+        self.registry = registry
+        self.finished: T | None = None
+        self.elements: list[_ParsedElement[T]] = []
 
     def start(self, tag: str, attrs: dict[str, str]) -> None:
-        if tag == "ROOT":
-            return
-        if self.current_element["tag"]:
-            raise TypeError("You cannot use nested elements when using f-strings.")
-        self.current_element["tag"] = tag
-        self.current_element["attrs"] = attrs
+        if len(self.elements) > LUDIC_MAX_ELEMENT_DEPTH:
+            raise RuntimeError("Max element depth reached")
+        self.elements.append(_ParsedElement(tag=tag, children=[], attrs=attrs))
 
     def end(self, tag: str) -> None:
-        if tag == "ROOT":
-            return
-        self.elements.append(ParsedElement(**self.current_element))
-        self.current_element = ParsedElement(tag="", children=[], attrs={})
+        element = self.elements.pop()
+        if tag not in self.registry:
+            raise TypeError(
+                f"Element or component {tag!r} not found in registry, "
+                "maybe you forgot to import it?"
+            )
+
+        element_type = self.registry[tag]
+        attrs = parse_attrs(element_type, element["attrs"])
+
+        new_element: T = self.registry[tag](*element["children"], **attrs)
+        if self.elements:
+            self.elements[-1]["children"].append(new_element)
+        else:
+            self.finished = new_element
 
     def data(self, data: str) -> None:
-        if self.current_element["tag"]:
-            self.current_element["children"].append(data)
-        else:
-            if self.elements and isinstance(self.elements[-1], str):
-                self.elements[-1] += data
-            else:
-                self.elements.append(data)
+        self.elements[-1]["children"].append(data)
 
-    def close(self) -> list[ParsedElement | str]:
-        return self.elements
+    def close(self) -> T:
+        if self.finished is None:
+            raise TypeError("Element is not finished")
+        return self.finished
 
 
-def parse_elements(string: str) -> list[ParsedElement | str]:
+def parse_element[T](tree: str, registry: dict[str, type[T]]) -> T:
     """Parse HTML elements from a string.
 
     Args:
-        string (str): The string to parse.
+        tree (str): The string to parse.
+        registry (dict[str, Any]): The element registry.
 
     Returns:
         list[ParsedElement | str]: A list of parsed elements and text.
     """
-    parser = XMLParser(target=_LudicElementHandler())  # noqa
-    parser.feed(f"<ROOT>{string}</ROOT>")
+    parser = XMLParser(target=_LudicElementHandler(registry))  # noqa
+    try:
+        parser.feed(tree)
+    except ParseError as err:
+        raise TypeError("The given string is not a valid XHTML.") from err
     return parser.close()
-
-
-def format_html_attribute(key: str, value: Any) -> str:
-    """Format an HTML attribute with the given key and value.
-
-    Args:
-        key (str): The key of the attribute.
-        value (Any): The value of the attribute, can be a string or a dictionary.
-    Returns:
-        str: The formatted HTML attribute.
-    """
-    if isinstance(value, dict):
-        value = ";".join(f"{dkey}:{dvalue}" for dkey, dvalue in value.items())  # type: ignore
-    return f'{key}="{value}"'
-
-
-def format_attribute(key: str, value: Any) -> str:
-    """Format the attribute key and value into a string.
-
-    Args:
-        key (str): The attribute key.
-        value (Any): The attribute value.
-
-    Returns:
-        str: The formatted attribute string.
-    """
-    return f'{key}="{value}"'
 
 
 def get_element_generic_args(cls_or_obj: Any) -> tuple[type, ...] | None:
@@ -181,44 +171,133 @@ def validate_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None:
                 raise TypeError(f"Invalid elements for {cls_or_obj!r}: {err}.")
 
 
-def unalias_attrs(cls: Any, attrs: dict[str, Any]) -> dict[str, Any]:
-    """Unalias the given attributes according to the element's annotations.
+def _format_attr_value(key: str, value: Any, html: bool = False) -> str:
+    """Format an HTML attribute with the given key and value.
+
+    Args:
+        key (str): The key of the attribute.
+        value (Any): The value of the attribute, can be a string or a dictionary.
+    Returns:
+        str: The formatted HTML attribute.
+    """
+    if isinstance(value, dict):
+        value = ";".join(f"{dkey}:{dvalue}" for dkey, dvalue in value.items())  # type: ignore
+    if isinstance(value, bool):
+        if html:
+            if value:
+                value = key
+            else:
+                return ""
+        else:
+            value = "true" if value else "false"
+    return value
+
+
+def _parse_attr_value(value_type: type[Any], value: str, html: bool = False) -> Any:
+    """Parse an HTML attribute with the given key and value.
+
+    Args:
+        key (str): The key of the attribute.
+        value (Any): The value of the attribute, can be a string or a dictionary.
+    Returns:
+        Any: The parsed value.
+    """
+    if value_type is bool:
+        return True if html else value not in ("false", "off", "0")
+    elif value_type is int:
+        return int(value)
+    elif value_type is float:
+        return float(value)
+    elif value_type is dict:
+        return dict(tuple(part.split(":", 1)) for part in value.split(";"))
+    else:
+        return value
+
+
+def format_attrs(
+    element_type: Any, attrs: dict[str, Any], html: bool = False
+) -> dict[str, Any]:
+    """Format the given attributes according to the element's attributes.
 
     Here is an example of TypedDict definition:
 
         class PersonAttrs(TypedDict):
             name: str
             class_: Annotated[str, "class"]
+            is_adult: bool
 
-    And here is the attrs that will be unaliased:
+    And here is the attrs that will be formatted:
 
-        attrs = {"name": "John", "class": "person"}
+        attrs = {"name": "John", "class_": "person", "is_adult": True}
 
     The result will be:
 
-        >>> unalias_attrs(PersonAttrs, attrs)
-        >>> {"name": "John", "class_": "person"}
+        >>> format_attrs(PersonAttrs, attrs)
+        >>> {"name": "John", "class": "person"}
 
     Args:
-        cls (type): The element class.
-        attrs (dict[str, Any]): The attributes to unalias.
+        element_type (Any): The element.
+        attrs (dict[str, Any]): The attributes to format.
 
     Returns:
-        dict[str, Any]: The unaliased attributes.
+        dict[str, Any]: The formatted attributes.
+    """
+    hints = get_element_attrs_annotations(element_type, include_extras=True)
+
+    def _get_key(key: str) -> str:
+        if get_origin(hints[key]) is Annotated:
+            args = get_args(hints[key])
+            if len(args) > 1 and isinstance(args[1], str):
+                return args[1]
+        return key
+
+    return {
+        _get_key(key): _format_attr_value(key, value, html=html)
+        for key, value in attrs.items()
+    }
+
+
+def parse_attrs(
+    element_type: Any, attrs: dict[str, Any], html: bool = False
+) -> dict[str, Any]:
+    """Parse the given attributes according to the element's attributes.
+
+    Here is an example of TypedDict definition:
+
+        class PersonAttrs(TypedDict):
+            name: str
+            class_: Annotated[str, "class"]
+            is_adult: bool
+
+    And here is the attrs that will be parsed:
+
+        attrs = {"name": "John", "class": "person", "is_adult": "is_adult"}
+
+    The result will be:
+
+        >>> parse_attrs(PersonAttrs, attrs)
+        >>> {"name": "John", "class_": "person", "is_adult": True}
+
+    Args:
+        element_type (type): The element class.
+        attrs (dict[str, Any]): The attributes to parse.
+
+    Returns:
+        dict[str, Any]: The parsed attributes.
     """
 
-    def _get_key(annotation: Any, default: str) -> str:
+    def _get_info(annotation: Any, default: str) -> tuple[type[Any], str]:
         if get_origin(annotation) is Annotated:
             args = get_args(annotation)
             if len(args) > 1 and isinstance(args[1], str):
-                return args[1]
-        return default
+                return args
+        return annotation, default
 
-    lookup = {
-        _get_key(annotation, key): key
-        for key, annotation in get_element_attrs_annotations(
-            cls, include_extras=True
-        ).items()
-    }
-
-    return {lookup[key]: value for key, value in attrs.items()}
+    result: dict[str, Any] = {}
+    for key, ann in get_element_attrs_annotations(
+        element_type, include_extras=True
+    ).items():
+        annotation, key_alias = _get_info(ann, key)
+        if (value := attrs.get(key_alias)) is not None:
+            result[key] = _parse_attr_value(annotation, value, html=html)
+    return result

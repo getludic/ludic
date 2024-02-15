@@ -36,6 +36,13 @@ def test_component_with_f_string():
     )
 
 
+def test_invalid_component_with_f_string():
+    with pytest.raises(TypeError):
+        Paragraph(Safe("should <does_not_exist /> not pass"))
+    with pytest.raises(TypeError):
+        Paragraph(Safe("should <xml_invalid> not pass"))
+
+
 def test_component_with_invalid_f_string():
     with pytest.raises(TypeError):
         Link(Safe(f"should {b("not pass")}"), to="https://example.com")

@@ -1,10 +1,8 @@
-from typing import Annotated, cast, get_type_hints, override
+from typing import cast, override
 
-from ludic.attrs import BaseAttrs, GlobalAttrs
+from ludic.attrs import GlobalAttrs
 from ludic.base import ComplexChildren, Component, PrimitiveChild, PrimitiveChildren
-from ludic.html import table, tbody, td, th, thead, tr
-
-from .utils import attr_to_camel
+from ludic.html import table, tbody, thead, tr
 
 
 class TableRow(Component[*ComplexChildren, GlobalAttrs]):
@@ -50,59 +48,3 @@ class Table(Component[TableHead, *tuple[TableRow, ...], GlobalAttrs]):
     @override
     def render(self) -> table:
         return table(thead(self.children[0]), tbody(*self.children[1:]), **self.attrs)
-
-
-def create_table[Ta: BaseAttrs](
-    attrs_type: type[Ta], *attrs_list: Ta
-) -> tuple[TableHead, list[TableRow]]:
-    """Create table from the given attributes.
-
-    Example:
-
-        class CustomerAttrs(BaseAttrs):
-            id: str
-            name: Annotated[
-                str,
-                FieldAttrs(label="Customer Name", type="input"),
-            ]
-
-        header, rows = create_table(
-            CustomerAttrs,
-            {"id": 1, "name": "John Doe"},
-            {"id": 2, "name": "Jane Doe"},
-        )
-
-        table = Table(header, *rows)
-
-    Args:
-        attrs_type (type[Ta]): The table header - The names of attributes to create
-            the table header from.
-        *attrs_list (BaseAttrs): The table body - the values of attributes to create
-            the table body from.
-    """
-    hints = get_type_hints(attrs_type, include_extras=True)
-
-    header_names: list[str] = []
-    annotations: dict[str, str] = {}
-    rows: list[TableRow] = []
-
-    for name, annotation in hints.items():
-        label_text: str = attr_to_camel(name)
-
-        if isinstance(annotation, Annotated):
-            for metadata in annotation.__metadata__:
-                label_text = metadata.get("label", label_text)
-
-        annotations[label_text] = name
-        header_names.append(label_text)
-
-    header = TableHead(*map(th, header_names))
-
-    for attrs in attrs_list:
-        values: list[td] = []
-        for name in header_names:
-            value = attrs.get(annotations[name], "")
-            values.append(td(str(value)))
-        rows.append(TableRow(*values))
-
-    return (header, rows)

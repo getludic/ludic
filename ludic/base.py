@@ -2,22 +2,16 @@ import html
 from abc import ABCMeta, abstractmethod
 from collections.abc import Callable, Iterator
 from typing import (
-    Annotated,
     Any,
-    TypeAlias,
     TypedDict,
     Union,
     cast,
-    get_args,
-    get_origin,
 )
 
 from .utils import (
-    format_attribute,
-    format_html_attribute,
+    format_attrs,
     get_element_attrs_annotations,
-    parse_elements,
-    unalias_attrs,
+    parse_element,
     validate_attributes,
     validate_elements,
 )
@@ -26,23 +20,8 @@ _ELEMENT_REGISTRY: dict[str, type["AnyElement"]] = {}
 
 
 def _parse_children(string: str) -> "AnyChildren":
-    parsed_children = parse_elements(string)
-    new_children: list[AnyChild] = []
-    for child in parsed_children:
-        if isinstance(child, str):
-            new_children.append(Safe(child))
-        elif child["tag"] not in _ELEMENT_REGISTRY:
-            raise TypeError(
-                f"Element or component {child["tag"]!r} not found, "
-                "maybe you forgot to import it?"
-            )
-        else:
-            element_type = _ELEMENT_REGISTRY[child["tag"]]
-            element = element_type(
-                *child["children"], **unalias_attrs(element_type, child["attrs"])
-            )
-            new_children.append(element)
-    return tuple(new_children)
+    element: AnyElement = parse_element(f"<div>{string}</div>", _ELEMENT_REGISTRY)
+    return element.children
 
 
 def default_html_formatter(child: "AnyChild") -> str:
@@ -57,6 +36,10 @@ def default_html_formatter(child: "AnyChild") -> str:
         return child.to_html()
     else:
         return str(child)
+
+
+class Alias(str):
+    """Alias type for attributes."""
 
 
 class Safe(str):
@@ -99,7 +82,7 @@ class BaseAttrs(TypedDict, total=False):
     """
 
 
-class Element[*Te, Ta: BaseAttrs](metaclass=ABCMeta):
+class Element[*Te, Ta: BaseAttrs]:
     """Base class for PyMX elements.
 
     Args:
@@ -142,7 +125,7 @@ class Element[*Te, Ta: BaseAttrs](metaclass=ABCMeta):
         return iter(self.children)
 
     def __repr__(self) -> str:
-        return f"<{type(self).__name__} />"
+        return self.to_string()
 
     def __eq__(self, other: Any) -> bool:
         return (
@@ -151,12 +134,13 @@ class Element[*Te, Ta: BaseAttrs](metaclass=ABCMeta):
             and self.attrs == other.attrs
         )
 
-    def _format_attributes(
-        self, formatter: Callable[[str, Any], str] = format_attribute
-    ) -> str:
-        return " ".join(
-            formatter(key, value) for key, value in self.aliased_attrs.items()
-        )
+    def _format_attributes(self, html: bool = False) -> str:
+        attrs: dict[str, Any]
+        if html:
+            attrs = format_attrs(type(self), dict(self.attrs), html=True)
+        else:
+            attrs = self.aliased_attrs
+        return " ".join(f'{key}="{value}"' for key, value in attrs.items())
 
     def _format_children(
         self,
@@ -182,16 +166,7 @@ class Element[*Te, Ta: BaseAttrs](metaclass=ABCMeta):
     @property
     def aliased_attrs(self) -> dict[str, Any]:
         """Attributes as a dict with keys renamed to their aliases."""
-        hints = get_element_attrs_annotations(self, include_extras=True)
-
-        def _get_key(key: str) -> str:
-            if get_origin(hints[key]) is Annotated:
-                args: tuple[Any, ...] = get_args(hints[key])
-                if len(args) > 1 and isinstance(args[1], str):
-                    return args[1]
-            return key
-
-        return {_get_key(key): value for key, value in self.attrs.items()}
+        return format_attrs(type(self), dict(self.attrs))
 
     def is_simple(self) -> bool:
         """Check if the element is simple (i.e. contains only primitive types)."""
@@ -251,7 +226,7 @@ class Element[*Te, Ta: BaseAttrs](metaclass=ABCMeta):
         element_tag = f"<{dom.html_name}"
 
         if dom.has_attributes():
-            attributes_str = dom._format_attributes(format_html_attribute)
+            attributes_str = dom._format_attributes(html=True)
             element_tag += f" {attributes_str}"
 
         if dom.children or dom.always_pair:
@@ -331,10 +306,10 @@ class Component[*Te, Ta: BaseAttrs](Element[*Te, Ta], metaclass=ABCMeta):
         """Render the component as an instance of :class:`Element`."""
 
 
-PrimitiveChild: TypeAlias = str | bool | int | float
-AnyElement: TypeAlias = Element[*tuple["AnyChild", ...], BaseAttrs]
-AnyChild: TypeAlias = PrimitiveChild | Safe | AnyElement
+PrimitiveChild = str | bool | int | float
+AnyElement = Element[*tuple["AnyChild", ...], BaseAttrs]
+AnyChild = PrimitiveChild | Safe | AnyElement
 
-PrimitiveChildren: TypeAlias = tuple[PrimitiveChild, ...]
-AnyChildren: TypeAlias = tuple[AnyChild, ...]
-ComplexChildren: TypeAlias = tuple[AnyElement, ...]
+PrimitiveChildren = tuple[PrimitiveChild, ...]
+AnyChildren = tuple[AnyChild, ...]
+ComplexChildren = tuple[AnyElement, ...]

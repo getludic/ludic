@@ -1,6 +1,6 @@
 from typing import Annotated, Literal
 
-from .base import BaseAttrs
+from .base import Alias, BaseAttrs
 from .css import CSSProperties
 
 
@@ -13,7 +13,7 @@ class HtmlAttrs(BaseAttrs, total=False):
 
     id: str
     accesskey: str
-    class_: Annotated[str, "class"]
+    class_: Annotated[str, Alias("class")]
     contenteditable: Literal["true", "false"]
     dir: Literal["ltr", "rtl"]
     draggable: Literal["true", "false"]
@@ -39,14 +39,14 @@ class HtmxAttrs(BaseAttrs, total=False):
     See: https://htmx.org/
     """
 
-    hx_get: Annotated[str, "hx-get"]
-    hx_post: Annotated[str, "hx-post"]
-    hx_put: Annotated[str, "hx-put"]
-    hx_delete: Annotated[str, "hx-delete"]
-    hx_patch: Annotated[str, "hx-patch"]
+    hx_get: Annotated[str, Alias("hx-get")]
+    hx_post: Annotated[str, Alias("hx-post")]
+    hx_put: Annotated[str, Alias("hx-put")]
+    hx_delete: Annotated[str, Alias("hx-delete")]
+    hx_patch: Annotated[str, Alias("hx-patch")]
 
-    hx_trigger: Annotated[str, "hx-trigger"]
-    hx_target: Annotated[str, "hx-target"]
+    hx_trigger: Annotated[str, Alias("hx-trigger")]
+    hx_target: Annotated[str, Alias("hx-target")]
     hx_swap: Annotated[
         Literal[
             "innerHTML",
@@ -58,7 +58,7 @@ class HtmxAttrs(BaseAttrs, total=False):
             "delete",
             "none",
         ],
-        "hx-swap",
+        Alias("hx-swap"),
     ]
 
 
@@ -291,7 +291,7 @@ class SelectAttrs(GlobalAttrs, total=False):
     size: int
 
 
-class TextareaAttrs(GlobalAttrs, total=False):
+class TextAreaAttrs(GlobalAttrs, total=False):
     autofocus: bool
     cols: int
     dirname: str

@@ -1,8 +1,10 @@
-from typing import Annotated, get_origin, get_type_hints, override
+from collections.abc import Iterable
+from typing import override
 
-from ludic.attrs import BaseAttrs, GlobalAttrs
-from ludic.base import Component, PrimitiveChildren
+from ludic.attrs import GlobalAttrs
+from ludic.base import Component
 from ludic.html import dd, dl, dt
+from ludic.types import PrimitiveChild, PrimitiveChildren
 
 from .utils import attr_to_camel
 
@@ -19,44 +21,15 @@ class Value(Component[*PrimitiveChildren, GlobalAttrs]):
         return dd(*self.children, **self.attrs)
 
 
-class Items(Component[*tuple[Key | Value, ...], GlobalAttrs]):
+class PairsAttrs(GlobalAttrs, total=False):
+    items: Iterable[tuple[str, PrimitiveChild]]
+
+
+class Pairs(Component[*tuple[Key | Value, ...], PairsAttrs]):
     @override
     def render(self) -> dl:
-        return dl(*self.children, **self.attrs)
-
-
-def create_items[Ta: BaseAttrs](attrs_type: type[Ta], attrs: Ta) -> list[Key | Value]:
-    """Create description list from the given attributes.
-
-    Example:
-
-        class CustomerAttrs(BaseAttrs):
-            id: str
-            name: Annotated[
-                str,
-                {"label": "Customer Name"},
-            ]
-
-        attrs = {"id": 1, "name": "John Doe"}
-        data = create_items(CustomerAttrs, attrs)
-
-        items = Items(*data)
-
-    Args:
-        attrs_type (type[Ta]): The type of the attributes.
-        attrs (Ta): The attributes to create the description list from.
-    """
-    hints = get_type_hints(attrs_type, include_extras=True)
-    items: list[Key | Value] = []
-
-    for name, annotation in hints.items():
-        label_text: str = attr_to_camel(name)
-
-        if get_origin(annotation) is Annotated:
-            for metadata in annotation.__metadata__:
-                label_text = metadata.get("label", label_text)
-
-        items.append(Key(label_text))
-        items.append(Value(str(attrs.get(name, ""))))
-
-    return items
+        from_items: list[Key | Value] = []
+        for key, value in self.attrs.get("items", ()):
+            from_items.append(Key(attr_to_camel(key)))
+            from_items.append(Value(value))
+        return dl(*from_items, *self.children, **self.attrs_for(dl))

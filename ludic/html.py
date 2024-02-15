@@ -22,7 +22,7 @@ from .attrs import (
     StyleAttrs,
     SvgAttrs,
     TdAttrs,
-    TextareaAttrs,
+    TextAreaAttrs,
     ThAttrs,
 )
 from .base import AnyChildren, ComplexChildren, Element, PrimitiveChildren
@@ -140,7 +140,7 @@ class select(Element[*AnyChildren, SelectAttrs]):
     html_name: str = "select"
 
 
-class textarea(Element[*PrimitiveChildren, TextareaAttrs]):
+class textarea(Element[*PrimitiveChildren, TextAreaAttrs]):
     html_name: str = "textarea"
 
 
