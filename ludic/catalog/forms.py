@@ -3,9 +3,15 @@ from dataclasses import dataclass
 from typing import Annotated, Any, Literal, get_origin, override
 
 from ludic.attrs import BaseAttrs, FormAttrs, InputAttrs, TextAreaAttrs
-from ludic.base import Component
 from ludic.html import div, form, input, label, textarea
-from ludic.types import AnyElement, ComplexChildren, PrimitiveChild
+from ludic.types import (
+    BaseElement,
+    ComplexChild,
+    Component,
+    PrimitiveChild,
+    TAttr,
+    TElement,
+)
 from ludic.utils import get_element_attrs_annotations
 
 from .utils import attr_to_camel
@@ -42,7 +48,7 @@ class FieldMeta:
     attrs: InputAttrs | TextAreaAttrs | None = None
     validator: Callable[[Any], PrimitiveChild] = str
 
-    def create_field(self, key: str, value: Any) -> AnyElement:
+    def create_field(self, key: str, value: Any) -> BaseElement:
         value = self.validator(value)
         attrs = self.attrs or {}
         attrs["name"] = key
@@ -67,9 +73,9 @@ class TextAreaFieldAttrs(FieldAttrs, TextAreaAttrs):
     pass
 
 
-class FormField[*Te, Ta: FieldAttrs](Component[*Te, Ta]):
+class FormField(Component[TElement, TAttr]):
     def get_label_text(self) -> str:
-        return self.attrs.get("label", attr_to_camel(str(self.children[0])))
+        return str(self.attrs.get("label", attr_to_camel(str(self.children[0]))))
 
 
 class InputField(FormField[PrimitiveChild, InputFieldAttrs]):
@@ -102,11 +108,11 @@ class TextAreaField(FormField[PrimitiveChild, TextAreaFieldAttrs]):
         )
 
 
-class Form(Component[*ComplexChildren, FormAttrs]):
+class Form(Component[ComplexChild, FormAttrs]):
     """A component helper for creating HTML forms."""
 
     @staticmethod
-    def create_fields(element: AnyElement) -> ComplexChildren:
+    def create_fields(element: BaseElement) -> tuple[ComplexChild, ...]:
         """Create form fields from the given attributes.
 
         Example:
@@ -127,13 +133,13 @@ class Form(Component[*ComplexChildren, FormAttrs]):
             form = Form(*fields)
 
         Args:
-            element (AnyElement): The element to create forms from.
+            element (Element): The element to create forms from.
 
         Returns:
-            ComplexChildren: list of form fields.
+            ComplexChild: list of form fields.
         """
         annotations = get_element_attrs_annotations(element, include_extras=True)
-        fields: list[AnyElement] = []
+        fields: list[ComplexChild] = []
 
         for name, annotation in annotations.items():
             if get_origin(annotation) is not Annotated:

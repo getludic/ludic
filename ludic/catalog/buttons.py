@@ -1,10 +1,10 @@
 from ludic.attrs import ButtonAttrs
-from ludic.base import AnyElement, Component, PrimitiveChild
 from ludic.html import button
+from ludic.types import BaseElement, Component, PrimitiveChild
 
 
 class Button(Component[PrimitiveChild, ButtonAttrs]):
-    def render(self) -> AnyElement:
+    def render(self) -> BaseElement:
         self.attrs.setdefault("class_", "btn")
         return button(self.children[0], **self.attrs_for(button))
 

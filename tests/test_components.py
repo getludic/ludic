@@ -14,8 +14,6 @@ def test_link():
 def test_invalid_link():
     with pytest.raises(TypeError):
         Link("should not pass")
-    with pytest.raises(TypeError):
-        Link(to="https://should.not.pass")  # type: ignore
 
 
 def test_component_with_f_string():
@@ -64,6 +62,6 @@ def test_navigation():
 
 def test_invalid_navigation():
     with pytest.raises(TypeError):
-        Navigation("should not pass")  # type: ignore
+        Navigation("should not pass")
     with pytest.raises(TypeError):
-        Navigation(li("Home"), li("About"))  # type: ignore
+        Navigation(li("Home"), li("About"))

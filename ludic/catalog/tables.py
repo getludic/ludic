@@ -1,11 +1,11 @@
 from typing import cast, override
 
 from ludic.attrs import GlobalAttrs
-from ludic.base import ComplexChildren, Component, PrimitiveChild, PrimitiveChildren
 from ludic.html import table, tbody, thead, tr
+from ludic.types import ComplexChild, Component, ComponentStrict, PrimitiveChild
 
 
-class TableRow(Component[*ComplexChildren, GlobalAttrs]):
+class TableRow(Component[ComplexChild, GlobalAttrs]):
     def get_text(self, index: int) -> str:
         if len(self.children) > index:
             return self.children[index].text
@@ -16,9 +16,9 @@ class TableRow(Component[*ComplexChildren, GlobalAttrs]):
         return tr(*self.children, **self.attrs)
 
 
-class TableHead(Component[*ComplexChildren, GlobalAttrs]):
+class TableHead(Component[ComplexChild, GlobalAttrs]):
     @property
-    def header(self) -> PrimitiveChildren:
+    def header(self) -> tuple[PrimitiveChild, ...]:
         return tuple(child.text for child in self.children if self.children)
 
     @override
@@ -26,9 +26,9 @@ class TableHead(Component[*ComplexChildren, GlobalAttrs]):
         return tr(*self.children, **self.attrs)
 
 
-class Table(Component[TableHead, *tuple[TableRow, ...], GlobalAttrs]):
+class Table(ComponentStrict[TableHead, *tuple[TableRow, ...], GlobalAttrs]):
     @property
-    def header(self) -> PrimitiveChildren:
+    def header(self) -> tuple[PrimitiveChild, ...]:
         return self.children[0].header
 
     def getlist(self, key: str) -> list[PrimitiveChild | None]:

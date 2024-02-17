@@ -1,12 +1,17 @@
 import html
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 from collections.abc import Callable, Iterator
 from typing import (
     Any,
+    Generic,
+    Never,
     TypedDict,
     Union,
+    Unpack,
     cast,
 )
+
+from typing_extensions import TypeVar, TypeVarTuple
 
 from .utils import (
     format_attrs,
@@ -16,11 +21,11 @@ from .utils import (
     validate_elements,
 )
 
-_ELEMENT_REGISTRY: dict[str, type["AnyElement"]] = {}
+_ELEMENT_REGISTRY: dict[str, type["BaseElement"]] = {}
 
 
-def _parse_children(string: str) -> "AnyChildren":
-    element: AnyElement = parse_element(f"<div>{string}</div>", _ELEMENT_REGISTRY)
+def _parse_children(string: str) -> tuple["AnyChild", ...]:
+    element: BaseElement = parse_element(f"<div>{string}</div>", _ELEMENT_REGISTRY)
     return element.children
 
 
@@ -32,7 +37,7 @@ def default_html_formatter(child: "AnyChild") -> str:
     """
     if isinstance(child, str) and not isinstance(child, Safe):
         return html.escape(child)
-    elif isinstance(child, Element):
+    elif isinstance(child, BaseElement):
         return child.to_html()
     else:
         return str(child)
@@ -53,7 +58,7 @@ class Safe(str):
     """
 
     @staticmethod
-    def parse(string: str) -> Union["AnyChild", "AnyChildren"]:
+    def parse(string: str) -> Union["AnyChild", tuple["AnyChild", ...]]:
         result = _parse_children(string)
         if len(result) == 1:
             return result[0]
@@ -82,35 +87,12 @@ class BaseAttrs(TypedDict, total=False):
     """
 
 
-class Element[*Te, Ta: BaseAttrs]:
-    """Base class for PyMX elements.
-
-    Args:
-        *children (*Te): The children of the element.
-        **attributes (**Ta): The attributes of the element.
-    """
-
+class BaseElement(metaclass=ABCMeta):
     html_name: str
     always_pair: bool = False
 
-    _children: tuple[*Te]
-    _attrs: Ta
-
     def __init_subclass__(cls) -> None:
-        _ELEMENT_REGISTRY[cls.__name__] = cast(type["AnyElement"], cls)
-
-    def __init__(self, *children: *Te, **attributes: Any) -> None:
-        validate_attributes(self, attributes)
-        self._attrs = cast(Ta, attributes)
-
-        if len(children) == 1 and isinstance(children[0], Safe):
-            new_children = _parse_children(children[0])
-            validate_elements(self, new_children)
-            self._children = cast(tuple[*Te], new_children)
-
-        else:
-            validate_elements(self, children)
-            self._children = children
+        _ELEMENT_REGISTRY[cls.__name__] = cls
 
     def __str__(self) -> str:
         return self.to_string()
@@ -148,29 +130,29 @@ class Element[*Te, Ta: BaseAttrs]:
     ) -> str:
         return "".join(formatter(child) for child in self.children)
 
-    @property
-    def children(self) -> tuple[*Te]:
-        return cast(tuple[*Te], getattr(self, "_children", []))
+    @abstractproperty
+    def children(self) -> tuple[Any, ...]:
+        raise NotImplementedError()
 
-    @property
-    def text(self) -> str:
-        return "".join(
-            child.text if isinstance(child, Element) else str(child)
-            for child in self.children
-        )
-
-    @property
-    def attrs(self) -> Ta:
-        return cast(Ta, getattr(self, "_attrs", {}))
+    @abstractproperty
+    def attrs(self) -> Any:
+        raise NotImplementedError()
 
     @property
     def aliased_attrs(self) -> dict[str, Any]:
         """Attributes as a dict with keys renamed to their aliases."""
         return format_attrs(type(self), dict(self.attrs))
 
+    @property
+    def text(self) -> str:
+        return "".join(
+            child.text if isinstance(child, BaseElement) else str(child)
+            for child in self.children
+        )
+
     def is_simple(self) -> bool:
         """Check if the element is simple (i.e. contains only primitive types)."""
-        return len(self) == 1 and isinstance(self.children[0], PrimitiveChild)
+        return len(self) == 1 and not isinstance(self.children[0], BaseElement)
 
     def has_attributes(self) -> bool:
         """Check if the element has any attributes."""
@@ -197,9 +179,9 @@ class Element[*Te, Ta: BaseAttrs]:
 
         if self.children:
             children_str = self._format_children(
-                lambda child: str(child)
-                if isinstance(child, PrimitiveChild)
-                else child.to_string(pretty=pretty, _level=_level + 1),
+                lambda child: child.to_string(pretty=pretty, _level=_level + 1)
+                if isinstance(child, BaseElement)
+                else str(child)
             )
 
             if pretty:
@@ -237,7 +219,7 @@ class Element[*Te, Ta: BaseAttrs]:
 
         return element_tag
 
-    def attrs_for(self, cls: type["AnyElement"]) -> dict[str, Any]:
+    def attrs_for(self, cls: type["BaseElement"]) -> dict[str, Any]:
         """Get the attributes of this component that are defined in the given element.
 
         This is useful so that you can pass common attributes to an element
@@ -252,15 +234,86 @@ class Element[*Te, Ta: BaseAttrs]:
             if key in get_element_attrs_annotations(cls)
         }
 
-    def render(self) -> "AnyElement":
-        return cast(AnyElement, self)
+    def render(self) -> "BaseElement":
+        return cast(BaseElement, self)
 
 
-class Component[*Te, Ta: BaseAttrs](Element[*Te, Ta], metaclass=ABCMeta):
+TElement = TypeVar("TElement", bound="AnyChild", default=BaseElement, covariant=True)
+TElementTuple = TypeVarTuple("TElementTuple", default=Unpack[tuple["AnyChild", ...]])
+TAttr = TypeVar("TAttr", bound=BaseAttrs, default=BaseAttrs, covariant=True)
+
+
+class Element(Generic[TElement, TAttr], BaseElement):
+    """Base class for PyMX elements.
+
+    Args:
+        *children (*Te): The children of the element.
+        **attributes (**Ta): The attributes of the element.
+    """
+
+    _children: tuple[TElement, ...]
+    _attrs: TAttr
+
+    def __init__(self, *children: TElement, **attributes: Any) -> None:
+        validate_attributes(self, attributes)
+        self._attrs = cast(TAttr, attributes)
+
+        if len(children) == 1 and isinstance(children[0], Safe):
+            new_children = _parse_children(children[0])
+            validate_elements(self, new_children)
+            self._children = cast(tuple[TElement], new_children)
+
+        else:
+            validate_elements(self, children)
+            self._children = children
+
+    @property
+    def children(self) -> tuple[TElement, ...]:
+        return cast(tuple[TElement, ...], getattr(self, "_children", ()))
+
+    @property
+    def attrs(self) -> TAttr:
+        return cast(TAttr, getattr(self, "_attrs", BaseAttrs()))
+
+
+class ElementStrict(Generic[*TElementTuple, TAttr], BaseElement):
+    """Base class for PyMX elements.
+
+    Args:
+        *children (*Te): The children of the element.
+        **attributes (**Ta): The attributes of the element.
+    """
+
+    _children: tuple[*TElementTuple]
+    _attrs: TAttr
+
+    def __init__(self, *children: *TElementTuple, **attributes: Any) -> None:
+        validate_attributes(self, attributes)
+        self._attrs = cast(TAttr, attributes)
+
+        if 1 <= len(children) > 0 and isinstance(children[0], Safe):
+            new_children = _parse_children(children[0])
+            validate_elements(self, new_children)
+            self._children = cast(tuple[*TElementTuple], new_children)
+
+        else:
+            validate_elements(self, children)
+            self._children = children
+
+    @property
+    def children(self) -> tuple[*TElementTuple]:
+        return cast(tuple[*TElementTuple], getattr(self, "_children", ()))
+
+    @property
+    def attrs(self) -> TAttr:
+        return cast(TAttr, getattr(self, "_attrs", BaseAttrs()))
+
+
+class Component(Element[TElement, TAttr], metaclass=ABCMeta):
     """Base class for components.
 
     A component subclasses an :class:`Element` and represents any element
-    that can be rendered in PyMX.
+    that can be rendered in Ludic.
 
     Example usage:
 
@@ -281,17 +334,30 @@ class Component[*Te, Ta: BaseAttrs](Element[*Te, Ta], metaclass=ABCMeta):
 
         >>> div(Person(name="John Doe", age=30), id="person-detail")
 
-    You can also make the component take children:
+    """
+
+    @abstractmethod
+    def render(self) -> "BaseElement":
+        """Render the component as an instance of :class:`Element`."""
+
+
+class ComponentStrict(ElementStrict[*TElementTuple, TAttr], metaclass=ABCMeta):
+    """Base class for strict components.
+
+    A component subclasses an :class:`ElementStrict` and represents any
+    element that can be rendered in Ludic.
+
+    Example usage:
 
         class PersonAttrs(Attributes):
             age: NotRequired[int]
 
-        class Person(Component[str, str, PersonAttrs]):
+        class Person(ComponentStrict[str, str, PersonAttrs]):
             @override
             def render(self) -> dl:
                 return dl(
                     dt("Name"),
-                    dd(" ".join(self.children)),
+                    dd(self.attrs["name"]),
                     dt("Age"),
                     dd(self.attrs.get("age", "N/A")),
                 )
@@ -302,14 +368,11 @@ class Component[*Te, Ta: BaseAttrs](Element[*Te, Ta], metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def render(self) -> "AnyElement":
+    def render(self) -> "BaseElement":
         """Render the component as an instance of :class:`Element`."""
 
 
+NoChild = Never
 PrimitiveChild = str | bool | int | float
-AnyElement = Element[*tuple["AnyChild", ...], BaseAttrs]
-AnyChild = PrimitiveChild | Safe | AnyElement
-
-PrimitiveChildren = tuple[PrimitiveChild, ...]
-AnyChildren = tuple[AnyChild, ...]
-ComplexChildren = tuple[AnyElement, ...]
+ComplexChild = BaseElement
+AnyChild = PrimitiveChild | ComplexChild | Safe

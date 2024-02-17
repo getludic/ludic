@@ -19,7 +19,6 @@ class HtmlAttrs(BaseAttrs, total=False):
     draggable: Literal["true", "false"]
     enterkeyhint: Literal["enter", "done", "go", "next", "previous", "search", "send"]
     hidden: Literal["true", "false"]
-    id: str
     inert: bool
     inputmode: Literal[
         "none", "text", "search", "tel", "url", "email", "numeric", "decimal"

@@ -14,7 +14,6 @@ python-multipart = {version = "^0.0.9", optional = true}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
-pyright = "^1.1.350"
 
 [tool.poetry.extras]
 starlette = ["starlette", "python-multipart"]
@@ -53,5 +52,5 @@ fixable = ["ALL"]
 [tool.ruff.lint.isort]
 known-first-party = ["ludic"]
 
-[tool.pyright]
-reportMissingImports = false
+[tool.mypy]
+python_version = "3.12"

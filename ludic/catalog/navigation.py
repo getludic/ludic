@@ -24,7 +24,7 @@ class NavItem(Component[PrimitiveChild, NavItemAttrs]):
         return li(Link(label, to=self.attrs["to"]), id=label.lower())
 
 
-class Navigation(Component[*tuple[NavItem, ...], GlobalAttrs]):
+class Navigation(Component[NavItem, GlobalAttrs]):
     """Simple component simulating a navigation bar.
 
     Example usage:

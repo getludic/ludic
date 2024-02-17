@@ -1,12 +1,14 @@
 import os
 import random
 import string
-from types import UnionType
+from collections.abc import Mapping
 from typing import (
     Annotated,
     Any,
     Final,
+    Generic,
     TypedDict,
+    TypeVar,
     get_args,
     get_origin,
     get_type_hints,
@@ -18,9 +20,12 @@ from typeguard import TypeCheckError, check_type
 LUDIC_MAX_ELEMENT_DEPTH: Final[int] = int(os.getenv("LUDIC_MAX_ELEMENT_DEPTH", 50))
 
 
-class _ParsedElement[T](TypedDict):
+_T = TypeVar("_T", covariant=True)
+
+
+class _ParsedElement(Generic[_T], TypedDict):
     tag: str
-    children: list[T | str]
+    children: list[_T | str]
     attrs: dict[str, str]
 
 
@@ -36,13 +41,13 @@ def random_string(n: int) -> str:
     )
 
 
-class _LudicElementHandler[T]:
+class _LudicElementHandler(Generic[_T]):
     """Parse HTML elements from a string and collects them as ParsedElement's."""
 
-    def __init__(self, registry: dict[str, type[T]]) -> None:
+    def __init__(self, registry: Mapping[str, type[_T]]) -> None:
         self.registry = registry
-        self.finished: T | None = None
-        self.elements: list[_ParsedElement[T]] = []
+        self.finished: _T | None = None
+        self.elements: list[_ParsedElement[_T]] = []
 
     def start(self, tag: str, attrs: dict[str, str]) -> None:
         if len(self.elements) > LUDIC_MAX_ELEMENT_DEPTH:
@@ -60,7 +65,7 @@ class _LudicElementHandler[T]:
         element_type = self.registry[tag]
         attrs = parse_attrs(element_type, element["attrs"])
 
-        new_element: T = self.registry[tag](*element["children"], **attrs)
+        new_element: _T = self.registry[tag](*element["children"], **attrs)
         if self.elements:
             self.elements[-1]["children"].append(new_element)
         else:
@@ -69,13 +74,13 @@ class _LudicElementHandler[T]:
     def data(self, data: str) -> None:
         self.elements[-1]["children"].append(data)
 
-    def close(self) -> T:
+    def close(self) -> _T:
         if self.finished is None:
             raise TypeError("Element is not finished")
         return self.finished
 
 
-def parse_element[T](tree: str, registry: dict[str, type[T]]) -> T:
+def parse_element(tree: str, registry: Mapping[str, type[_T]]) -> _T:
     """Parse HTML elements from a string.
 
     Args:
@@ -102,10 +107,10 @@ def get_element_generic_args(cls_or_obj: Any) -> tuple[type, ...] | None:
     Returns:
         dict[str, Any] | None: The generic arguments or :obj:`None`.
     """
-    from ludic.base import Element
+    from ludic.base import BaseElement
 
     for base in getattr(cls_or_obj, "__orig_bases__", []):
-        if issubclass(get_origin(base), Element):
+        if issubclass(get_origin(base), BaseElement):
             return get_args(base)
     return None
 
@@ -150,25 +155,26 @@ def validate_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None:
     """
     if (args := get_element_generic_args(cls_or_obj)) is not None:
         types = args[:-1]
-        if len(types) == 0:
-            if len(elements) != 0:
-                raise TypeError(
-                    f"The element {cls_or_obj!r} doesn't expect any elements. "
-                    f"Got {len(elements)} elements."
-                )
-        elif len(types) > 1 or get_origin(types[0]) is UnionType:
-            if len(types) != len(elements):
-                raise TypeError(
-                    f"The element {cls_or_obj!r} got an invalid number of elements. "
-                    f"Expected {len(types)} but got {len(elements)}."
-                )
-            for element, type_ in zip(elements, types, strict=True):
-                check_type(element, type_)
-        else:
-            try:
-                check_type(elements, types)
-            except TypeCheckError as err:
-                raise TypeError(f"Invalid elements for {cls_or_obj!r}: {err}.")
+        try:
+            if len(types) == 0:
+                if len(elements) != 0:
+                    raise TypeError(
+                        f"The element {cls_or_obj!r} doesn't expect any elements. "
+                        f"Got {len(elements)} elements."
+                    )
+            elif len(types) > 1:
+                if len(types) != len(elements):
+                    raise TypeError(
+                        f"The element {cls_or_obj!r} got an invalid number of elements."
+                        f" Expected {len(types)} but got {len(elements)}."
+                    )
+                for element, type_ in zip(elements, types, strict=True):
+                    check_type(element, type_)
+            else:
+                for element in elements:
+                    check_type(element, types[0])
+        except TypeCheckError as err:
+            raise TypeError(f"Invalid elements for {cls_or_obj!r}: {err}.")
 
 
 def _format_attr_value(key: str, value: Any, html: bool = False) -> str:
@@ -209,7 +215,7 @@ def _parse_attr_value(value_type: type[Any], value: str, html: bool = False) -> 
     elif value_type is float:
         return float(value)
     elif value_type is dict:
-        return dict(tuple(part.split(":", 1)) for part in value.split(";"))
+        return dict(part.split(":", 1) for part in value.split(";"))
     else:
         return value
 

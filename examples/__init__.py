@@ -12,12 +12,12 @@ from ludic.html import (
     script,
     title,
 )
-from ludic.types import AnyChildren, AnyElement, PrimitiveChild
+from ludic.types import AnyChild, BaseElement, PrimitiveChild
 from ludic.web import LudicApp
 
 
-class Page(Component[*AnyChildren, BaseAttrs]):
-    def render(self) -> AnyElement:
+class Page(Component[AnyChild, BaseAttrs]):
+    def render(self) -> BaseElement:
         return html(
             head(
                 title("Ludic Example"),
@@ -38,7 +38,7 @@ class Header(Component[PrimitiveChild, BaseAttrs]):
         )
 
 
-class Body(Component[*AnyChildren, BaseAttrs]):
+class Body(Component[AnyChild, BaseAttrs]):
     def render(self) -> div:
         return div(*self.children)
 

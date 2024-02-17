@@ -2,6 +2,7 @@ from typing import Annotated, Self
 
 from starlette.datastructures import FormData
 
+from examples import Body, Header, Page, app
 from ludic.base import BaseAttrs
 from ludic.catalog.buttons import ButtonDanger, ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form
@@ -9,8 +10,6 @@ from ludic.catalog.lists import Pairs
 from ludic.html import div
 from ludic.web.endpoints import Endpoint
 from ludic.web.exceptions import NotFoundError
-
-from examples import Body, Header, Page, app
 
 
 class ContactAttrs(BaseAttrs):

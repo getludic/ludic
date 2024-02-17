@@ -10,7 +10,7 @@ from starlette.responses import PlainTextResponse, Response
 from starlette.routing import Route, Router, get_name
 from starlette.types import Receive, Scope, Send
 
-from ludic.base import Element
+from ludic.base import BaseElement
 
 from .endpoints import Endpoint
 from .response import LudicResponse
@@ -30,7 +30,7 @@ class _FunctionHandler:
             response = await self.handler(request, **handler_kw)
         else:
             response = await run_in_threadpool(self.handler, request, **handler_kw)
-        if isinstance(response, Element):
+        if isinstance(response, BaseElement):
             response = LudicResponse(response)
         await response(scope, receive, send)
 
@@ -61,7 +61,7 @@ class _EndpointHandler:
             response = await handler(**handler_kw)
         else:
             response = await run_in_threadpool(handler, **handler_kw)
-        if isinstance(response, Element):
+        if isinstance(response, BaseElement):
             response = LudicResponse(response)
         await response(scope, receive, send)
 

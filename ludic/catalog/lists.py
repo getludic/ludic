@@ -4,18 +4,18 @@ from typing import override
 from ludic.attrs import GlobalAttrs
 from ludic.base import Component
 from ludic.html import dd, dl, dt
-from ludic.types import PrimitiveChild, PrimitiveChildren
+from ludic.types import PrimitiveChild
 
 from .utils import attr_to_camel
 
 
-class Key(Component[*PrimitiveChildren, GlobalAttrs]):
+class Key(Component[PrimitiveChild, GlobalAttrs]):
     @override
     def render(self) -> dt:
         return dt(*self.children, **self.attrs)
 
 
-class Value(Component[*PrimitiveChildren, GlobalAttrs]):
+class Value(Component[PrimitiveChild, GlobalAttrs]):
     @override
     def render(self) -> dd:
         return dd(*self.children, **self.attrs)
@@ -25,7 +25,7 @@ class PairsAttrs(GlobalAttrs, total=False):
     items: Iterable[tuple[str, PrimitiveChild]]
 
 
-class Pairs(Component[*tuple[Key | Value, ...], PairsAttrs]):
+class Pairs(Component[Key | Value, PairsAttrs]):
     @override
     def render(self) -> dl:
         from_items: list[Key | Value] = []

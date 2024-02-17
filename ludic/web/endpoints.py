@@ -1,21 +1,17 @@
 from collections.abc import Callable
-from typing import Any, ClassVar, Protocol
+from typing import Any, ClassVar, Never, Protocol
 
 from starlette._utils import is_async_callable
 from starlette.concurrency import run_in_threadpool
 from starlette.endpoints import HTTPEndpoint as BaseEndpoint
 from starlette.requests import Request
 from starlette.routing import Route
-from typing_extensions import TypeVar
 
-from ludic.attrs import BaseAttrs
-from ludic.base import Component, Element
+from ludic.types import Component, Element, TAttr
 from ludic.utils import get_element_generic_args
 
 from .response import LudicResponse
 from .utils import extract_from_request
-
-Ta = TypeVar("Ta", bound=BaseAttrs, default=BaseAttrs)
 
 
 class RoutedProtocol(Protocol):
@@ -39,7 +35,7 @@ def url_for(endpoint: type[RoutedProtocol], **kwargs: Any) -> str:
     return endpoint.route.url_path_for(endpoint.__name__, **url_kwargs)
 
 
-class HTTPEndpoint(BaseEndpoint):  # type: ignore
+class HTTPEndpoint(BaseEndpoint):
     """Endpoint class for PyMX components.
 
     Usage:
@@ -59,8 +55,8 @@ class HTTPEndpoint(BaseEndpoint):  # type: ignore
             else request.method.lower()
         )
 
-        handler: Callable[[Request], Any] = getattr(
-            self, handler_name, self.method_not_allowed
+        handler: Callable[[Request], Any] = (
+            getattr(self, handler_name, None) or self.method_not_allowed
         )
         handler_kw = await extract_from_request(handler, request)
 
@@ -76,7 +72,7 @@ class HTTPEndpoint(BaseEndpoint):  # type: ignore
         await response(self.scope, self.receive, self.send)
 
 
-class Endpoint(Component[Ta]):
+class Endpoint(Component[Never, TAttr]):
     """Base class for PyMX endpoints."""
 
     route: ClassVar[Route]
