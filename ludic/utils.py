@@ -150,31 +150,44 @@ def validate_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None:
     """Check if the given elements are valid for the given class.
 
     Args:
-        cls (type): The expected type of the elements.
+        cls_or_obj (type): The expected type of the elements.
         elements (tuple[Any, ...]): The elements to check.
     """
     if (args := get_element_generic_args(cls_or_obj)) is not None:
-        types = args[:-1]
+        found_type = args[0]
         try:
-            if len(types) == 0:
-                if len(elements) != 0:
-                    raise TypeError(
-                        f"The element {cls_or_obj!r} doesn't expect any elements. "
-                        f"Got {len(elements)} elements."
-                    )
-            elif len(types) > 1:
-                if len(types) != len(elements):
-                    raise TypeError(
-                        f"The element {cls_or_obj!r} got an invalid number of elements."
-                        f" Expected {len(types)} but got {len(elements)}."
-                    )
-                for element, type_ in zip(elements, types, strict=True):
-                    check_type(element, type_)
-            else:
-                for element in elements:
-                    check_type(element, types[0])
+            check_type(elements, tuple[found_type, ...])  # type: ignore
         except TypeCheckError as err:
             raise TypeError(f"Invalid elements for {cls_or_obj!r}: {err}.")
+
+
+def validate_strict_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None:
+    """Check if the given strict elements are valid for the given class.
+
+    Args:
+        cls_or_obj (type): The expected type of the elements.
+        elements (tuple[Any, ...]): The elements to check.
+    """
+    if (args := get_element_generic_args(cls_or_obj)) is not None:
+        try:
+            for idx, type_hint in enumerate(args[:-1]):
+                if getattr(type_hint, "__unpacked__", False):
+                    break
+                if len(elements) <= idx:
+                    raise TypeError(f"Invalid number of children for {cls_or_obj!r}. ")
+                check_type(elements[idx], type_hint)
+            else:
+                if elements[idx + 1 :]:
+                    raise TypeError(
+                        f"Invalid number of children for {cls_or_obj!r}. "
+                        f"Expected {len(args[:-1])}, got {len(elements)}."
+                    )
+                return
+
+            packed_tuple_type = args[-2]
+            check_type(elements[idx:], packed_tuple_type)
+        except TypeCheckError as err:
+            raise TypeError(f"Invalid children for {cls_or_obj!r}: {err}.")
 
 
 def _format_attr_value(key: str, value: Any, html: bool = False) -> str:

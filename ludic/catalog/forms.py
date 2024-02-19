@@ -38,11 +38,11 @@ class FieldMeta:
             id: str
             name: Annotated[
                 str,
-                FieldMeta(label="Email"),
+                FieldMeta(label="Email", validator=validate_email),
             ]
     """
 
-    label: str
+    label: str | None = None
     kind: Literal["input", "textarea"] = "input"
     type: Literal["text", "number", "email", "password", "hidden"] = "text"
     attrs: InputAttrs | TextAreaAttrs | None = None
@@ -75,7 +75,7 @@ class TextAreaFieldAttrs(FieldAttrs, TextAreaAttrs):
 
 class FormField(Component[TElement, TAttr]):
     def get_label_text(self) -> str:
-        return str(self.attrs.get("label", attr_to_camel(str(self.children[0]))))
+        return f"{self.attrs.get("label") or attr_to_camel(str(self.children[0]))}: "
 
 
 class InputField(FormField[PrimitiveChild, InputFieldAttrs]):

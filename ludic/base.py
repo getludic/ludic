@@ -5,8 +5,8 @@ from typing import (
     Any,
     Generic,
     Never,
+    TypeAlias,
     TypedDict,
-    Union,
     Unpack,
     cast,
 )
@@ -19,13 +19,14 @@ from .utils import (
     parse_element,
     validate_attributes,
     validate_elements,
+    validate_strict_elements,
 )
 
 _ELEMENT_REGISTRY: dict[str, type["BaseElement"]] = {}
 
 
 def _parse_children(string: str) -> tuple["AnyChild", ...]:
-    element: BaseElement = parse_element(f"<div>{string}</div>", _ELEMENT_REGISTRY)
+    element = parse_element(f"<div>{string}</div>", _ELEMENT_REGISTRY)
     return element.children
 
 
@@ -58,7 +59,7 @@ class Safe(str):
     """
 
     @staticmethod
-    def parse(string: str) -> Union["AnyChild", tuple["AnyChild", ...]]:
+    def parse(string: str) -> "AnyChild | tuple[AnyChild, ...]":
         result = _parse_children(string)
         if len(result) == 1:
             return result[0]
@@ -238,8 +239,13 @@ class BaseElement(metaclass=ABCMeta):
         return cast(BaseElement, self)
 
 
-TElement = TypeVar("TElement", bound="AnyChild", default=BaseElement, covariant=True)
-TElementTuple = TypeVarTuple("TElementTuple", default=Unpack[tuple["AnyChild", ...]])
+NoChild: TypeAlias = Never
+PrimitiveChild: TypeAlias = str | bool | int | float
+ComplexChild: TypeAlias = BaseElement
+AnyChild: TypeAlias = PrimitiveChild | ComplexChild | Safe
+
+TElement = TypeVar("TElement", bound=AnyChild, default=BaseElement, covariant=True)
+TElementTuple = TypeVarTuple("TElementTuple", default=Unpack[tuple[AnyChild, ...]])
 TAttr = TypeVar("TAttr", bound=BaseAttrs, default=BaseAttrs, covariant=True)
 
 
@@ -259,13 +265,10 @@ class Element(Generic[TElement, TAttr], BaseElement):
         self._attrs = cast(TAttr, attributes)
 
         if len(children) == 1 and isinstance(children[0], Safe):
-            new_children = _parse_children(children[0])
-            validate_elements(self, new_children)
-            self._children = cast(tuple[TElement], new_children)
+            children = _parse_children(children[0])  # type: ignore
 
-        else:
-            validate_elements(self, children)
-            self._children = children
+        validate_elements(self, children)
+        self._children = children
 
     @property
     def children(self) -> tuple[TElement, ...]:
@@ -292,13 +295,10 @@ class ElementStrict(Generic[*TElementTuple, TAttr], BaseElement):
         self._attrs = cast(TAttr, attributes)
 
         if 1 <= len(children) > 0 and isinstance(children[0], Safe):
-            new_children = _parse_children(children[0])
-            validate_elements(self, new_children)
-            self._children = cast(tuple[*TElementTuple], new_children)
+            children = _parse_children(children[0])  # type: ignore
 
-        else:
-            validate_elements(self, children)
-            self._children = children
+        validate_strict_elements(self, children)
+        self._children = children
 
     @property
     def children(self) -> tuple[*TElementTuple]:
@@ -337,7 +337,7 @@ class Component(Element[TElement, TAttr], metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def render(self) -> "BaseElement":
+    def render(self) -> BaseElement:
         """Render the component as an instance of :class:`Element`."""
 
 
@@ -362,17 +362,11 @@ class ComponentStrict(ElementStrict[*TElementTuple, TAttr], metaclass=ABCMeta):
                     dd(self.attrs.get("age", "N/A")),
                 )
 
-    Valid usage would now look like this:
+    Valid usage would look like this:
 
         >>> div(Person("John", "Doe", age=30), id="person-detail")
     """
 
     @abstractmethod
-    def render(self) -> "BaseElement":
+    def render(self) -> BaseElement:
         """Render the component as an instance of :class:`Element`."""
-
-
-NoChild = Never
-PrimitiveChild = str | bool | int | float
-ComplexChild = BaseElement
-AnyChild = PrimitiveChild | ComplexChild | Safe

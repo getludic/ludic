@@ -1,7 +1,5 @@
 from typing import Annotated, Self
 
-from starlette.datastructures import FormData
-
 from examples import Body, Header, Page, app
 from ludic.base import BaseAttrs
 from ludic.catalog.buttons import ButtonDanger, ButtonPrimary
@@ -53,14 +51,12 @@ class Contact(Endpoint[ContactAttrs]):
         return cls(**contact)
 
     @classmethod
-    async def put(cls, id: str, data: FormData) -> Self:
+    async def put(cls, id: str, data: ContactAttrs) -> Self:
         contact = contacts.get(id)
         if contact is None:
             raise NotFoundError("Contact not found")
 
-        contact["first_name"] = str(data["first_name"])
-        contact["last_name"] = str(data["last_name"])
-        contact["email"] = str(data["email"])
+        contact.update(data)
 
         return cls(**contact)
 
