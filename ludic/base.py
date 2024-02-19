@@ -244,7 +244,7 @@ TAttr = TypeVar("TAttr", bound=BaseAttrs, default=BaseAttrs, covariant=True)
 
 
 class Element(Generic[TElement, TAttr], BaseElement):
-    """Base class for PyMX elements.
+    """Base class for Ludic elements.
 
     Args:
         *children (*Te): The children of the element.
@@ -277,7 +277,7 @@ class Element(Generic[TElement, TAttr], BaseElement):
 
 
 class ElementStrict(Generic[*TElementTuple, TAttr], BaseElement):
-    """Base class for PyMX elements.
+    """Base class for strict elements (elements with concrete types of children).
 
     Args:
         *children (*Te): The children of the element.

@@ -469,3 +469,38 @@ class IframeAttrs(GlobalAttrs, total=False):
     src: str
     srcdoc: str
     width: int
+
+
+class ColAttrs(GlobalAttrs, total=False):
+    span: int
+
+
+class DelAttrs(GlobalAttrs, total=False):
+    cite: str
+    datetime: str
+
+
+class InsAttrs(GlobalAttrs, total=False):
+    cite: str
+    datetime: str
+
+
+class AreaAttrs(GlobalAttrs, total=False):
+    alt: str
+    coords: str
+    download: str
+    href: str
+    ping: str
+    referrerpolicy: Literal[
+        "no-referrer",
+        "no-referrer-when-downgrade",
+        "origin",
+        "origin-when-cross-origin",
+        "same-origin",
+        "strict-origin",
+        "strict-origin-when-cross-origin",
+        "unsafe-url",
+    ]
+    rel: str
+    shape: Literal["rect", "circle", "poly", "default"]
+    target: str

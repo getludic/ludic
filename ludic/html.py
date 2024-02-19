@@ -1,6 +1,9 @@
 from .attrs import (
+    AreaAttrs,
     BlockquoteAttrs,
     ButtonAttrs,
+    ColAttrs,
+    DelAttrs,
     FieldsetAttrs,
     FormAttrs,
     GlobalAttrs,
@@ -10,6 +13,7 @@ from .attrs import (
     IframeAttrs,
     ImgAttrs,
     InputAttrs,
+    InsAttrs,
     LabelAttrs,
     LiAttrs,
     MetaAttrs,
@@ -183,8 +187,32 @@ class u(Element[AnyChild, GlobalAttrs]):
     html_name: str = "u"
 
 
+class strong(Element[AnyChild, GlobalAttrs]):
+    html_name: str = "strong"
+
+
+class em(Element[AnyChild, GlobalAttrs]):
+    html_name: str = "em"
+
+
+class mark(Element[AnyChild, GlobalAttrs]):
+    html_name: str = "mark"
+
+
+class del_(Element[AnyChild, DelAttrs]):
+    html_name: str = "del"
+
+
+class ins(Element[AnyChild, InsAttrs]):
+    html_name: str = "ins"
+
+
 class header(Element[AnyChild, GlobalAttrs]):
     html_name: str = "header"
+
+
+class big(Element[AnyChild, GlobalAttrs]):
+    html_name: str = "big"
 
 
 class small(Element[AnyChild, GlobalAttrs]):
@@ -199,8 +227,16 @@ class pre(Element[AnyChild, GlobalAttrs]):
     html_name: str = "pre"
 
 
+class cite(Element[AnyChild, GlobalAttrs]):
+    html_name: str = "cite"
+
+
 class blockquote(Element[AnyChild, BlockquoteAttrs]):
     html_name: str = "blockquote"
+
+
+class abbr(Element[AnyChild, GlobalAttrs]):
+    html_name: str = "abbr"
 
 
 class h1(Element[AnyChild, GlobalAttrs]):
@@ -271,3 +307,27 @@ class html(ElementStrict[head, body, HtmlTagAttrs]):
 
 class iframe(Element[NoChild, IframeAttrs]):
     html_name: str = "iframe"
+
+
+class article(Element[AnyChild, GlobalAttrs]):
+    html_name: str = "article"
+
+
+class address(Element[AnyChild, GlobalAttrs]):
+    html_name: str = "address"
+
+
+class caption(Element[AnyChild, GlobalAttrs]):
+    html_name: str = "caption"
+
+
+class col(Element[NoChild, ColAttrs]):
+    html_name: str = "col"
+
+
+class colgroup(Element[AnyChild, GlobalAttrs]):
+    html_name: str = "colgroup"
+
+
+class area(Element[NoChild, AreaAttrs]):
+    html_name: str = "area"

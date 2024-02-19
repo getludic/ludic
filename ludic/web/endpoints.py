@@ -36,11 +36,11 @@ def url_for(endpoint: type[RoutedProtocol], **kwargs: Any) -> str:
 
 
 class HTTPEndpoint(BaseEndpoint):
-    """Endpoint class for PyMX components.
+    """Endpoint class for Ludic components.
 
     Usage:
 
-        class MyButtonEndpoint(PyMXEndpoint):
+        class MyButtonEndpoint(HTTPEndpoint):
             async def get(self, request: Request) -> button:
                 return button(...)
     """
@@ -73,7 +73,7 @@ class HTTPEndpoint(BaseEndpoint):
 
 
 class Endpoint(Component[Never, TAttr]):
-    """Base class for PyMX endpoints."""
+    """Base class for Ludic endpoints."""
 
     route: ClassVar[Route]
 
