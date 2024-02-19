@@ -1,9 +1,11 @@
 import inspect
 from collections.abc import Callable
-from typing import Any, get_type_hints
+from typing import Any, get_origin
 
 from starlette.datastructures import FormData, Headers, QueryParams
 from starlette.requests import Request
+
+from ludic.web.parsers import Parser
 
 
 async def extract_from_request(
@@ -22,18 +24,16 @@ async def extract_from_request(
         handler_kwargs.update(request.path_params)
 
     for name, param in parameters.items():
-        if issubclass(param.annotation, FormData):
+        if (
+            get_origin(param.annotation) is not None
+            and issubclass(get_origin(param.annotation), Parser)
+        ) or issubclass(param.annotation, FormData):
             async with request.form() as form:
-                handler_kwargs[name] = form
-        elif issubclass(param.annotation, dict) and (
-            hints := get_type_hints(param.annotation)
-        ):
-            async with request.form() as form:
-                handler_kwargs[name] = {
-                    key: type_construct(form[key])
-                    for key, type_construct in hints.items()
-                    if key in form
-                }
+                if isinstance(param.annotation, FormData):
+                    handler_kwargs[name] = form
+                else:
+                    handler_kwargs[name] = param.annotation(form)
+                    handler_kwargs[name].__post_init__()
         elif issubclass(param.annotation, QueryParams):
             handler_kwargs[name] = request.query_params
         elif issubclass(param.annotation, Request):

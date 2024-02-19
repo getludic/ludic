@@ -11,9 +11,9 @@ from .base import (
     NoChild,
     PrimitiveChild,
     Safe,
-    TAttr,
-    TElement,
-    TElementTuple,
+    TAttrs,
+    TChildren,
+    TChildrenTuple,
 )
 
 __all__ = (
@@ -29,7 +29,7 @@ __all__ = (
     "NoChild",
     "PrimitiveChild",
     "Safe",
-    "TAttr",
-    "TElement",
-    "TElementTuple",
+    "TAttrs",
+    "TChildren",
+    "TChildrenTuple",
 )

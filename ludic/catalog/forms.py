@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Annotated, Any, Literal, get_origin, override
+from typing import Any, Literal, override
 
 from ludic.attrs import BaseAttrs, FormAttrs, InputAttrs, TextAreaAttrs
 from ludic.html import div, form, input, label, textarea
@@ -9,10 +9,10 @@ from ludic.types import (
     ComplexChild,
     Component,
     PrimitiveChild,
-    TAttr,
-    TElement,
+    TAttrs,
+    TChildren,
 )
-from ludic.utils import get_element_attrs_annotations
+from ludic.utils import get_annotations_metadata_of_type, get_element_attrs_annotations
 
 from .utils import attr_to_camel
 
@@ -73,7 +73,7 @@ class TextAreaFieldAttrs(FieldAttrs, TextAreaAttrs):
     pass
 
 
-class FormField(Component[TElement, TAttr]):
+class FormField(Component[TChildren, TAttrs]):
     def get_label_text(self) -> str:
         return f"{self.attrs.get("label") or attr_to_camel(str(self.children[0]))}: "
 
@@ -139,15 +139,13 @@ class Form(Component[ComplexChild, FormAttrs]):
             ComplexChild: list of form fields.
         """
         annotations = get_element_attrs_annotations(element, include_extras=True)
+        metadata_list = get_annotations_metadata_of_type(annotations, FieldMeta)
         fields: list[ComplexChild] = []
 
-        for name, annotation in annotations.items():
-            if get_origin(annotation) is not Annotated:
-                continue
-            for metadata in annotation.__metadata__:
-                if isinstance(metadata, FieldMeta) and name in element.attrs:
-                    field = metadata.create_field(name, element.attrs[name])
-                    fields.append(field)
+        for name, metadata in metadata_list.items():
+            if name in element.attrs:
+                field = metadata.create_field(name, element.attrs[name])
+                fields.append(field)
 
         return tuple(fields)
 

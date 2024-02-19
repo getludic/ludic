@@ -17,9 +17,9 @@ from .utils import (
     format_attrs,
     get_element_attrs_annotations,
     parse_element,
-    validate_attributes,
-    validate_elements,
-    validate_strict_elements,
+    validate_element_attrs,
+    validate_element_children,
+    validate_element_strict_children,
 )
 
 _ELEMENT_REGISTRY: dict[str, type["BaseElement"]] = {}
@@ -244,12 +244,12 @@ PrimitiveChild: TypeAlias = str | bool | int | float
 ComplexChild: TypeAlias = BaseElement
 AnyChild: TypeAlias = PrimitiveChild | ComplexChild | Safe
 
-TElement = TypeVar("TElement", bound=AnyChild, default=BaseElement, covariant=True)
-TElementTuple = TypeVarTuple("TElementTuple", default=Unpack[tuple[AnyChild, ...]])
-TAttr = TypeVar("TAttr", bound=BaseAttrs, default=BaseAttrs, covariant=True)
+TChildren = TypeVar("TChildren", bound=AnyChild, default=BaseElement, covariant=True)
+TChildrenTuple = TypeVarTuple("TChildrenTuple", default=Unpack[tuple[AnyChild, ...]])
+TAttrs = TypeVar("TAttrs", bound=BaseAttrs, default=BaseAttrs, covariant=True)
 
 
-class Element(Generic[TElement, TAttr], BaseElement):
+class Element(Generic[TChildren, TAttrs], BaseElement):
     """Base class for Ludic elements.
 
     Args:
@@ -257,29 +257,29 @@ class Element(Generic[TElement, TAttr], BaseElement):
         **attributes (**Ta): The attributes of the element.
     """
 
-    _children: tuple[TElement, ...]
-    _attrs: TAttr
+    _children: tuple[TChildren, ...]
+    _attrs: TAttrs
 
-    def __init__(self, *children: TElement, **attributes: Any) -> None:
-        validate_attributes(self, attributes)
-        self._attrs = cast(TAttr, attributes)
+    def __init__(self, *children: TChildren, **attributes: Any) -> None:
+        validate_element_attrs(self, attributes)
+        self._attrs = cast(TAttrs, attributes)
 
         if len(children) == 1 and isinstance(children[0], Safe):
             children = _parse_children(children[0])  # type: ignore
 
-        validate_elements(self, children)
+        validate_element_children(self, children)
         self._children = children
 
     @property
-    def children(self) -> tuple[TElement, ...]:
-        return cast(tuple[TElement, ...], getattr(self, "_children", ()))
+    def children(self) -> tuple[TChildren, ...]:
+        return cast(tuple[TChildren, ...], getattr(self, "_children", ()))
 
     @property
-    def attrs(self) -> TAttr:
-        return cast(TAttr, getattr(self, "_attrs", BaseAttrs()))
+    def attrs(self) -> TAttrs:
+        return cast(TAttrs, getattr(self, "_attrs", BaseAttrs()))
 
 
-class ElementStrict(Generic[*TElementTuple, TAttr], BaseElement):
+class ElementStrict(Generic[*TChildrenTuple, TAttrs], BaseElement):
     """Base class for strict elements (elements with concrete types of children).
 
     Args:
@@ -287,29 +287,29 @@ class ElementStrict(Generic[*TElementTuple, TAttr], BaseElement):
         **attributes (**Ta): The attributes of the element.
     """
 
-    _children: tuple[*TElementTuple]
-    _attrs: TAttr
+    _children: tuple[*TChildrenTuple]
+    _attrs: TAttrs
 
-    def __init__(self, *children: *TElementTuple, **attributes: Any) -> None:
-        validate_attributes(self, attributes)
-        self._attrs = cast(TAttr, attributes)
+    def __init__(self, *children: *TChildrenTuple, **attributes: Any) -> None:
+        validate_element_attrs(self, attributes)
+        self._attrs = cast(TAttrs, attributes)
 
         if 1 <= len(children) > 0 and isinstance(children[0], Safe):
             children = _parse_children(children[0])  # type: ignore
 
-        validate_strict_elements(self, children)
+        validate_element_strict_children(self, children)
         self._children = children
 
     @property
-    def children(self) -> tuple[*TElementTuple]:
-        return cast(tuple[*TElementTuple], getattr(self, "_children", ()))
+    def children(self) -> tuple[*TChildrenTuple]:
+        return cast(tuple[*TChildrenTuple], getattr(self, "_children", ()))
 
     @property
-    def attrs(self) -> TAttr:
-        return cast(TAttr, getattr(self, "_attrs", BaseAttrs()))
+    def attrs(self) -> TAttrs:
+        return cast(TAttrs, getattr(self, "_attrs", BaseAttrs()))
 
 
-class Component(Element[TElement, TAttr], metaclass=ABCMeta):
+class Component(Element[TChildren, TAttrs], metaclass=ABCMeta):
     """Base class for components.
 
     A component subclasses an :class:`Element` and represents any element
@@ -341,7 +341,7 @@ class Component(Element[TElement, TAttr], metaclass=ABCMeta):
         """Render the component as an instance of :class:`Element`."""
 
 
-class ComponentStrict(ElementStrict[*TElementTuple, TAttr], metaclass=ABCMeta):
+class ComponentStrict(ElementStrict[*TChildrenTuple, TAttrs], metaclass=ABCMeta):
     """Base class for strict components.
 
     A component subclasses an :class:`ElementStrict` and represents any

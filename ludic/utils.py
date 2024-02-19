@@ -132,7 +132,7 @@ def get_element_attrs_annotations(
     return {}
 
 
-def validate_attributes(cls_or_obj: Any, values: dict[str, Any]) -> None:
+def validate_element_attrs(cls_or_obj: Any, values: dict[str, Any]) -> Any:
     """Check if the given values are valid for the given class.
 
     Args:
@@ -141,12 +141,12 @@ def validate_attributes(cls_or_obj: Any, values: dict[str, Any]) -> None:
     """
     if (args := get_element_generic_args(cls_or_obj)) is not None:
         try:
-            check_type(values, args[-1])
+            return check_type(values, args[-1])
         except TypeCheckError as err:
             raise TypeError(f"Invalid attributes for {cls_or_obj!r}: {err}.")
 
 
-def validate_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None:
+def validate_element_children(cls_or_obj: Any, elements: tuple[Any, ...]) -> Any:
     """Check if the given elements are valid for the given class.
 
     Args:
@@ -156,12 +156,12 @@ def validate_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None:
     if (args := get_element_generic_args(cls_or_obj)) is not None:
         found_type = args[0]
         try:
-            check_type(elements, tuple[found_type, ...])  # type: ignore
+            return check_type(elements, tuple[found_type, ...])  # type: ignore
         except TypeCheckError as err:
             raise TypeError(f"Invalid elements for {cls_or_obj!r}: {err}.")
 
 
-def validate_strict_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None:
+def validate_element_strict_children(cls_or_obj: Any, elements: tuple[Any, ...]) -> Any:
     """Check if the given strict elements are valid for the given class.
 
     Args:
@@ -175,7 +175,7 @@ def validate_strict_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None
                     break
                 if len(elements) <= idx:
                     raise TypeError(f"Invalid number of children for {cls_or_obj!r}. ")
-                check_type(elements[idx], type_hint)
+                return check_type(elements[idx], type_hint)
             else:
                 if elements[idx + 1 :]:
                     raise TypeError(
@@ -185,7 +185,7 @@ def validate_strict_elements(cls_or_obj: Any, elements: tuple[Any, ...]) -> None
                 return
 
             packed_tuple_type = args[-2]
-            check_type(elements[idx:], packed_tuple_type)
+            return check_type(elements[idx:], packed_tuple_type)
         except TypeCheckError as err:
             raise TypeError(f"Invalid children for {cls_or_obj!r}: {err}.")
 
@@ -319,4 +319,33 @@ def parse_attrs(
         annotation, key_alias = _get_info(ann, key)
         if (value := attrs.get(key_alias)) is not None:
             result[key] = _parse_attr_value(annotation, value, html=html)
+    return result
+
+
+def get_annotations_metadata_of_type(
+    annotations: dict[str, Any],
+    expected_type: type[_T],
+    default: _T | None = None,
+) -> dict[str, _T]:
+    """Get the metadata of the annotations with the given type.
+
+    Args:
+        annotations (dict[str, Any]): The annotations.
+        expected_type (Any): The expected type.
+        default (Any, optional): The default type.
+
+    Returns:
+        dict[str, Any]: The metadata.
+    """
+    result: dict[str, _T] = {}
+    for name, annotation in annotations.items():
+        if get_origin(annotation) is not Annotated:
+            continue
+        for metadata in annotation.__metadata__:
+            if isinstance(metadata, expected_type):
+                result[name] = metadata
+                break
+        else:
+            if default is not None:
+                result[name] = default
     return result

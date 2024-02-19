@@ -1,17 +1,18 @@
-from typing import Annotated, Self
+from typing import Annotated, NotRequired, Self
 
 from examples import Body, Header, Page, app
-from ludic.base import BaseAttrs
 from ludic.catalog.buttons import ButtonDanger, ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form
 from ludic.catalog.lists import Pairs
 from ludic.html import div
+from ludic.types import BaseAttrs
 from ludic.web.endpoints import Endpoint
 from ludic.web.exceptions import NotFoundError
+from ludic.web.parsers import Parser
 
 
 class ContactAttrs(BaseAttrs):
-    id: str
+    id: NotRequired[str]
     first_name: Annotated[str, FieldMeta(label="First Name")]
     last_name: Annotated[str, FieldMeta(label="Last Name")]
     email: Annotated[str, FieldMeta(label="Email", type="email")]
@@ -51,12 +52,12 @@ class Contact(Endpoint[ContactAttrs]):
         return cls(**contact)
 
     @classmethod
-    async def put(cls, id: str, data: ContactAttrs) -> Self:
+    async def put(cls, id: str, data: Parser[ContactAttrs]) -> Self:
         contact = contacts.get(id)
         if contact is None:
             raise NotFoundError("Contact not found")
 
-        contact.update(data)
+        contact.update(data.parse())
 
         return cls(**contact)
 

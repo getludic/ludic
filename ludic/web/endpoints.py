@@ -7,7 +7,7 @@ from starlette.endpoints import HTTPEndpoint as BaseEndpoint
 from starlette.requests import Request
 from starlette.routing import Route
 
-from ludic.types import Component, Element, TAttr
+from ludic.types import Component, Element, TAttrs
 from ludic.utils import get_element_generic_args
 
 from .response import LudicResponse
@@ -72,7 +72,7 @@ class HTTPEndpoint(BaseEndpoint):
         await response(self.scope, self.receive, self.send)
 
 
-class Endpoint(Component[Never, TAttr]):
+class Endpoint(Component[Never, TAttrs]):
     """Base class for Ludic endpoints."""
 
     route: ClassVar[Route]
