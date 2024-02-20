@@ -1,31 +1,29 @@
 from typing import Annotated, NotRequired, Self
 
-from examples import Body, Header, Page, app
+from examples import Body, Header, Page, app, db
 from ludic.catalog.buttons import ButtonDanger, ButtonPrimary
-from ludic.catalog.forms import FieldMeta, Form
+from ludic.catalog.forms import FieldMeta, Form, create_fields
 from ludic.catalog.lists import Pairs
 from ludic.html import div
 from ludic.types import BaseAttrs
 from ludic.web.endpoints import Endpoint
 from ludic.web.exceptions import NotFoundError
-from ludic.web.parsers import Parser
+from ludic.web.parsers import Parser, ValidationError
+
+
+def email_validator(email: str) -> str:
+    if len(email.split("@")) != 2:
+        raise ValidationError("Invalid email")
+    return email
 
 
 class ContactAttrs(BaseAttrs):
     id: NotRequired[str]
     first_name: Annotated[str, FieldMeta(label="First Name")]
     last_name: Annotated[str, FieldMeta(label="Last Name")]
-    email: Annotated[str, FieldMeta(label="Email", type="email")]
-
-
-contacts = {
-    "1": ContactAttrs(
-        id="1",
-        first_name="John",
-        last_name="Doe",
-        email="qN6Z8@example.com",
-    )
-}
+    email: Annotated[
+        str, FieldMeta(label="Email", type="email", parser=email_validator)
+    ]
 
 
 @app.endpoint("/")
@@ -37,7 +35,7 @@ class Index(Endpoint):
     def render(self) -> Page:
         return Page(
             Header("Click To Edit"),
-            Body(*(Contact(**contact) for contact in contacts.values())),
+            Body(*(Contact(**contact.dict()) for contact in db.contacts.values())),
         )
 
 
@@ -45,21 +43,22 @@ class Index(Endpoint):
 class Contact(Endpoint[ContactAttrs]):
     @classmethod
     async def get(cls, id: str) -> Self:
-        contact = contacts.get(id)
+        contact = db.contacts.get(id)
         if contact is None:
             raise NotFoundError("Contact not found")
 
-        return cls(**contact)
+        return cls(**contact.dict())
 
     @classmethod
-    async def put(cls, id: str, data: Parser[ContactAttrs]) -> Self:
-        contact = contacts.get(id)
+    async def put(cls, id: str, attrs: Parser[ContactAttrs]) -> Self:
+        contact = db.contacts.get(id)
         if contact is None:
             raise NotFoundError("Contact not found")
 
-        contact.update(data.parse())
+        for key, value in attrs.validate().items():
+            setattr(contact, key, value)
 
-        return cls(**contact)
+        return await cls.get(id)
 
     def render(self) -> div:
         return div(
@@ -77,16 +76,16 @@ class Contact(Endpoint[ContactAttrs]):
 class ContactForm(Endpoint[ContactAttrs]):
     @classmethod
     async def get(cls, id: str) -> Self:
-        contact = contacts.get(id)
+        contact = db.contacts.get(id)
 
         if contact is None:
             raise NotFoundError("Contact not found")
 
-        return cls(**contact)
+        return cls(**contact.dict())
 
     def render(self) -> Form:
         return Form(
-            *Form.create_fields(self),
+            *create_fields(self.attrs, spec=ContactAttrs),
             ButtonPrimary("Submit"),
             ButtonDanger("Cancel", hx_get=self.url_for(Contact)),
             hx_put=self.url_for(Contact),

@@ -203,10 +203,7 @@ def _format_attr_value(key: str, value: Any, html: bool = False) -> str:
         value = ";".join(f"{dkey}:{dvalue}" for dkey, dvalue in value.items())  # type: ignore
     if isinstance(value, bool):
         if html:
-            if value:
-                value = key
-            else:
-                return ""
+            value = key if value else ""
         else:
             value = "true" if value else "false"
     return value
@@ -270,10 +267,11 @@ def format_attrs(
                 return args[1]
         return key
 
-    return {
-        _get_key(key): _format_attr_value(key, value, html=html)
-        for key, value in attrs.items()
-    }
+    result = {}
+    for key, value in attrs.items():
+        if formatted_value := _format_attr_value(key, value, html=html):
+            result[_get_key(key)] = formatted_value
+    return result
 
 
 def parse_attrs(

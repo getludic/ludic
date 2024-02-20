@@ -1,49 +1,28 @@
-from typing import Final, Self
+from typing import Annotated, Self
 
-from examples import Body, Header, Page, app
-from ludic.catalog.tables import Table, TableHead, TableRow
-from ludic.html import td, th
+from examples import Body, Header, Page, app, db
+from ludic.catalog.buttons import ButtonPrimary
+from ludic.catalog.forms import FieldMeta, Form
+from ludic.catalog.tables import ColumnMeta, Table, create_rows
+from ludic.css import CSSProperties
+from ludic.html import span
 from ludic.types import BaseAttrs
 from ludic.web.endpoints import Endpoint
+from ludic.web.parsers import ListParser
 
 
-class PersonAttrs(BaseAttrs):
-    id: str
-    name: str
-    email: str
-    active: bool
+class PersonAttrs(BaseAttrs, total=False):
+    id: Annotated[str, ColumnMeta(identifier=True)]
+    name: Annotated[str, ColumnMeta()]
+    email: Annotated[str, ColumnMeta()]
+    active: Annotated[
+        bool,
+        ColumnMeta(kind=FieldMeta(kind="checkbox", label=None)),
+    ]
 
 
-class PeopleAttrs(BaseAttrs):
+class PeopleTableAttrs(BaseAttrs):
     people: list[PersonAttrs]
-
-
-people = {
-    "1": PersonAttrs(
-        id="1",
-        name="Joe Smith",
-        email="joe@smith.org",
-        active=True,
-    ),
-    "2": PersonAttrs(
-        id="2",
-        name="Angie MacDowell",
-        email="angie@macdowell.org",
-        active=True,
-    ),
-    "3": PersonAttrs(
-        id="3",
-        name="Fuqua Tarkenton",
-        email="fuqua@tarkenton.org",
-        active=True,
-    ),
-    "4": PersonAttrs(
-        id="2",
-        name="Kim Yee",
-        email="kim@yee.org",
-        active=False,
-    ),
-}
 
 
 @app.endpoint("/")
@@ -55,25 +34,46 @@ class Index(Endpoint):
     def render(self) -> Page:
         return Page(
             Header("Bulk Update"),
-            Body(People(people=list(people.values()))),
+            Body(self.lazy_load(PeopleTable)),
         )
 
 
 @app.endpoint("/people/")
-class People(Endpoint[PeopleAttrs]):
-    COLUMNS: Final[tuple[str, ...]] = ("Name", "Email", "Active")
+class PeopleTable(Endpoint[PeopleTableAttrs]):
+    styles: dict[str, CSSProperties] = {
+        "toast": {"margin": "10px 20px", "background": "#E1F0DA"}
+    }
+
+    @classmethod
+    async def post(cls, data: ListParser[PersonAttrs]) -> span:
+        items = {row["id"]: row for row in data.validate()}
+        activations = {True: 0, False: 0}
+
+        for person in db.people.values():
+            active = items.get(person.id, {}).get("active", False)
+            if person.active != active:
+                person.active = active
+                activations[active] += 1
+
+        return span(
+            f"Activated {activations[True]}, deactivated {activations[False]}",
+            id="toast",
+            style=cls.styles["toast"],
+        )
 
     @classmethod
     async def get(cls) -> Self:
-        return cls(people=list(people.values()))
+        return cls(people=[person.dict() for person in db.people.values()])
 
-    def render(self) -> Table:
-        return Table(
-            TableHead(*map(th, self.COLUMNS)),
-            *(
-                TableRow(
-                    *(td(person.get(column.lower(), "")) for column in self.COLUMNS)  # type: ignore
-                )
-                for person in self.attrs["people"]
+    def render(self) -> Form:
+        return Form(
+            Table(*create_rows(self.attrs["people"], spec=PersonAttrs)),
+            ButtonPrimary("Bulk Update", type="submit"),
+            span(
+                id="toast",
+                style=self.styles["toast"],
             ),
+            hx_post=self.url_for(PeopleTable),
+            hx_target="#toast",
+            hx_swap="outerHTML settle:3s",
         )

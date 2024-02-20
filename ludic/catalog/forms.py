@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Literal, override
+from typing import Any, Literal, get_type_hints, override
 
 from ludic.attrs import BaseAttrs, FormAttrs, InputAttrs, TextAreaAttrs
 from ludic.html import div, form, input, label, textarea
@@ -8,20 +8,20 @@ from ludic.types import (
     BaseElement,
     ComplexChild,
     Component,
+    NoChild,
     PrimitiveChild,
     TAttrs,
     TChildren,
 )
-from ludic.utils import get_annotations_metadata_of_type, get_element_attrs_annotations
+from ludic.utils import get_annotations_metadata_of_type
 
 from .utils import attr_to_camel
 
-
-class ValidationError(Exception):
-    reason: str
-
-    def __init__(self, reason: str) -> None:
-        self.reason = reason
+DEFAULT_FIELD_PARSERS: dict[str, Callable[[Any], PrimitiveChild]] = {
+    "input": lambda value: value,
+    "textarea": lambda value: value,
+    "checkbox": lambda value: True if value == "on" else False,
+}
 
 
 @dataclass
@@ -29,7 +29,7 @@ class FieldMeta:
     """Class to be used as an annotation for attributes.
 
     Example:
-        def validate_email(email: str) -> str:
+        def parse_email(email: str) -> str:
             if len(email.split("@")) != 2:
                 raise ValidationError("Invalid email")
             return email
@@ -38,26 +38,38 @@ class FieldMeta:
             id: str
             name: Annotated[
                 str,
-                FieldMeta(label="Email", validator=validate_email),
+                FieldMeta(label="Email", parser=parse_email),
             ]
     """
 
-    label: str | None = None
-    kind: Literal["input", "textarea"] = "input"
-    type: Literal["text", "number", "email", "password", "hidden"] = "text"
+    label: str | Literal["auto"] | None = "auto"
+    kind: Literal["input", "textarea", "checkbox"] = "input"
+    type: Literal["text", "email", "password", "hidden"] = "text"
     attrs: InputAttrs | TextAreaAttrs | None = None
-    validator: Callable[[Any], PrimitiveChild] = str
+    parser: Callable[[Any], PrimitiveChild] | None = None
 
     def create_field(self, key: str, value: Any) -> BaseElement:
-        value = self.validator(value)
-        attrs = self.attrs or {}
+        attrs = {} if self.attrs is None else dict(self.attrs)
         attrs["name"] = key
+
+        if self.label:
+            attrs["label"] = self.label
+        elif self.label == "auto":
+            attrs["label"] = attr_to_camel(key)
 
         match self.kind:
             case "input":
-                return InputField(value, label=self.label, type=self.type, **attrs)
+                return InputField(value=value, type=self.type, **attrs)
+            case "checkbox":
+                return InputField(checked=value, type="checkbox", **attrs)
             case "textarea":
-                return TextAreaField(value, label=self.label, **attrs)
+                return TextAreaField(value=value, **attrs)
+
+    def __call__(self, value: Any) -> PrimitiveChild:
+        if self.parser:
+            return self.parser(value)
+        else:
+            return DEFAULT_FIELD_PARSERS[self.kind](value)
 
 
 class FieldAttrs(BaseAttrs, total=False):
@@ -74,81 +86,82 @@ class TextAreaFieldAttrs(FieldAttrs, TextAreaAttrs):
 
 
 class FormField(Component[TChildren, TAttrs]):
-    def get_label_text(self) -> str:
-        return f"{self.attrs.get("label") or attr_to_camel(str(self.children[0]))}: "
+    def create_label(self, text: PrimitiveChild, for_: str = "") -> label:
+        if for_:
+            return label(text, for_=for_)
+        else:
+            return label(text)
 
 
-class InputField(FormField[PrimitiveChild, InputFieldAttrs]):
+class InputField(FormField[NoChild, InputFieldAttrs]):
     @override
     def render(self) -> div:
-        label_attrs = {}
-        input_attrs = self.attrs_for(input)
+        attrs = self.attrs_for(input)
         if "name" in self.attrs:
-            input_attrs["id"] = label_attrs["for_"] = self.attrs["name"]
+            attrs["id"] = self.attrs["name"]
 
-        return div(
-            label(self.get_label_text(), **label_attrs),
-            input(value=self.children[0], **input_attrs),
-            class_=self.attrs.get("class_div", "form-input"),
-        )
+        elements: list[ComplexChild] = []
+        if text := self.attrs.get("label"):
+            elements.append(self.create_label(text=text, for_=attrs.get("id", "")))
+        elements.append(input(**attrs))
+
+        return div(*elements, class_=self.attrs.get("class_div", "form-group"))
 
 
 class TextAreaField(FormField[PrimitiveChild, TextAreaFieldAttrs]):
     @override
     def render(self) -> div:
-        label_attrs = {}
-        textarea_attrs = self.attrs_for(textarea)
+        attrs = self.attrs_for(textarea)
         if "name" in self.attrs:
-            textarea_attrs["id"] = label_attrs["for_"] = self.attrs["name"]
+            attrs["id"] = self.attrs["name"]
 
-        return div(
-            label(self.get_label_text(), **label_attrs),
-            textarea(self.children[0], **textarea_attrs),
-            class_=self.attrs.get("class_div", "form-textarea"),
-        )
+        elements: list[ComplexChild] = []
+        if text := self.attrs.get("label"):
+            elements.append(self.create_label(text=text, for_=attrs.get("id", "")))
+        elements.append(textarea(self.children[0], **attrs))
+
+        return div(*elements, class_=self.attrs.get("class_div", "form-group"))
 
 
 class Form(Component[ComplexChild, FormAttrs]):
     """A component helper for creating HTML forms."""
 
-    @staticmethod
-    def create_fields(element: BaseElement) -> tuple[ComplexChild, ...]:
-        """Create form fields from the given attributes.
-
-        Example:
-
-            class CustomerAttrs(BaseAttrs):
-                id: str
-                name: Annotated[
-                    str,
-                    InputMeta(label="Customer Name"),
-                ]
-
-            class Customer(Component[BaseAttrs]):
-                def render(self): ...
-
-            customer = Customer(id=1, name="John Doe")
-            fields = Form.create_fields(customer)
-
-            form = Form(*fields)
-
-        Args:
-            element (Element): The element to create forms from.
-
-        Returns:
-            ComplexChild: list of form fields.
-        """
-        annotations = get_element_attrs_annotations(element, include_extras=True)
-        metadata_list = get_annotations_metadata_of_type(annotations, FieldMeta)
-        fields: list[ComplexChild] = []
-
-        for name, metadata in metadata_list.items():
-            if name in element.attrs:
-                field = metadata.create_field(name, element.attrs[name])
-                fields.append(field)
-
-        return tuple(fields)
-
     @override
     def render(self) -> form:
         return form(*self.children, **self.attrs)
+
+
+def create_fields(attrs: BaseAttrs, spec: type[TAttrs]) -> tuple[ComplexChild, ...]:
+    """Create form fields from the given attributes.
+
+    Example:
+
+        class CustomerAttrs(BaseAttrs):
+            id: str
+            name: Annotated[
+                str,
+                FieldMeta(label="Customer Name"),
+            ]
+
+        customer = Customer(id=1, name="John Doe")
+        fields = create_fields(customer, spec=CustomerAttrs)
+
+        form = Form(*fields)
+
+    Args:
+        attrs (BaseAttrs): The attributes to create form fields from.
+        spec (type[TAttrs]): The specification of the attributes.
+
+    Returns:
+        ComplexChild: list of form fields.
+    """
+    annotations = get_type_hints(spec, include_extras=True)
+    metadata_list = get_annotations_metadata_of_type(annotations, FieldMeta)
+    fields: list[ComplexChild] = []
+
+    for name, metadata in metadata_list.items():
+        if value := attrs.get(name):
+            field = metadata.create_field(name, value)
+            fields.append(field)
+
+    return tuple(fields)

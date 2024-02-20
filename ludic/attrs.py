@@ -45,7 +45,7 @@ class HtmxAttrs(BaseAttrs, total=False):
     hx_patch: Annotated[str, Alias("hx-patch")]
 
     hx_trigger: Annotated[str, Alias("hx-trigger")]
-    hx_target: Annotated[str, Alias("hx-target")]
+    hx_target: Annotated[Literal["this", "next", "previous"] | str, Alias("hx-target")]
     hx_swap: Annotated[
         Literal[
             "innerHTML",
@@ -56,7 +56,8 @@ class HtmxAttrs(BaseAttrs, total=False):
             "afterend",
             "delete",
             "none",
-        ],
+        ]
+        | str,
         Alias("hx-swap"),
     ]
 
@@ -207,6 +208,7 @@ class InputAttrs(GlobalAttrs, total=False):
     alt: str
     autcomplete: Literal["on", "off"]
     autofocus: bool
+    checked: bool
     dirname: str
     disabled: bool
     form: str
