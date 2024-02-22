@@ -25,17 +25,12 @@ class PeopleTableAttrs(BaseAttrs):
     people: list[PersonAttrs]
 
 
-@app.endpoint("/")
-class Index(Endpoint):
-    @classmethod
-    async def get(cls) -> Self:
-        return cls()
-
-    def render(self) -> Page:
-        return Page(
-            Header("Bulk Update"),
-            Body(self.lazy_load(PeopleTable)),
-        )
+@app.get("/")
+async def index() -> Page:
+    return Page(
+        Header("Bulk Update"),
+        Body(await PeopleTable.get()),
+    )
 
 
 @app.endpoint("/people/")

@@ -108,7 +108,7 @@ class BaseElement(metaclass=ABCMeta):
         return iter(self.children)
 
     def __repr__(self) -> str:
-        return self.to_string()
+        return self.to_string(pretty=False)
 
     def __eq__(self, other: Any) -> bool:
         return (
@@ -345,7 +345,10 @@ class ComponentStrict(ElementStrict[*TChildrenTuple, TAttrs], metaclass=ABCMeta)
     """Base class for strict components.
 
     A component subclasses an :class:`ElementStrict` and represents any
-    element that can be rendered in Ludic.
+    element that can be rendered in Ludic. The difference between
+    :class:`Component` and :class:`ComponentStrict` is that the latter
+    expects concrete types of children. It allows specification
+    of each child's type.
 
     Example usage:
 
@@ -357,7 +360,7 @@ class ComponentStrict(ElementStrict[*TChildrenTuple, TAttrs], metaclass=ABCMeta)
             def render(self) -> dl:
                 return dl(
                     dt("Name"),
-                    dd(self.attrs["name"]),
+                    dd(" ".join(self.children),
                     dt("Age"),
                     dd(self.attrs.get("age", "N/A")),
                 )
@@ -365,6 +368,10 @@ class ComponentStrict(ElementStrict[*TChildrenTuple, TAttrs], metaclass=ABCMeta)
     Valid usage would look like this:
 
         >>> div(Person("John", "Doe", age=30), id="person-detail")
+
+    In this case, we specified that Person expects two string children.
+    First child is the first name, and the second is the second name.
+    We also specify age as a key-word argument.
     """
 
     @abstractmethod

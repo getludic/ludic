@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Any, ClassVar, Never, Protocol
+from typing import Any, ClassVar, Protocol
 
 from starlette._utils import is_async_callable
 from starlette.concurrency import run_in_threadpool
@@ -8,7 +8,7 @@ from starlette.requests import Request
 from starlette.routing import Route
 
 from ludic.html import div
-from ludic.types import AnyChild, Component, Element, TAttrs
+from ludic.types import AnyChild, Component, Element, NoChild, TAttrs
 from ludic.utils import get_element_generic_args
 
 from .response import LudicResponse
@@ -56,16 +56,16 @@ class HTTPEndpoint(BaseEndpoint):
             else request.method.lower()
         )
 
-        handler: Callable[[Request], Any] = (
+        handler: Callable[..., Any] = (
             getattr(self, handler_name, None) or self.method_not_allowed
         )
         handler_kw = await extract_from_request(handler, request)
 
         is_async = is_async_callable(handler)
         if is_async:
-            response = await handler(request, **handler_kw)
+            response = await handler(**handler_kw)
         else:
-            response = await run_in_threadpool(handler, request, **handler_kw)
+            response = await run_in_threadpool(handler, **handler_kw)
 
         if isinstance(response, Element):
             response = LudicResponse(response)
@@ -73,7 +73,7 @@ class HTTPEndpoint(BaseEndpoint):
         await response(self.scope, self.receive, self.send)
 
 
-class Endpoint(Component[Never, TAttrs]):
+class Endpoint(Component[NoChild, TAttrs]):
     """Base class for Ludic endpoints."""
 
     route: ClassVar[Route]

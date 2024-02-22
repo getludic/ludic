@@ -26,7 +26,7 @@ DEFAULT_FIELD_PARSERS: dict[str, Callable[[Any], PrimitiveChild]] = {
 
 @dataclass
 class FieldMeta:
-    """Class to be used as an annotation for attributes.
+    """Class to be used in attributes annotations to create form fields.
 
     Example:
         def parse_email(email: str) -> str:

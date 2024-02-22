@@ -27,9 +27,9 @@ class _FunctionHandler:
 
         is_async = is_async_callable(self.handler)
         if is_async:
-            response = await self.handler(request, **handler_kw)
+            response = await self.handler(**handler_kw)
         else:
-            response = await run_in_threadpool(self.handler, request, **handler_kw)
+            response = await run_in_threadpool(self.handler, **handler_kw)
         if isinstance(response, BaseElement):
             response = LudicResponse(response)
         await response(scope, receive, send)

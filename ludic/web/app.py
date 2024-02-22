@@ -1,5 +1,5 @@
 from collections.abc import Callable, Mapping, Sequence
-from typing import Any, Literal
+from typing import Any, Literal, TypeVar
 
 from starlette.applications import AppType, Starlette
 from starlette.middleware import Middleware
@@ -9,9 +9,12 @@ from starlette.types import ExceptionHandler, Lifespan
 from .endpoints import Endpoint
 from .routing import LudicRouter
 
+TCallable = TypeVar("TCallable", bound=Callable[..., Any])
+TEndpoint = TypeVar("TEndpoint", bound=Endpoint)
+
 
 class LudicApp(Starlette):
-    """Starlette application with Ludic methods.
+    """Starlette application with Ludic adoption.
 
     Example:
 
@@ -50,6 +53,10 @@ class LudicApp(Starlette):
         """Register GET endpoint to the application."""
         return self.register_route(path, method="GET", **kwargs)
 
+    def head(self, path: str, **kwargs: Any) -> Callable[..., Any]:
+        """Register GET endpoint to the application."""
+        return self.register_route(path, method="HEAD", **kwargs)
+
     def post(self, path: str, **kwargs: Any) -> Callable[..., Any]:
         """Register POST endpoint to the application."""
         return self.register_route(path, method="POST", **kwargs)
@@ -66,15 +73,21 @@ class LudicApp(Starlette):
         """Register PATCH endpoint to the application."""
         return self.register_route(path, method="PATCH", **kwargs)
 
+    def options(self, path: str, **kwargs: Any) -> Callable[..., Any]:
+        """Register OPTIONS endpoint to the application."""
+        return self.register_route(path, method="OPTIONS", **kwargs)
+
     def register_route(
         self,
         path: str,
-        method: Literal["GET", "POST", "PUT", "DELETE", "PATCH"] = "GET",
+        method: Literal[
+            "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+        ] = "GET",
         include_in_schema: bool = True,
-    ) -> Callable[..., Any]:
+    ) -> Callable[[TCallable], TCallable]:
         """Register an endpoint to the application."""
 
-        def register(handler: Callable[..., Any]) -> Callable[..., Any]:
+        def register(handler: TCallable) -> TCallable:
             self.add_route(
                 path, handler, methods=[method], include_in_schema=include_in_schema
             )
@@ -86,10 +99,10 @@ class LudicApp(Starlette):
         self,
         path: str,
         include_in_schema: bool = True,
-    ) -> Callable[..., Any]:
+    ) -> Callable[[type[TEndpoint]], type[TEndpoint]]:
         """Register a Ludic class endpoint to the application."""
 
-        def register(endpoint: type[Endpoint]) -> type[Endpoint]:
+        def register(endpoint: type[TEndpoint]) -> type[TEndpoint]:
             self.add_route(path, endpoint, include_in_schema=include_in_schema)
             return endpoint
 

@@ -26,17 +26,12 @@ class ContactAttrs(BaseAttrs):
     ]
 
 
-@app.endpoint("/")
-class Index(Endpoint):
-    @classmethod
-    async def get(cls) -> Self:
-        return cls()
-
-    def render(self) -> Page:
-        return Page(
-            Header("Click To Edit"),
-            Body(*(Contact(**contact.dict()) for contact in db.contacts.values())),
-        )
+@app.get("/")
+async def index() -> Page:
+    return Page(
+        Header("Click To Edit"),
+        Body(*(Contact(**contact.dict()) for contact in db.contacts.values())),
+    )
 
 
 @app.endpoint("/contacts/{id}")

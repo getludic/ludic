@@ -175,7 +175,7 @@ def validate_element_strict_children(cls_or_obj: Any, elements: tuple[Any, ...])
                     break
                 if len(elements) <= idx:
                     raise TypeError(f"Invalid number of children for {cls_or_obj!r}. ")
-                return check_type(elements[idx], type_hint)
+                check_type(elements[idx], type_hint)
             else:
                 if elements[idx + 1 :]:
                     raise TypeError(
