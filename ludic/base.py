@@ -22,7 +22,7 @@ from .utils import (
     validate_element_strict_children,
 )
 
-_ELEMENT_REGISTRY: dict[str, type["BaseElement"]] = {}
+_ELEMENT_REGISTRY: dict[str, list[type["BaseElement"]]] = {}
 
 
 def _parse_children(string: str) -> tuple["AnyChild", ...]:
@@ -93,7 +93,8 @@ class BaseElement(metaclass=ABCMeta):
     always_pair: bool = False
 
     def __init_subclass__(cls) -> None:
-        _ELEMENT_REGISTRY[cls.__name__] = cls
+        _ELEMENT_REGISTRY.setdefault(cls.__name__, [])
+        _ELEMENT_REGISTRY[cls.__name__].append(cls)
 
     def __str__(self) -> str:
         return self.to_string()
@@ -203,8 +204,8 @@ class BaseElement(metaclass=ABCMeta):
     def to_html(self) -> str:
         """Convert the element tree to an HTML string."""
         dom = self
-        while not hasattr(dom, "html_name"):
-            dom = dom.render()
+        while dom != (rendered_dom := dom.render()):
+            dom = rendered_dom
 
         element_tag = f"<{dom.html_name}"
 
@@ -244,12 +245,12 @@ PrimitiveChild: TypeAlias = str | bool | int | float
 ComplexChild: TypeAlias = BaseElement
 AnyChild: TypeAlias = PrimitiveChild | ComplexChild | Safe
 
-TChildren = TypeVar("TChildren", bound=AnyChild, default=BaseElement, covariant=True)
-TChildrenTuple = TypeVarTuple("TChildrenTuple", default=Unpack[tuple[AnyChild, ...]])
+TChild = TypeVar("TChild", bound=AnyChild, default=AnyChild, covariant=True)
+TChildren = TypeVarTuple("TChildren", default=Unpack[tuple[AnyChild, ...]])
 TAttrs = TypeVar("TAttrs", bound=BaseAttrs, default=BaseAttrs, covariant=True)
 
 
-class Element(Generic[TChildren, TAttrs], BaseElement):
+class Element(Generic[TChild, TAttrs], BaseElement):
     """Base class for Ludic elements.
 
     Args:
@@ -257,10 +258,10 @@ class Element(Generic[TChildren, TAttrs], BaseElement):
         **attributes (**Ta): The attributes of the element.
     """
 
-    _children: tuple[TChildren, ...]
+    _children: tuple[TChild, ...]
     _attrs: TAttrs
 
-    def __init__(self, *children: TChildren, **attributes: Any) -> None:
+    def __init__(self, *children: TChild, **attributes: Any) -> None:
         validate_element_attrs(self, attributes)
         self._attrs = cast(TAttrs, attributes)
 
@@ -271,15 +272,15 @@ class Element(Generic[TChildren, TAttrs], BaseElement):
         self._children = children
 
     @property
-    def children(self) -> tuple[TChildren, ...]:
-        return cast(tuple[TChildren, ...], getattr(self, "_children", ()))
+    def children(self) -> tuple[TChild, ...]:
+        return cast(tuple[TChild, ...], getattr(self, "_children", ()))
 
     @property
     def attrs(self) -> TAttrs:
         return cast(TAttrs, getattr(self, "_attrs", BaseAttrs()))
 
 
-class ElementStrict(Generic[*TChildrenTuple, TAttrs], BaseElement):
+class ElementStrict(Generic[*TChildren, TAttrs], BaseElement):
     """Base class for strict elements (elements with concrete types of children).
 
     Args:
@@ -287,10 +288,10 @@ class ElementStrict(Generic[*TChildrenTuple, TAttrs], BaseElement):
         **attributes (**Ta): The attributes of the element.
     """
 
-    _children: tuple[*TChildrenTuple]
+    _children: tuple[*TChildren]
     _attrs: TAttrs
 
-    def __init__(self, *children: *TChildrenTuple, **attributes: Any) -> None:
+    def __init__(self, *children: *TChildren, **attributes: Any) -> None:
         validate_element_attrs(self, attributes)
         self._attrs = cast(TAttrs, attributes)
 
@@ -301,15 +302,15 @@ class ElementStrict(Generic[*TChildrenTuple, TAttrs], BaseElement):
         self._children = children
 
     @property
-    def children(self) -> tuple[*TChildrenTuple]:
-        return cast(tuple[*TChildrenTuple], getattr(self, "_children", ()))
+    def children(self) -> tuple[*TChildren]:
+        return cast(tuple[*TChildren], getattr(self, "_children", ()))
 
     @property
     def attrs(self) -> TAttrs:
         return cast(TAttrs, getattr(self, "_attrs", BaseAttrs()))
 
 
-class Component(Element[TChildren, TAttrs], metaclass=ABCMeta):
+class Component(Element[TChild, TAttrs], metaclass=ABCMeta):
     """Base class for components.
 
     A component subclasses an :class:`Element` and represents any element
@@ -341,7 +342,7 @@ class Component(Element[TChildren, TAttrs], metaclass=ABCMeta):
         """Render the component as an instance of :class:`Element`."""
 
 
-class ComponentStrict(ElementStrict[*TChildrenTuple, TAttrs], metaclass=ABCMeta):
+class ComponentStrict(ElementStrict[*TChildren, TAttrs], metaclass=ABCMeta):
     """Base class for strict components.
 
     A component subclasses an :class:`ElementStrict` and represents any
@@ -377,3 +378,37 @@ class ComponentStrict(ElementStrict[*TChildrenTuple, TAttrs], metaclass=ABCMeta)
     @abstractmethod
     def render(self) -> BaseElement:
         """Render the component as an instance of :class:`Element`."""
+
+
+def locate_element(
+    name: str, base_class: type[BaseElement] = BaseElement
+) -> type[BaseElement]:
+    """Get the element class by its name.
+
+    Args:
+        name (str): The name of the element.
+
+    Returns:
+        type[TChild]: The element class.
+    """
+    result = []
+    if "." in name:
+        module, element_name = name.rsplit(".", 1)
+    else:
+        module = ""
+        element_name = name
+
+    for element in _ELEMENT_REGISTRY[element_name]:
+        if issubclass(element, base_class):
+            if not module:
+                result.append(element)
+            submodules = element.__module__.split(".")
+            if all(submodule in submodules for submodule in module.split(".")):
+                result.append(element)
+
+    if len(result) == 1:
+        return result[0]
+    elif len(result) > 1:
+        raise ValueError(f"Multiple elements found for {name!r}: {result!r}.")
+    else:
+        raise ValueError(f"Could not locate element: {name!r}.")

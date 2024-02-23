@@ -12,8 +12,8 @@ from .base import (
     PrimitiveChild,
     Safe,
     TAttrs,
+    TChild,
     TChildren,
-    TChildrenTuple,
 )
 
 __all__ = (
@@ -30,6 +30,6 @@ __all__ = (
     "PrimitiveChild",
     "Safe",
     "TAttrs",
+    "TChild",
     "TChildren",
-    "TChildrenTuple",
 )

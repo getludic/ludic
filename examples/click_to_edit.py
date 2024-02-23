@@ -30,7 +30,7 @@ class ContactAttrs(BaseAttrs):
 async def index() -> Page:
     return Page(
         Header("Click To Edit"),
-        Body(*(Contact(**contact.dict()) for contact in db.contacts.values())),
+        Body(*[await Contact.get(contact_id) for contact_id in db.contacts]),
     )
 
 
@@ -39,6 +39,7 @@ class Contact(Endpoint[ContactAttrs]):
     @classmethod
     async def get(cls, id: str) -> Self:
         contact = db.contacts.get(id)
+
         if contact is None:
             raise NotFoundError("Contact not found")
 
@@ -47,6 +48,7 @@ class Contact(Endpoint[ContactAttrs]):
     @classmethod
     async def put(cls, id: str, attrs: Parser[ContactAttrs]) -> Self:
         contact = db.contacts.get(id)
+
         if contact is None:
             raise NotFoundError("Contact not found")
 
@@ -83,6 +85,6 @@ class ContactForm(Endpoint[ContactAttrs]):
             *create_fields(self.attrs, spec=ContactAttrs),
             ButtonPrimary("Submit"),
             ButtonDanger("Cancel", hx_get=self.url_for(Contact)),
-            hx_put=self.url_for(Contact),
+            hx_put=self.url_for("Contact"),
             hx_target="this",
         )

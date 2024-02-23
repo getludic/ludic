@@ -7,7 +7,7 @@ from starlette.routing import BaseRoute
 from starlette.types import ExceptionHandler, Lifespan
 
 from .endpoints import Endpoint
-from .routing import LudicRouter
+from .routing import Router
 
 TCallable = TypeVar("TCallable", bound=Callable[..., Any])
 TEndpoint = TypeVar("TEndpoint", bound=Endpoint)
@@ -45,7 +45,7 @@ class LudicApp(Starlette):
         super().__init__(
             debug, middleware=middleware, exception_handlers=exception_handlers
         )
-        self.router = LudicRouter(
+        self.router = Router(
             routes, on_startup=on_startup, on_shutdown=on_shutdown, lifespan=lifespan
         )
 
@@ -104,6 +104,7 @@ class LudicApp(Starlette):
 
         def register(endpoint: type[TEndpoint]) -> type[TEndpoint]:
             self.add_route(path, endpoint, include_in_schema=include_in_schema)
+            endpoint.app = self
             return endpoint
 
         return register

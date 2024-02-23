@@ -11,7 +11,7 @@ from ludic.types import (
     NoChild,
     PrimitiveChild,
     TAttrs,
-    TChildren,
+    TChild,
 )
 from ludic.utils import get_annotations_metadata_of_type
 
@@ -85,7 +85,7 @@ class TextAreaFieldAttrs(FieldAttrs, TextAreaAttrs):
     pass
 
 
-class FormField(Component[TChildren, TAttrs]):
+class FormField(Component[TChild, TAttrs]):
     def create_label(self, text: PrimitiveChild, for_: str = "") -> label:
         if for_:
             return label(text, for_=for_)

@@ -1,39 +1,24 @@
+import inspect
 from collections.abc import Callable
 from typing import Any, ClassVar, Protocol
 
 from starlette._utils import is_async_callable
+from starlette.applications import Starlette
 from starlette.concurrency import run_in_threadpool
 from starlette.endpoints import HTTPEndpoint as BaseEndpoint
 from starlette.requests import Request
 from starlette.routing import Route
 
 from ludic.html import div
-from ludic.types import AnyChild, Component, Element, NoChild, TAttrs
+from ludic.types import AnyChild, BaseElement, Component, NoChild, TAttrs
 from ludic.utils import get_element_generic_args
 
-from .response import LudicResponse
+from .responses import LudicResponse
 from .utils import extract_from_request
 
 
 class RoutedProtocol(Protocol):
     route: ClassVar[Route]
-
-
-def url_for(endpoint: type[RoutedProtocol], **kwargs: Any) -> str:
-    """Get URL for an endpoint.
-
-    Args:
-        endpoint: The endpoint.
-        **kwargs: URL path parameters.
-
-    Returns:
-        The URL.
-    """
-    url_kwargs: dict[str, Any] = {}
-    for param_name in endpoint.route.param_convertors.keys():
-        if param_name in kwargs:
-            url_kwargs[param_name] = kwargs[param_name]
-    return endpoint.route.url_path_for(endpoint.__name__, **url_kwargs)
 
 
 class HTTPEndpoint(BaseEndpoint):
@@ -67,7 +52,7 @@ class HTTPEndpoint(BaseEndpoint):
         else:
             response = await run_in_threadpool(handler, **handler_kw)
 
-        if isinstance(response, Element):
+        if isinstance(response, BaseElement):
             response = LudicResponse(response)
 
         await response(self.scope, self.receive, self.send)
@@ -77,6 +62,7 @@ class Endpoint(Component[NoChild, TAttrs]):
     """Base class for Ludic endpoints."""
 
     route: ClassVar[Route]
+    app: ClassVar[Starlette]
 
     def lazy_load(
         self,
@@ -97,7 +83,7 @@ class Endpoint(Component[NoChild, TAttrs]):
             hx_trigger="load",
         )
 
-    def url_for(self, endpoint: type[RoutedProtocol], **kwargs: Any) -> str:
+    def url_for(self, endpoint: type[RoutedProtocol] | str, **kwargs: Any) -> str:
         """Get URL for an endpoint.
 
         Args:
@@ -107,14 +93,26 @@ class Endpoint(Component[NoChild, TAttrs]):
         Returns:
             The URL.
         """
-        endpoint_generic_args = get_element_generic_args(endpoint)
-        self_generic_args = get_element_generic_args(self)
+        if not hasattr(self, "app"):
+            raise RuntimeError(
+                f"{type(self).__name__} is not bound to an app, you need to set the"
+                f"{type(self).__name__}.app property in order to use Endpoint.url_for."
+            )
 
-        if (
-            endpoint_generic_args
-            and self_generic_args
-            and endpoint_generic_args[-1] is self_generic_args[-1]
-        ):
-            kwargs = {**self.attrs, **kwargs}
+        if inspect.isclass(endpoint) and issubclass(endpoint, Endpoint):
+            endpoint_generic_args = get_element_generic_args(endpoint)
+            self_generic_args = get_element_generic_args(self)
 
-        return url_for(endpoint, **kwargs)
+            if (
+                endpoint_generic_args
+                and self_generic_args
+                and endpoint_generic_args[-1] is self_generic_args[-1]
+            ):
+                kwargs = {
+                    key: value
+                    for key, value in {**self.attrs, **kwargs}.items()
+                    if key in endpoint.route.param_convertors
+                }
+
+        endpoint_name = endpoint if isinstance(endpoint, str) else endpoint.route.name
+        return str(self.app.url_path_for(endpoint_name, **kwargs))

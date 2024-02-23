@@ -5,16 +5,29 @@ from typing import Any
 from starlette._utils import is_async_callable
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
-from starlette.requests import Request
 from starlette.responses import PlainTextResponse, Response
-from starlette.routing import Route, Router, get_name
+from starlette.routing import Host, Mount, get_name
+from starlette.routing import (
+    Route as StarletteRoute,
+)
+from starlette.routing import (
+    Router as StarletteRouter,
+)
 from starlette.types import Receive, Scope, Send
 
 from ludic.base import BaseElement
 
 from .endpoints import Endpoint
-from .response import LudicResponse
+from .requests import Request
+from .responses import LudicResponse
 from .utils import extract_from_request
+
+__all__ = (
+    "Host",
+    "Mount",
+    "Route",
+    "Router",
+)
 
 
 class _FunctionHandler:
@@ -81,7 +94,7 @@ class _EndpointHandler:
         return make_response
 
 
-class LudicRoute(Route):
+class Route(StarletteRoute):
     def __init__(
         self,
         path: str,
@@ -101,7 +114,7 @@ class LudicRoute(Route):
         super().__init__(path, wrapped_route, name=name, **kwargs)
 
 
-class LudicRouter(Router):
+class Router(StarletteRouter):
     def add_route(
         self,
         path: str,
@@ -110,7 +123,7 @@ class LudicRouter(Router):
         name: str | None = None,
         include_in_schema: bool = True,
     ) -> None:
-        route = LudicRoute(
+        route = Route(
             path,
             endpoint=endpoint,
             methods=methods,

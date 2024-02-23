@@ -21,8 +21,17 @@ class PersonAttrs(BaseAttrs, total=False):
     ]
 
 
-class PeopleTableAttrs(BaseAttrs):
+class PeopleAttrs(BaseAttrs):
     people: list[PersonAttrs]
+
+
+class Toast(span):
+    id: str = "toast"
+    target: str = f"#{id}"
+    styles: CSSProperties = {"margin": "10px 20px", "background": "#E1F0DA"}
+
+    def render(self) -> span:
+        return span(*self.children, id=self.id, style=self.styles)
 
 
 @app.get("/")
@@ -34,13 +43,9 @@ async def index() -> Page:
 
 
 @app.endpoint("/people/")
-class PeopleTable(Endpoint[PeopleTableAttrs]):
-    styles: dict[str, CSSProperties] = {
-        "toast": {"margin": "10px 20px", "background": "#E1F0DA"}
-    }
-
+class PeopleTable(Endpoint[PeopleAttrs]):
     @classmethod
-    async def post(cls, data: ListParser[PersonAttrs]) -> span:
+    async def post(cls, data: ListParser[PersonAttrs]) -> Toast:
         items = {row["id"]: row for row in data.validate()}
         activations = {True: 0, False: 0}
 
@@ -50,11 +55,7 @@ class PeopleTable(Endpoint[PeopleTableAttrs]):
                 person.active = active
                 activations[active] += 1
 
-        return span(
-            f"Activated {activations[True]}, deactivated {activations[False]}",
-            id="toast",
-            style=cls.styles["toast"],
-        )
+        return Toast(f"Activated {activations[True]}, deactivated {activations[False]}")
 
     @classmethod
     async def get(cls) -> Self:
@@ -64,11 +65,8 @@ class PeopleTable(Endpoint[PeopleTableAttrs]):
         return Form(
             Table(*create_rows(self.attrs["people"], spec=PersonAttrs)),
             ButtonPrimary("Bulk Update", type="submit"),
-            span(
-                id="toast",
-                style=self.styles["toast"],
-            ),
+            Toast(),
             hx_post=self.url_for(PeopleTable),
-            hx_target="#toast",
+            hx_target=Toast.target,
             hx_swap="outerHTML settle:3s",
         )

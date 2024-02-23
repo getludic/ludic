@@ -44,7 +44,7 @@ def random_string(n: int) -> str:
 class _LudicElementHandler(Generic[_T]):
     """Parse HTML elements from a string and collects them as ParsedElement's."""
 
-    def __init__(self, registry: Mapping[str, type[_T]]) -> None:
+    def __init__(self, registry: Mapping[str, list[type[_T]]]) -> None:
         self.registry = registry
         self.finished: _T | None = None
         self.elements: list[_ParsedElement[_T]] = []
@@ -62,10 +62,10 @@ class _LudicElementHandler(Generic[_T]):
                 "maybe you forgot to import it?"
             )
 
-        element_type = self.registry[tag]
+        element_type = self.registry[tag][0]
         attrs = parse_attrs(element_type, element["attrs"])
 
-        new_element: _T = self.registry[tag](*element["children"], **attrs)
+        new_element: _T = element_type(*element["children"], **attrs)
         if self.elements:
             self.elements[-1]["children"].append(new_element)
         else:
@@ -80,7 +80,7 @@ class _LudicElementHandler(Generic[_T]):
         return self.finished
 
 
-def parse_element(tree: str, registry: Mapping[str, type[_T]]) -> _T:
+def parse_element(tree: str, registry: Mapping[str, list[type[_T]]]) -> _T:
     """Parse HTML elements from a string.
 
     Args:
