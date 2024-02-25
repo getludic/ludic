@@ -207,7 +207,8 @@ class BaseElement(metaclass=ABCMeta):
         while dom != (rendered_dom := dom.render()):
             dom = rendered_dom
 
-        element_tag = f"<{dom.html_name}"
+        hidden = type(dom) is children
+        element_tag = "" if hidden else f"<{dom.html_name}"
 
         if dom.has_attributes():
             attributes_str = dom._format_attributes(html=True)
@@ -215,8 +216,10 @@ class BaseElement(metaclass=ABCMeta):
 
         if dom.children or dom.always_pair:
             children_str = dom._format_children()
-            element_tag += f">{children_str}</{dom.html_name}>"
-        else:
+            element_tag += (
+                children_str if hidden else f">{children_str}</{dom.html_name}>"
+            )
+        elif not hidden:
             element_tag += " />"
 
         return element_tag
@@ -308,6 +311,14 @@ class ElementStrict(Generic[*TChildren, TAttrs], BaseElement):
     @property
     def attrs(self) -> TAttrs:
         return cast(TAttrs, getattr(self, "_attrs", BaseAttrs()))
+
+
+class children(Element[TChild, BaseAttrs]):
+    """Element representing no element at all, just children.
+
+    The purpose of this element is to be able to return only children
+    when rendering a component.
+    """
 
 
 class Component(Element[TChild, TAttrs], metaclass=ABCMeta):

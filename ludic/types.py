@@ -14,6 +14,7 @@ from .base import (
     TAttrs,
     TChild,
     TChildren,
+    children,
 )
 
 __all__ = (
@@ -32,4 +33,5 @@ __all__ = (
     "TAttrs",
     "TChild",
     "TChildren",
+    "children",
 )

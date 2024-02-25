@@ -3,7 +3,6 @@ from collections.abc import Callable
 from typing import Any, ClassVar, Protocol
 
 from starlette._utils import is_async_callable
-from starlette.applications import Starlette
 from starlette.concurrency import run_in_threadpool
 from starlette.endpoints import HTTPEndpoint as BaseEndpoint
 from starlette.requests import Request
@@ -13,8 +12,14 @@ from ludic.html import div
 from ludic.types import AnyChild, BaseElement, Component, NoChild, TAttrs
 from ludic.utils import get_element_generic_args
 
+from .datastructures import URLPath
 from .responses import LudicResponse
 from .utils import extract_from_request
+
+
+class AppProtocol(Protocol):
+    def url_path_for(self, name: str, /, **path_params: Any) -> URLPath:
+        ...
 
 
 class RoutedProtocol(Protocol):
@@ -62,7 +67,7 @@ class Endpoint(Component[NoChild, TAttrs]):
     """Base class for Ludic endpoints."""
 
     route: ClassVar[Route]
-    app: ClassVar[Starlette]
+    app: ClassVar[AppProtocol]
 
     def lazy_load(
         self,
@@ -83,7 +88,7 @@ class Endpoint(Component[NoChild, TAttrs]):
             hx_trigger="load",
         )
 
-    def url_for(self, endpoint: type[RoutedProtocol] | str, **kwargs: Any) -> str:
+    def url_for(self, endpoint: type[RoutedProtocol] | str, **kwargs: Any) -> URLPath:
         """Get URL for an endpoint.
 
         Args:
@@ -115,4 +120,4 @@ class Endpoint(Component[NoChild, TAttrs]):
                 }
 
         endpoint_name = endpoint if isinstance(endpoint, str) else endpoint.route.name
-        return str(self.app.url_path_for(endpoint_name, **kwargs))
+        return self.app.url_path_for(endpoint_name, **kwargs)

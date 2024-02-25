@@ -17,6 +17,7 @@ from starlette.types import Receive, Scope, Send
 
 from ludic.base import BaseElement
 
+from .datastructures import URLPath
 from .endpoints import Endpoint
 from .requests import Request
 from .responses import LudicResponse
@@ -113,6 +114,10 @@ class Route(StarletteRoute):
             endpoint.route = self  # type: ignore
         super().__init__(path, wrapped_route, name=name, **kwargs)
 
+    def url_path_for(self, name: str, /, **path_params: Any) -> URLPath:
+        result = super().url_path_for(name, **path_params)
+        return URLPath(result, result.protocol, result.host)
+
 
 class Router(StarletteRouter):
     def add_route(
@@ -131,3 +136,6 @@ class Router(StarletteRouter):
             include_in_schema=include_in_schema,
         )
         self.routes.append(route)
+
+    def url_path_for(self, name: str, /, **path_params: Any) -> URLPath:
+        return super().url_path_for(name, **path_params)  # type: ignore

@@ -6,6 +6,7 @@ from starlette.middleware import Middleware
 from starlette.routing import BaseRoute
 from starlette.types import ExceptionHandler, Lifespan
 
+from .datastructures import URLPath
 from .endpoints import Endpoint
 from .routing import Router
 
@@ -30,6 +31,8 @@ class LudicApp(Starlette):
         async def homepage(request: Request) -> button:
             return button(...)
     """
+
+    router: Router
 
     def __init__(
         self,
@@ -134,3 +137,6 @@ class LudicApp(Starlette):
             name=name,
             include_in_schema=include_in_schema,
         )
+
+    def url_path_for(self, name: str, /, **path_params: Any) -> URLPath:
+        return self.router.url_path_for(name, **path_params)
