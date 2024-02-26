@@ -2,8 +2,6 @@ import inspect
 from collections.abc import Callable
 from typing import Any
 
-from starlette._utils import is_async_callable
-from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
 from starlette.responses import PlainTextResponse, Response
 from starlette.routing import Host, Mount, get_name
@@ -15,13 +13,10 @@ from starlette.routing import (
 )
 from starlette.types import Receive, Scope, Send
 
-from ludic.base import BaseElement
-
 from .datastructures import URLPath
 from .endpoints import Endpoint
 from .requests import Request
-from .responses import LudicResponse
-from .utils import extract_from_request
+from .responses import prepare_response
 
 __all__ = (
     "Host",
@@ -37,15 +32,7 @@ class _FunctionHandler:
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         request = Request(scope, receive)
-        handler_kw = await extract_from_request(self.handler, request)
-
-        is_async = is_async_callable(self.handler)
-        if is_async:
-            response = await self.handler(**handler_kw)
-        else:
-            response = await run_in_threadpool(self.handler, **handler_kw)
-        if isinstance(response, BaseElement):
-            response = LudicResponse(response)
+        response = await prepare_response(self.handler, request)
         await response(scope, receive, send)
 
 
@@ -68,15 +55,7 @@ class _EndpointHandler:
         handler: Callable[..., Any] = getattr(
             self.handler, handler_name, self.method_not_allowed(scope)
         )
-        handler_kw = await extract_from_request(handler, request)
-
-        is_async = is_async_callable(handler)
-        if is_async:
-            response = await handler(**handler_kw)
-        else:
-            response = await run_in_threadpool(handler, **handler_kw)
-        if isinstance(response, BaseElement):
-            response = LudicResponse(response)
+        response = await prepare_response(handler, request)
         await response(scope, receive, send)
 
     def method_not_allowed(self, scope: Scope) -> Callable[..., Any]:

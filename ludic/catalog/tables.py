@@ -1,5 +1,8 @@
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Literal, cast, get_type_hints, override
+
+from typing_extensions import TypeVar
 
 from ludic.attrs import GlobalAttrs
 from ludic.html import table, tbody, td, th, thead, tr
@@ -38,10 +41,11 @@ class ColumnMeta:
     identifier: bool = False
     label: str | None = None
     kind: Literal["text"] | FieldMeta = "text"
+    parser: Callable[[Any], PrimitiveChild] | None = None
 
     def __call__(self, value: Any) -> PrimitiveChild:
         if self.kind == "text":
-            return value
+            return value if self.parser is None else self.parser(value)
         return self.kind(value)
 
 
@@ -71,7 +75,17 @@ class TableHead(Component[AnyChild, GlobalAttrs]):
         return tr(*map(th, self.children), **self.attrs)
 
 
-class Table(ComponentStrict[TableHead, *tuple[TableRow, ...], GlobalAttrs]):
+THead = TypeVar("THead", bound=BaseElement, default=TableHead)
+TRow = TypeVar("TRow", bound=BaseElement, default=TableRow)
+
+
+class TableType(ComponentStrict[THead, *tuple[TRow, ...], GlobalAttrs]):
+    @override
+    def render(self) -> table:
+        return table(thead(self.children[0]), tbody(*self.children[1:]), **self.attrs)
+
+
+class Table(TableType[TableHead, TableRow]):
     @property
     def header(self) -> tuple[PrimitiveChild, ...]:
         return self.children[0].header
@@ -89,10 +103,6 @@ class Table(ComponentStrict[TableHead, *tuple[TableRow, ...], GlobalAttrs]):
                     result.append(value)
 
         return result
-
-    @override
-    def render(self) -> table:
-        return table(thead(self.children[0]), tbody(*self.children[1:]), **self.attrs)
 
 
 def create_rows(

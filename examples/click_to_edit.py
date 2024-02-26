@@ -69,7 +69,7 @@ class Contact(Endpoint[ContactAttrs]):
         )
 
 
-@app.endpoint("/contacts/{id}/form")
+@app.endpoint("/contacts/{id}/form/")
 class ContactForm(Endpoint[ContactAttrs]):
     @classmethod
     async def get(cls, id: str) -> Self:

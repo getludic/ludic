@@ -44,6 +44,7 @@ class HtmxAttrs(BaseAttrs, total=False):
     hx_delete: Annotated[str, Alias("hx-delete")]
     hx_patch: Annotated[str, Alias("hx-patch")]
 
+    hx_confirm: Annotated[str, Alias("hx-confirm")]
     hx_trigger: Annotated[str, Alias("hx-trigger")]
     hx_target: Annotated[Literal["this", "next", "previous"] | str, Alias("hx-target")]
     hx_swap: Annotated[
