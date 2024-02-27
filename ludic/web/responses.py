@@ -100,9 +100,7 @@ async def extract_from_request(
             origin, BaseParser
         ):
             async with request.form() as form:
-                validator = param.annotation(form)
-                validator._load_parsers()
-                handler_kwargs[name] = validator
+                handler_kwargs[name] = param.annotation(form)
         elif issubclass(param.annotation, FormData):
             async with request.form() as form:
                 handler_kwargs[name] = form

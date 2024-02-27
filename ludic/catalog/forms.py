@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Any, Literal, get_type_hints, override
 
@@ -17,9 +17,7 @@ from ludic.utils import get_annotations_metadata_of_type
 
 from .utils import attr_to_camel
 
-DEFAULT_FIELD_PARSERS: dict[str, Callable[[Any], PrimitiveChild]] = {
-    "input": lambda value: value,
-    "textarea": lambda value: value,
+DEFAULT_FIELD_PARSERS: Mapping[str, Callable[[Any], PrimitiveChild]] = {
     "checkbox": lambda value: True if value == "on" else False,
 }
 
@@ -48,7 +46,7 @@ class FieldMeta:
     attrs: InputAttrs | TextAreaAttrs | None = None
     parser: Callable[[Any], PrimitiveChild] | None = None
 
-    def create_field(self, key: str, value: Any) -> BaseElement:
+    def format(self, key: str, value: Any) -> BaseElement:
         attrs = {} if self.attrs is None else dict(self.attrs)
         attrs["name"] = key
 
@@ -65,11 +63,14 @@ class FieldMeta:
             case "textarea":
                 return TextAreaField(value=value, **attrs)
 
-    def __call__(self, value: Any) -> PrimitiveChild:
+    def parse(self, value: Any) -> PrimitiveChild:
         if self.parser:
             return self.parser(value)
         else:
-            return DEFAULT_FIELD_PARSERS[self.kind](value)
+            return DEFAULT_FIELD_PARSERS.get(self.kind, str)(value)
+
+    def __call__(self, value: Any) -> PrimitiveChild:
+        return self.parse(value)
 
 
 class FieldAttrs(BaseAttrs, total=False):
@@ -161,7 +162,7 @@ def create_fields(attrs: BaseAttrs, spec: type[TAttrs]) -> tuple[ComplexChild, .
 
     for name, metadata in metadata_list.items():
         if value := attrs.get(name):
-            field = metadata.create_field(name, value)
+            field = metadata.format(name, value)
             fields.append(field)
 
     return tuple(fields)

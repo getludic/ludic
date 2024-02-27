@@ -1,7 +1,11 @@
 from typing import Annotated, Literal
 
-from .base import Alias, BaseAttrs
+from .base import BaseAttrs
 from .css import CSSProperties
+
+
+class Alias(str):
+    """Alias type for attributes."""
 
 
 class NoAttrs(BaseAttrs):
@@ -44,6 +48,7 @@ class HtmxAttrs(BaseAttrs, total=False):
     hx_delete: Annotated[str, Alias("hx-delete")]
     hx_patch: Annotated[str, Alias("hx-patch")]
 
+    hx_on: Annotated[str, Alias("hx-on")]
     hx_confirm: Annotated[str, Alias("hx-confirm")]
     hx_trigger: Annotated[str, Alias("hx-trigger")]
     hx_target: Annotated[Literal["this", "next", "previous"] | str, Alias("hx-target")]
@@ -117,7 +122,6 @@ class MouseEventAttrs(BaseAttrs, total=False):
     onmouseout: str
     onmouseover: str
     onmouseup: str
-    onmousewheel: str  # Deprecated, use onwheel instead
     onwheel: str
 
 

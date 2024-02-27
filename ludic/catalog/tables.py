@@ -43,10 +43,18 @@ class ColumnMeta:
     kind: Literal["text"] | FieldMeta = "text"
     parser: Callable[[Any], PrimitiveChild] | None = None
 
-    def __call__(self, value: Any) -> PrimitiveChild:
+    def format(self, key: str, value: Any) -> AnyChild:
+        if isinstance(self.kind, FieldMeta):
+            return self.kind.format(key, value)
+        return value
+
+    def parse(self, value: Any) -> PrimitiveChild:
         if self.kind == "text":
             return value if self.parser is None else self.parser(value)
         return self.kind(value)
+
+    def __call__(self, value: Any) -> PrimitiveChild:
+        return self.parse(value)
 
 
 class TableRow(Component[AnyChild, GlobalAttrs]):
@@ -113,19 +121,13 @@ def create_rows(
     Example:
 
         class PersonAttrs(BaseAttrs):
-            id: str
-            name: Annotated[
-                str,
-                ColumnMeta(label="Full Name"),
-            ]
-            email: Annotated[
-                str,
-                ColumnMeta(label="Email"),
-            ]
+            id: Annotated[int, ColumnMeta(identifier=True)]
+            name: Annotated[str, ColumnMeta(label="Full Name")]
+            email: Annotated[str, ColumnMeta(label="Email")]
 
         people = [
-            Person(id=1, name="John Doe", email="john@j.com"),
-            Person(id=2, name="Jane Smith", email="jane@s.com"),
+            {"id": 1, "name": "John Doe", "email": "john@j.com"},
+            {"id": 2, "name": "Jane Smith", "email": "jane@s.com"},
         ]
         rows = create_rows(people, spec=PersonAttrs)
 
@@ -152,15 +154,14 @@ def create_rows(
     rows: list[TableRow] = []
     for idx, attrs in enumerate(attrs_list):
         cells: list[AnyChild] = []
+
         for key, value in attrs.items():
             if meta := matadata.get(key):
                 if meta.identifier and not include_id_column:
                     continue
-                if isinstance(meta.kind, FieldMeta):
-                    name = f"{key}:{id_col_name}:{attrs.get(id_col_name, str(idx))}"
-                    cells.append(meta.kind.create_field(name, value))
-                else:
-                    cells.append(value)  # type: ignore
+                name = f"{key}:{id_col_name}:{attrs.get(id_col_name, str(idx))}"
+                cells.append(meta.format(name, value))
+
         if cells:
             rows.append(TableRow(*cells))
 

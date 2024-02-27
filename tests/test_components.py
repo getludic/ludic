@@ -1,19 +1,12 @@
-import pytest
-
 from ludic.base import Safe
 from ludic.catalog.navigation import Navigation, NavItem
 from ludic.catalog.typography import Link, Paragraph
-from ludic.html import b, li
+from ludic.html import b
 
 
 def test_link():
     link = Link("A link!", to="https://example.com")
     assert link.to_html() == '<a href="https://example.com">A link!</a>'
-
-
-def test_invalid_link():
-    with pytest.raises(TypeError):
-        Link("should not pass")
 
 
 def test_component_with_f_string():
@@ -34,18 +27,6 @@ def test_component_with_f_string():
     )
 
 
-def test_invalid_component_with_f_string():
-    with pytest.raises(TypeError):
-        Paragraph(Safe("should <does_not_exist /> not pass"))
-    with pytest.raises(TypeError):
-        Paragraph(Safe("should <xml_invalid> not pass"))
-
-
-def test_component_with_invalid_f_string():
-    with pytest.raises(TypeError):
-        Link(Safe(f"should {b("not pass")}"), to="https://example.com")
-
-
 def test_navigation():
     navigation = Navigation(
         NavItem("Home", to="/"),
@@ -58,10 +39,3 @@ def test_navigation():
             '<li id="about"><a href="/about">About</a></li>'
         "</ul>"
     )  # fmt: skip
-
-
-def test_invalid_navigation():
-    with pytest.raises(TypeError):
-        Navigation("should not pass")
-    with pytest.raises(TypeError):
-        Navigation(li("Home"), li("About"))

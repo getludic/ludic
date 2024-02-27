@@ -1,7 +1,7 @@
 from dataclasses import asdict, dataclass
 from typing import Any
 
-from ludic.base import BaseAttrs, Component
+from ludic.catalog.styles import ComponentsStyles
 from ludic.catalog.typography import Paragraph
 from ludic.html import (
     body,
@@ -15,7 +15,7 @@ from ludic.html import (
     script,
     title,
 )
-from ludic.types import AnyChild, BaseElement, PrimitiveChild
+from ludic.types import AnyChild, BaseAttrs, BaseElement, Component, PrimitiveChild
 from ludic.web import LudicApp
 
 
@@ -90,6 +90,7 @@ class Page(Component[AnyChild, BaseAttrs]):
         return html(
             head(
                 title("Ludic Example"),
+                ComponentsStyles(),
                 meta(charset="utf-8"),
                 meta(name="viewport", content="width=device-width, initial-scale=1.0"),
             ),

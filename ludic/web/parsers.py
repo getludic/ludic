@@ -21,35 +21,55 @@ class ValidationError(BadRequestError):
 class BaseParser(Generic[TAttrs], metaclass=ABCMeta):
     _form_data: FormData
     _parsers: Parsers
-    _attrs_type: type[dict]
+    _spec: type[TAttrs]
 
-    def __init__(self, data: FormData) -> None:
+    @property
+    def form_data(self) -> FormData:
+        return self._form_data
+
+    @property
+    def parsers(self) -> Parsers:
+        if not hasattr(self, "_parsers"):
+            self._load_meta()
+        return self._parsers
+
+    @property
+    def spec(self) -> type[TAttrs]:
+        if not hasattr(self, "_spec"):
+            self._load_meta()
+        return self._spec
+
+    def __init__(self, data: FormData, spec: type[TAttrs] | None = None) -> None:
         self._form_data = data
+        if spec is not None:
+            self._spec = spec
 
-    def _load_parsers(self) -> None:
+    def _load_meta(self) -> None:
         # This method cannot be part of __init__ as the __orig_class__
         # is not present at that time.
-        if (orig_class := getattr(self, "__orig_class__", None)) and (
-            bases := get_args(orig_class)
+        if (
+            not hasattr(self, "_spec")
+            and (orig_class := getattr(self, "__orig_class__", None))
+            and (bases := get_args(orig_class))
         ):
-            self._attrs_type = bases[0]
-            hints = get_type_hints(self._attrs_type, include_extras=True)
-
-            self._parsers = get_annotations_metadata_of_type(
-                hints,
-                Callable,  # type: ignore
-                default=str,
-            )
+            self._spec = bases[0]
         else:
             raise TypeError(
                 f"Could not collect type information from {self.__class__!r}"
             )
 
-    def _validate(self, attrs: dict[str, Any], attrs_type: type[dict]) -> TAttrs:
+        hints = get_type_hints(self._spec, include_extras=True)
+        self._parsers = get_annotations_metadata_of_type(
+            hints,
+            Callable,  # type: ignore
+            default=str,
+        )
+
+    def _validate(self, attrs: dict[str, Any]) -> TAttrs:
         try:
-            return check_type(attrs, attrs_type)
+            return check_type(attrs, self.spec)
         except TypeCheckError as err:
-            raise ValidationError(f"Invalid attributes for {attrs_type!r}: {err}.")
+            raise ValidationError(f"Invalid attributes for {self.spec!r}: {err}.")
 
     @abstractmethod
     def parse(self) -> Any:
@@ -91,9 +111,9 @@ class Parser(BaseParser[TAttrs]):
             dict[str, Any]: The parsed attributes.
         """
         return {
-            key: self._parsers[key](value)
-            for key, value in self._form_data.items()
-            if key in self._parsers
+            key: self.parsers[key](value)
+            for key, value in self.form_data.items()
+            if key in self.parsers
         }
 
     @override
@@ -107,7 +127,7 @@ class Parser(BaseParser[TAttrs]):
             ValidationError: If the attributes are invalid.
         """
         attrs = self.parse()
-        return self._validate(attrs, self._attrs_type)
+        return self._validate(attrs)
 
 
 class ListParser(BaseParser[TAttrs]):
@@ -122,20 +142,23 @@ class ListParser(BaseParser[TAttrs]):
             list[dict[str, Any]]: The parsed attributes.
         """
         result: dict[str, dict[str, Any]] = {}
-        for compound_key, value in self._form_data.items():
+        for compound_key, value in self.form_data.items():
             try:
                 key, id_name, id_value = compound_key.split(":", 2)
             except ValueError:
                 raise ValidationError(
                     "All keys in a list must contain a unique identifier."
                 )
-            if key not in self._parsers:
+            if key not in self.parsers:
                 continue
 
             result.setdefault(
-                id_value, {id_name: self._parsers.get(id_name, str)(id_value)}
+                id_value,
+                {id_name: self.parsers.get(id_name, str)(id_value)}
+                if not id_name.startswith("_")
+                else {},
             )
-            result[id_value][key] = self._parsers[key](value)
+            result[id_value][key] = self.parsers[key](value)
         return list(result.values())
 
     @override
@@ -148,8 +171,7 @@ class ListParser(BaseParser[TAttrs]):
         Raises:
             ValidationError: If the attributes are invalid.
         """
-        attrs_list = self.parse()
         result = []
-        for attrs in attrs_list:
-            result.append(self._validate(attrs, self._attrs_type))
+        for attrs in self.parse():
+            result.append(self._validate(attrs))
         return result

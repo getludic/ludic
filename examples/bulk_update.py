@@ -4,9 +4,8 @@ from examples import Body, Header, Page, app, db
 from ludic.catalog.buttons import ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form
 from ludic.catalog.tables import ColumnMeta, Table, create_rows
-from ludic.css import CSSProperties
 from ludic.html import span
-from ludic.types import BaseAttrs
+from ludic.types import BaseAttrs, GlobalStyles
 from ludic.web.endpoints import Endpoint
 from ludic.web.parsers import ListParser
 
@@ -28,10 +27,20 @@ class PeopleAttrs(BaseAttrs):
 class Toast(span):
     id: str = "toast"
     target: str = f"#{id}"
-    styles: CSSProperties = {"margin": "10px 20px", "background": "#E1F0DA"}
+    styles: GlobalStyles = {
+        target: {
+            "background": "#E1F0DA",
+            "margin": "10px 20px",
+            "opacity": "0",
+            "transition": "opacity 3s ease-out",
+        },
+        f"{target}.htmx-settling": {
+            "opacity": "100",
+        },
+    }
 
     def render(self) -> span:
-        return span(*self.children, id=self.id, style=self.styles)
+        return span(*self.children, id=self.id)
 
 
 @app.get("/")

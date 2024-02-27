@@ -15,8 +15,6 @@ from typing import (
 )
 from xml.etree.ElementTree import ParseError, XMLParser
 
-from typeguard import TypeCheckError, check_type
-
 LUDIC_MAX_ELEMENT_DEPTH: Final[int] = int(os.getenv("LUDIC_MAX_ELEMENT_DEPTH", 50))
 
 
@@ -130,64 +128,6 @@ def get_element_attrs_annotations(
     if (args := get_element_generic_args(cls_or_obj)) is not None:
         return get_type_hints(args[-1], include_extras=include_extras)
     return {}
-
-
-def validate_element_attrs(cls_or_obj: Any, values: dict[str, Any]) -> Any:
-    """Check if the given values are valid for the given class.
-
-    Args:
-        cls (type): The expected type of the values.
-        values (dict[str, Any]): The values to check.
-    """
-    if (args := get_element_generic_args(cls_or_obj)) is not None:
-        try:
-            return check_type(values, args[-1])
-        except TypeCheckError as err:
-            raise TypeError(f"Invalid attributes for {cls_or_obj!r}: {err}.")
-
-
-def validate_element_children(cls_or_obj: Any, elements: tuple[Any, ...]) -> Any:
-    """Check if the given elements are valid for the given class.
-
-    Args:
-        cls_or_obj (type): The expected type of the elements.
-        elements (tuple[Any, ...]): The elements to check.
-    """
-    if (args := get_element_generic_args(cls_or_obj)) is not None:
-        found_type = args[0]
-        try:
-            return check_type(elements, tuple[found_type, ...])  # type: ignore
-        except TypeCheckError as err:
-            raise TypeError(f"Invalid elements for {cls_or_obj!r}: {err}.")
-
-
-def validate_element_strict_children(cls_or_obj: Any, elements: tuple[Any, ...]) -> Any:
-    """Check if the given strict elements are valid for the given class.
-
-    Args:
-        cls_or_obj (type): The expected type of the elements.
-        elements (tuple[Any, ...]): The elements to check.
-    """
-    if (args := get_element_generic_args(cls_or_obj)) is not None:
-        try:
-            for idx, type_hint in enumerate(args[:-1]):
-                if getattr(type_hint, "__unpacked__", False):
-                    break
-                if len(elements) <= idx:
-                    raise TypeError(f"Invalid number of children for {cls_or_obj!r}. ")
-                check_type(elements[idx], type_hint)
-            else:
-                if elements[idx + 1 :]:
-                    raise TypeError(
-                        f"Invalid number of children for {cls_or_obj!r}. "
-                        f"Expected {len(args[:-1])}, got {len(elements)}."
-                    )
-                return
-
-            packed_tuple_type = args[-2]
-            return check_type(elements[idx:], packed_tuple_type)
-        except TypeCheckError as err:
-            raise TypeError(f"Invalid children for {cls_or_obj!r}: {err}.")
 
 
 def _format_attr_value(key: str, value: Any, html: bool = False) -> str:

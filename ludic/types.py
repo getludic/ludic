@@ -1,5 +1,4 @@
 from .base import (
-    Alias,
     AnyChild,
     BaseAttrs,
     BaseElement,
@@ -8,6 +7,7 @@ from .base import (
     ComponentStrict,
     Element,
     ElementStrict,
+    GlobalStyles,
     NoChild,
     PrimitiveChild,
     Safe,
@@ -18,7 +18,6 @@ from .base import (
 )
 
 __all__ = (
-    "Alias",
     "AnyChild",
     "BaseAttrs",
     "BaseElement",
@@ -27,6 +26,7 @@ __all__ = (
     "ComponentStrict",
     "Element",
     "ElementStrict",
+    "GlobalStyles",
     "NoChild",
     "PrimitiveChild",
     "Safe",

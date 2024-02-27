@@ -13,21 +13,23 @@ from typing import (
 
 from typing_extensions import TypeVar, TypeVarTuple
 
+from .css import CSSProperties
 from .utils import (
     format_attrs,
     get_element_attrs_annotations,
     parse_element,
-    validate_element_attrs,
-    validate_element_children,
-    validate_element_strict_children,
 )
 
 _ELEMENT_REGISTRY: dict[str, list[type["BaseElement"]]] = {}
 
+GlobalStyles = dict[str, CSSProperties]
+
 
 def _parse_children(string: str) -> tuple["AnyChild", ...]:
     element = parse_element(f"<div>{string}</div>", _ELEMENT_REGISTRY)
-    return element.children
+    return tuple(
+        Safe(child) if isinstance(child, str) else child for child in element.children
+    )
 
 
 def default_html_formatter(child: "AnyChild") -> str:
@@ -42,10 +44,6 @@ def default_html_formatter(child: "AnyChild") -> str:
         return child.to_html()
     else:
         return str(child)
-
-
-class Alias(str):
-    """Alias type for attributes."""
 
 
 class Safe(str):
@@ -91,6 +89,7 @@ class BaseAttrs(TypedDict, total=False):
 class BaseElement(metaclass=ABCMeta):
     html_name: str
     always_pair: bool = False
+    styles: GlobalStyles = {}
 
     def __init_subclass__(cls) -> None:
         _ELEMENT_REGISTRY.setdefault(cls.__name__, [])
@@ -264,14 +263,17 @@ class Element(Generic[TChild, TAttrs], BaseElement):
     _children: tuple[TChild, ...]
     _attrs: TAttrs
 
-    def __init__(self, *children: TChild, **attributes: Any) -> None:
-        validate_element_attrs(self, attributes)
+    def __init__(
+        self,
+        *children: TChild,
+        # https://github.com/python/typing/issues/1399
+        **attributes: Unpack[TAttrs],  # type: ignore
+    ) -> None:
         self._attrs = cast(TAttrs, attributes)
 
         if len(children) == 1 and isinstance(children[0], Safe):
             children = _parse_children(children[0])  # type: ignore
 
-        validate_element_children(self, children)
         self._children = children
 
     @property
@@ -294,14 +296,17 @@ class ElementStrict(Generic[*TChildren, TAttrs], BaseElement):
     _children: tuple[*TChildren]
     _attrs: TAttrs
 
-    def __init__(self, *children: *TChildren, **attributes: Any) -> None:
-        validate_element_attrs(self, attributes)
+    def __init__(
+        self,
+        *children: *TChildren,
+        # https://github.com/python/typing/issues/1399
+        **attributes: Unpack[TAttrs],  # type: ignore
+    ) -> None:
         self._attrs = cast(TAttrs, attributes)
 
         if 1 <= len(children) > 0 and isinstance(children[0], Safe):
             children = _parse_children(children[0])  # type: ignore
 
-        validate_element_strict_children(self, children)
         self._children = children
 
     @property
