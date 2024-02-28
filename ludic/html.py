@@ -30,304 +30,304 @@ from .attrs import (
     ThAttrs,
 )
 from .types import (
-    AnyChild,
-    ComplexChild,
+    AllowAny,
     Element,
     ElementStrict,
-    NoChild,
-    PrimitiveChild,
+    NotAllowed,
+    OnlyComplex,
+    OnlyPrimitive,
 )
 
 
-class div(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "div"
+class div(Element[AllowAny, GlobalAttrs]):
+    html_name = "div"
 
 
-class span(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "span"
+class span(Element[AllowAny, GlobalAttrs]):
+    html_name = "span"
 
 
-class main(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "main"
+class main(Element[AllowAny, GlobalAttrs]):
+    html_name = "main"
 
 
-class p(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "p"
+class p(Element[AllowAny, GlobalAttrs]):
+    html_name = "p"
 
 
-class a(Element[AnyChild, HyperlinkAttrs]):
-    html_name: str = "a"
+class a(Element[AllowAny, HyperlinkAttrs]):
+    html_name = "a"
 
 
-class br(Element[NoChild, GlobalAttrs]):
-    html_name: str = "br"
+class br(Element[NotAllowed, GlobalAttrs]):
+    html_name = "br"
 
 
-class button(Element[AnyChild, ButtonAttrs]):
-    html_name: str = "button"
+class button(Element[AllowAny, ButtonAttrs]):
+    html_name = "button"
 
 
-class label(Element[AnyChild, LabelAttrs]):
-    html_name: str = "label"
+class label(Element[AllowAny, LabelAttrs]):
+    html_name = "label"
 
 
-class td(Element[AnyChild, TdAttrs]):
-    html_name: str = "td"
+class td(Element[AllowAny, TdAttrs]):
+    html_name = "td"
 
 
-class th(Element[AnyChild, ThAttrs]):
-    html_name: str = "th"
+class th(Element[AllowAny, ThAttrs]):
+    html_name = "th"
 
 
-class tr(Element[ComplexChild, GlobalAttrs]):
-    html_name: str = "tr"
+class tr(Element[OnlyComplex, GlobalAttrs]):
+    html_name = "tr"
 
 
-class thead(Element[ComplexChild, GlobalAttrs]):
-    html_name: str = "thead"
+class thead(Element[OnlyComplex, GlobalAttrs]):
+    html_name = "thead"
 
 
-class tbody(Element[ComplexChild, GlobalAttrs]):
-    html_name: str = "tbody"
+class tbody(Element[OnlyComplex, GlobalAttrs]):
+    html_name = "tbody"
 
 
-class tfoot(Element[ComplexChild, GlobalAttrs]):
-    html_name: str = "tfoot"
+class tfoot(Element[OnlyComplex, GlobalAttrs]):
+    html_name = "tfoot"
 
 
-class table(Element[ComplexChild, GlobalAttrs]):
-    html_name: str = "table"
+class table(Element[OnlyComplex, GlobalAttrs]):
+    html_name = "table"
 
 
-class li(Element[AnyChild, LiAttrs]):
-    html_name: str = "li"
+class li(Element[AllowAny, LiAttrs]):
+    html_name = "li"
 
 
-class ul(Element[ComplexChild, GlobalAttrs]):
-    html_name: str = "ul"
+class ul(Element[OnlyComplex, GlobalAttrs]):
+    html_name = "ul"
 
 
-class ol(Element[ComplexChild, GlobalAttrs]):
-    html_name: str = "ol"
+class ol(Element[OnlyComplex, GlobalAttrs]):
+    html_name = "ol"
 
 
-class dt(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "dt"
+class dt(Element[AllowAny, GlobalAttrs]):
+    html_name = "dt"
 
 
-class dd(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "dd"
+class dd(Element[AllowAny, GlobalAttrs]):
+    html_name = "dd"
 
 
-class dl(Element[ComplexChild, GlobalAttrs]):
-    html_name: str = "dl"
+class dl(Element[OnlyComplex, GlobalAttrs]):
+    html_name = "dl"
 
 
-class section(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "section"
+class section(Element[AllowAny, GlobalAttrs]):
+    html_name = "section"
 
 
-class input(Element[NoChild, InputAttrs]):
-    html_name: str = "input"
+class input(Element[NotAllowed, InputAttrs]):
+    html_name = "input"
 
 
-class output(Element[NoChild, OutputAttrs]):
-    html_name: str = "output"
+class output(Element[NotAllowed, OutputAttrs]):
+    html_name = "output"
 
 
-class legend(Element[PrimitiveChild, GlobalAttrs]):
-    html_name: str = "legend"
+class legend(Element[OnlyPrimitive, GlobalAttrs]):
+    html_name = "legend"
 
 
-class option(Element[PrimitiveChild, OptionAttrs]):
-    html_name: str = "option"
+class option(Element[OnlyPrimitive, OptionAttrs]):
+    html_name = "option"
 
 
-class optgroup(Element[AnyChild, OptgroupAttrs]):
-    html_name: str = "optgroup"
+class optgroup(Element[AllowAny, OptgroupAttrs]):
+    html_name = "optgroup"
 
 
-class select(Element[AnyChild, SelectAttrs]):
-    html_name: str = "select"
+class select(Element[AllowAny, SelectAttrs]):
+    html_name = "select"
 
 
-class textarea(Element[PrimitiveChild, TextAreaAttrs]):
-    html_name: str = "textarea"
+class textarea(Element[OnlyPrimitive, TextAreaAttrs]):
+    html_name = "textarea"
 
 
-class fieldset(Element[AnyChild, FieldsetAttrs]):
-    html_name: str = "fieldset"
+class fieldset(Element[AllowAny, FieldsetAttrs]):
+    html_name = "fieldset"
 
 
-class form(Element[AnyChild, FormAttrs]):
-    html_name: str = "form"
+class form(Element[AllowAny, FormAttrs]):
+    html_name = "form"
 
 
-class img(Element[NoChild, ImgAttrs]):
-    html_name: str = "img"
+class img(Element[NotAllowed, ImgAttrs]):
+    html_name = "img"
 
 
-class svg(Element[AnyChild, SvgAttrs]):
-    html_name: str = "svg"
+class svg(Element[AllowAny, SvgAttrs]):
+    html_name = "svg"
 
 
-class b(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "b"
+class b(Element[AllowAny, GlobalAttrs]):
+    html_name = "b"
 
 
-class i(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "i"
+class i(Element[AllowAny, GlobalAttrs]):
+    html_name = "i"
 
 
-class s(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "s"
+class s(Element[AllowAny, GlobalAttrs]):
+    html_name = "s"
 
 
-class u(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "u"
+class u(Element[AllowAny, GlobalAttrs]):
+    html_name = "u"
 
 
-class strong(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "strong"
+class strong(Element[AllowAny, GlobalAttrs]):
+    html_name = "strong"
 
 
-class em(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "em"
+class em(Element[AllowAny, GlobalAttrs]):
+    html_name = "em"
 
 
-class mark(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "mark"
+class mark(Element[AllowAny, GlobalAttrs]):
+    html_name = "mark"
 
 
-class del_(Element[AnyChild, DelAttrs]):
-    html_name: str = "del"
+class del_(Element[AllowAny, DelAttrs]):
+    html_name = "del"
 
 
-class ins(Element[AnyChild, InsAttrs]):
-    html_name: str = "ins"
+class ins(Element[AllowAny, InsAttrs]):
+    html_name = "ins"
 
 
-class header(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "header"
+class header(Element[AllowAny, GlobalAttrs]):
+    html_name = "header"
 
 
-class big(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "big"
+class big(Element[AllowAny, GlobalAttrs]):
+    html_name = "big"
 
 
-class small(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "small"
+class small(Element[AllowAny, GlobalAttrs]):
+    html_name = "small"
 
 
-class code(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "code"
+class code(Element[AllowAny, GlobalAttrs]):
+    html_name = "code"
 
 
-class pre(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "pre"
+class pre(Element[AllowAny, GlobalAttrs]):
+    html_name = "pre"
 
 
-class cite(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "cite"
+class cite(Element[AllowAny, GlobalAttrs]):
+    html_name = "cite"
 
 
-class blockquote(Element[AnyChild, BlockquoteAttrs]):
-    html_name: str = "blockquote"
+class blockquote(Element[AllowAny, BlockquoteAttrs]):
+    html_name = "blockquote"
 
 
-class abbr(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "abbr"
+class abbr(Element[AllowAny, GlobalAttrs]):
+    html_name = "abbr"
 
 
-class h1(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "h1"
+class h1(Element[AllowAny, GlobalAttrs]):
+    html_name = "h1"
 
 
-class h2(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "h2"
+class h2(Element[AllowAny, GlobalAttrs]):
+    html_name = "h2"
 
 
-class h3(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "h3"
+class h3(Element[AllowAny, GlobalAttrs]):
+    html_name = "h3"
 
 
-class h4(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "h4"
+class h4(Element[AllowAny, GlobalAttrs]):
+    html_name = "h4"
 
 
-class h5(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "h5"
+class h5(Element[AllowAny, GlobalAttrs]):
+    html_name = "h5"
 
 
-class h6(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "h6"
+class h6(Element[AllowAny, GlobalAttrs]):
+    html_name = "h6"
 
 
-class title(Element[PrimitiveChild, NoAttrs]):
-    html_name: str = "title"
+class title(Element[OnlyPrimitive, NoAttrs]):
+    html_name = "title"
 
 
-class link(Element[PrimitiveChild, HeadLinkAttrs]):
-    html_name: str = "link"
+class link(Element[OnlyPrimitive, HeadLinkAttrs]):
+    html_name = "link"
 
 
-class style(Element[PrimitiveChild, StyleAttrs]):
-    html_name: str = "style"
+class style(Element[OnlyPrimitive, StyleAttrs]):
+    html_name = "style"
 
 
-class script(Element[PrimitiveChild, ScriptAttrs]):
-    html_name: str = "script"
-    always_pair: bool = True
+class script(Element[OnlyPrimitive, ScriptAttrs]):
+    html_name = "script"
+    always_pair = True
 
 
-class noscript(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "noscript"
-    always_pair: bool = True
+class noscript(Element[AllowAny, GlobalAttrs]):
+    html_name = "noscript"
+    always_pair = True
 
 
-class meta(Element[PrimitiveChild, MetaAttrs]):
-    html_name: str = "meta"
+class meta(Element[OnlyPrimitive, MetaAttrs]):
+    html_name = "meta"
 
 
-class head(Element[AnyChild, NoAttrs]):
-    html_name: str = "head"
+class head(Element[AllowAny, NoAttrs]):
+    html_name = "head"
 
 
-class body(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "body"
+class body(Element[AllowAny, GlobalAttrs]):
+    html_name = "body"
 
 
-class footer(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "footer"
+class footer(Element[AllowAny, GlobalAttrs]):
+    html_name = "footer"
 
 
 class html(ElementStrict[head, body, HtmlTagAttrs]):
-    html_name: str = "html"
+    html_name = "html"
 
 
-class iframe(Element[NoChild, IframeAttrs]):
-    html_name: str = "iframe"
+class iframe(Element[NotAllowed, IframeAttrs]):
+    html_name = "iframe"
 
 
-class article(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "article"
+class article(Element[AllowAny, GlobalAttrs]):
+    html_name = "article"
 
 
-class address(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "address"
+class address(Element[AllowAny, GlobalAttrs]):
+    html_name = "address"
 
 
-class caption(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "caption"
+class caption(Element[AllowAny, GlobalAttrs]):
+    html_name = "caption"
 
 
-class col(Element[NoChild, ColAttrs]):
-    html_name: str = "col"
+class col(Element[NotAllowed, ColAttrs]):
+    html_name = "col"
 
 
-class colgroup(Element[AnyChild, GlobalAttrs]):
-    html_name: str = "colgroup"
+class colgroup(Element[AllowAny, GlobalAttrs]):
+    html_name = "colgroup"
 
 
-class area(Element[NoChild, AreaAttrs]):
-    html_name: str = "area"
+class area(Element[NotAllowed, AreaAttrs]):
+    html_name = "area"

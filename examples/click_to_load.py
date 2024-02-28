@@ -4,7 +4,7 @@ from examples import Body, Header, Page, app
 from ludic.attrs import ButtonAttrs
 from ludic.catalog.buttons import ButtonPrimary
 from ludic.catalog.tables import Table, TableHead, TableRow
-from ludic.types import BaseAttrs, Component, children
+from ludic.types import BaseAttrs, Children, Component, ComponentStrict
 from ludic.web import Endpoint
 from ludic.web.datastructures import QueryParams
 
@@ -35,7 +35,7 @@ def load_contacts(page: int) -> list[ContactAttrs]:
     ]
 
 
-class LoadMoreButton(Component[str, LoadMoreAttrs]):
+class LoadMoreButton(ComponentStrict[LoadMoreAttrs]):
     target: str = "replace-me"
 
     def render(self) -> ButtonPrimary:
@@ -72,9 +72,9 @@ class ContactsSlice(Endpoint[ContactsSliceAttrs]):
         page = int(params.get("page", 1))
         return cls(page=page, contacts=load_contacts(page))
 
-    def render(self) -> children[TableRow]:
+    def render(self) -> Children[TableRow]:
         next_page = self.attrs["page"] + 1
-        return children(
+        return Children(
             *(
                 TableRow(contact["id"], contact["name"], contact["email"])
                 for contact in self.attrs["contacts"]

@@ -1,7 +1,7 @@
 from typing import override
 
 from ludic.attrs import GlobalAttrs
-from ludic.base import Component, PrimitiveChild
+from ludic.base import Component, OnlyPrimitive
 from ludic.html import li, ul
 
 from .typography import Link
@@ -11,7 +11,7 @@ class NavItemAttrs(GlobalAttrs):
     to: str
 
 
-class NavItem(Component[PrimitiveChild, NavItemAttrs]):
+class NavItem(Component[OnlyPrimitive, NavItemAttrs]):
     """Simple component simulating a navigation item.
 
     This component is supposed to be used as a child of the :class:`Navigation`

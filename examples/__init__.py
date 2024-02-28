@@ -17,11 +17,11 @@ from ludic.html import (
     title,
 )
 from ludic.types import (
-    AnyChild,
+    AllowAny,
     BaseElement,
     Component,
     ComponentStrict,
-    PrimitiveChild,
+    OnlyPrimitive,
 )
 from ludic.web import LudicApp
 
@@ -92,7 +92,7 @@ db = DB(
 )
 
 
-class Page(Component[AnyChild, NoAttrs]):
+class Page(Component[AllowAny, NoAttrs]):
     def render(self) -> BaseElement:
         return html(
             head(
@@ -108,14 +108,14 @@ class Page(Component[AnyChild, NoAttrs]):
         )
 
 
-class Header(ComponentStrict[PrimitiveChild, NoAttrs]):
+class Header(ComponentStrict[OnlyPrimitive, NoAttrs]):
     def render(self) -> header:
         return header(
             h1(f"Example - {self.children[0]}"),
         )
 
 
-class Body(Component[AnyChild, NoAttrs]):
+class Body(Component[AllowAny, NoAttrs]):
     def render(self) -> div:
         return div(*self.children)
 
@@ -124,7 +124,7 @@ app = LudicApp(debug=True)
 
 
 @app.exception_handler(404)
-def not_found() -> Page:
+async def not_found() -> Page:
     return Page(
         Header("Page Not Found"),
         Body(Paragraph("The page you are looking for was not found.")),

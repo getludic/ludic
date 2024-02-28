@@ -1,3 +1,5 @@
+"""An experimental module for creating HTML forms."""
+
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Any, Literal, get_type_hints, override
@@ -6,10 +8,10 @@ from ludic.attrs import BaseAttrs, FormAttrs, InputAttrs, TextAreaAttrs
 from ludic.html import div, form, input, label, textarea
 from ludic.types import (
     BaseElement,
-    ComplexChild,
     Component,
-    NoChild,
-    PrimitiveChild,
+    NotAllowed,
+    OnlyComplex,
+    OnlyPrimitive,
     TAttrs,
     TChild,
 )
@@ -17,7 +19,7 @@ from ludic.utils import get_annotations_metadata_of_type
 
 from .utils import attr_to_camel
 
-DEFAULT_FIELD_PARSERS: Mapping[str, Callable[[Any], PrimitiveChild]] = {
+DEFAULT_FIELD_PARSERS: Mapping[str, Callable[[Any], OnlyPrimitive]] = {
     "checkbox": lambda value: True if value == "on" else False,
 }
 
@@ -27,6 +29,7 @@ class FieldMeta:
     """Class to be used in attributes annotations to create form fields.
 
     Example:
+
         def parse_email(email: str) -> str:
             if len(email.split("@")) != 2:
                 raise ValidationError("Invalid email")
@@ -44,7 +47,7 @@ class FieldMeta:
     kind: Literal["input", "textarea", "checkbox"] = "input"
     type: Literal["text", "email", "password", "hidden"] = "text"
     attrs: InputAttrs | TextAreaAttrs | None = None
-    parser: Callable[[Any], PrimitiveChild] | None = None
+    parser: Callable[[Any], OnlyPrimitive] | None = None
 
     def format(self, key: str, value: Any) -> BaseElement:
         attrs = {} if self.attrs is None else dict(self.attrs)
@@ -63,45 +66,57 @@ class FieldMeta:
             case "textarea":
                 return TextAreaField(value=value, **attrs)
 
-    def parse(self, value: Any) -> PrimitiveChild:
+    def parse(self, value: Any) -> OnlyPrimitive:
         if self.parser:
             return self.parser(value)
         else:
             return DEFAULT_FIELD_PARSERS.get(self.kind, str)(value)
 
-    def __call__(self, value: Any) -> PrimitiveChild:
+    def __call__(self, value: Any) -> OnlyPrimitive:
         return self.parse(value)
 
 
 class FieldAttrs(BaseAttrs, total=False):
+    """Shared attributes between custom form fields."""
+
     label: str
     class_div: str
 
 
 class InputFieldAttrs(FieldAttrs, InputAttrs):
-    pass
+    """Attributes of the component ``InputField``.
+
+    The attributes are subclassed from :class:`FieldAttrs` and :class:`InputAttrs`.
+    """
 
 
 class TextAreaFieldAttrs(FieldAttrs, TextAreaAttrs):
-    pass
+    """Attributes of the component ``TextAreaField``.
+
+    The attributes are subclassed from :class:`FieldAttrs` and :class:`TextAreaAttrs`.
+    """
 
 
 class FormField(Component[TChild, TAttrs]):
-    def create_label(self, text: PrimitiveChild, for_: str = "") -> label:
+    """Base class for form fields."""
+
+    def create_label(self, text: OnlyPrimitive, for_: str = "") -> label:
         if for_:
             return label(text, for_=for_)
         else:
             return label(text)
 
 
-class InputField(FormField[NoChild, InputFieldAttrs]):
+class InputField(FormField[NotAllowed, InputFieldAttrs]):
+    """Represents the HTML ``input`` element with an optional ``label`` element."""
+
     @override
     def render(self) -> div:
         attrs = self.attrs_for(input)
         if "name" in self.attrs:
             attrs["id"] = self.attrs["name"]
 
-        elements: list[ComplexChild] = []
+        elements: list[OnlyComplex] = []
         if text := self.attrs.get("label"):
             elements.append(self.create_label(text=text, for_=attrs.get("id", "")))
         elements.append(input(**attrs))
@@ -109,14 +124,16 @@ class InputField(FormField[NoChild, InputFieldAttrs]):
         return div(*elements, class_=self.attrs.get("class_div", "form-group"))
 
 
-class TextAreaField(FormField[PrimitiveChild, TextAreaFieldAttrs]):
+class TextAreaField(FormField[OnlyPrimitive, TextAreaFieldAttrs]):
+    """Represents the HTML ``textarea`` element with an optional ``label`` element."""
+
     @override
     def render(self) -> div:
         attrs = self.attrs_for(textarea)
         if "name" in self.attrs:
             attrs["id"] = self.attrs["name"]
 
-        elements: list[ComplexChild] = []
+        elements: list[OnlyComplex] = []
         if text := self.attrs.get("label"):
             elements.append(self.create_label(text=text, for_=attrs.get("id", "")))
         elements.append(textarea(self.children[0], **attrs))
@@ -124,7 +141,7 @@ class TextAreaField(FormField[PrimitiveChild, TextAreaFieldAttrs]):
         return div(*elements, class_=self.attrs.get("class_div", "form-group"))
 
 
-class Form(Component[ComplexChild, FormAttrs]):
+class Form(Component[OnlyComplex, FormAttrs]):
     """A component helper for creating HTML forms."""
 
     @override
@@ -132,7 +149,7 @@ class Form(Component[ComplexChild, FormAttrs]):
         return form(*self.children, **self.attrs)
 
 
-def create_fields(attrs: BaseAttrs, spec: type[TAttrs]) -> tuple[ComplexChild, ...]:
+def create_fields(attrs: BaseAttrs, spec: type[TAttrs]) -> tuple[OnlyComplex, ...]:
     """Create form fields from the given attributes.
 
     Example:
@@ -158,7 +175,7 @@ def create_fields(attrs: BaseAttrs, spec: type[TAttrs]) -> tuple[ComplexChild, .
     """
     annotations = get_type_hints(spec, include_extras=True)
     metadata_list = get_annotations_metadata_of_type(annotations, FieldMeta)
-    fields: list[ComplexChild] = []
+    fields: list[OnlyComplex] = []
 
     for name, metadata in metadata_list.items():
         if value := attrs.get(name):

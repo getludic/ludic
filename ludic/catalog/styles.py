@@ -6,7 +6,11 @@ from ludic.types import BaseElement, GlobalStyles, Safe
 
 
 def format_styles(styles: GlobalStyles) -> str:
-    """Format styles from all registered elements."""
+    """Format styles from all registered elements.
+
+    Args:
+        styles (GlobalStyles): Styles to format.
+    """
     result: list[str] = ["\n"]
     nodes_to_parse: list[tuple[list[str], dict[str, Any]]] = [([], styles)]
 
@@ -27,21 +31,34 @@ def format_styles(styles: GlobalStyles) -> str:
 
 
 class ComponentsStyles(BaseElement):
-    """Global styles collector from all elements."""
+    """Global styles collector from all elements.
 
-    _styles: GlobalStyles
+    Example usage:
+
+        class Page(Component[AllowAny, NoAttrs]):
+
+            @override
+            def render(self) -> BaseElement:
+                return html(
+                    head(
+                        title("An example Example"),
+                        ComponentsStyles(),
+                    ),
+                    body(
+                        *self.children,
+                    ),
+                )
+
+    This components would ren an HTML page containing the ``<style>`` element
+    with the styles from all components.
+    """
+
+    attrs: GlobalStyles
 
     def __init__(self, extra_styles: GlobalStyles | None = None) -> None:
-        self._styles = extra_styles or {}
+        self.attrs = extra_styles or {}
+        self.children = ()
         self.collect()
-
-    @property
-    def children(self) -> tuple:
-        return ()
-
-    @property
-    def attrs(self) -> GlobalStyles:
-        return self._styles
 
     def collect(self) -> None:
         """Collect all styles from all registered elements."""
@@ -52,7 +69,7 @@ class ComponentsStyles(BaseElement):
 
                 for key, value in element.styles.items():
                     if isinstance(value, dict):
-                        self._styles[key] = value
+                        self.attrs[key] = value
 
     def render(self) -> style:
-        return style(Safe(format_styles(self._styles)))
+        return style(Safe(format_styles(self.attrs)))

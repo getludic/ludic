@@ -1,15 +1,12 @@
 from typing import Annotated, Literal
 
 from .base import BaseAttrs
+from .base import NoAttrs as NoAttrs
 from .css import CSSProperties
 
 
 class Alias(str):
     """Alias type for attributes."""
-
-
-class NoAttrs(BaseAttrs):
-    """Placeholder for element with no attributes."""
 
 
 class HtmlAttrs(BaseAttrs, total=False):

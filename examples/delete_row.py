@@ -4,7 +4,7 @@ from examples import Body, Header, Page, app, db
 from ludic.catalog.buttons import ButtonDanger
 from ludic.catalog.tables import TableHead, TableRow
 from ludic.html import table, tbody, thead
-from ludic.types import BaseAttrs, GlobalStyles
+from ludic.types import BaseAttrs
 from ludic.web.endpoints import Endpoint
 from ludic.web.exceptions import NotFoundError
 
@@ -48,7 +48,7 @@ class PersonRow(Endpoint[PersonAttrs]):
 
 @app.endpoint("/people/")
 class PeopleTable(Endpoint[PeopleAttrs]):
-    styles: GlobalStyles = {
+    styles = {
         "tr.htmx-swapping td": {
             "opacity": "0",
             "transition": "opacity 1s ease-out",

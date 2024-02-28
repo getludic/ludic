@@ -2,14 +2,14 @@ from typing import override
 
 from ludic.attrs import GlobalAttrs
 from ludic.html import a, p
-from ludic.types import AnyChild, BaseAttrs, Component, ComponentStrict, PrimitiveChild
+from ludic.types import AllowAny, BaseAttrs, Component, ComponentStrict, OnlyPrimitive
 
 
 class LinkAttrs(BaseAttrs):
     to: str
 
 
-class Link(ComponentStrict[PrimitiveChild, LinkAttrs]):
+class Link(ComponentStrict[OnlyPrimitive, LinkAttrs]):
     """Simple component simulating a link.
 
     The difference between :class:`Link` and :class:`a` is that this component
@@ -22,17 +22,17 @@ class Link(ComponentStrict[PrimitiveChild, LinkAttrs]):
 
     @override
     def render(self) -> a:
-        return a(self.children[0], href=self.attrs["to"])
+        return a(self.children[0], href=self.attrs["to"], **self.attrs_for(a))
 
 
-class Paragraph(Component[AnyChild, GlobalAttrs]):
+class Paragraph(Component[AllowAny, GlobalAttrs]):
     """Simple component simulating a paragraph.
 
     There is basically just an alias for the :class:`p` element.
 
     Example usage:
 
-        Paragraph(f"Hello, {b("World")}!")
+        Paragraph(Safe(f"Hello, {b("World")}!"))
     """
 
     @override

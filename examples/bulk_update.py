@@ -5,7 +5,7 @@ from ludic.catalog.buttons import ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form
 from ludic.catalog.tables import ColumnMeta, Table, create_rows
 from ludic.html import span
-from ludic.types import BaseAttrs, GlobalStyles
+from ludic.types import BaseAttrs
 from ludic.web.endpoints import Endpoint
 from ludic.web.parsers import ListParser
 
@@ -27,7 +27,7 @@ class PeopleAttrs(BaseAttrs):
 class Toast(span):
     id: str = "toast"
     target: str = f"#{id}"
-    styles: GlobalStyles = {
+    styles = {
         target: {
             "background": "#E1F0DA",
             "margin": "10px 20px",
