@@ -1,13 +1,21 @@
 from collections.abc import Callable, Mapping, Sequence
+from functools import wraps
 from typing import Any, Literal, TypeVar
 
+from starlette._utils import is_async_callable
 from starlette.applications import AppType, Starlette
+from starlette.concurrency import run_in_threadpool
 from starlette.middleware import Middleware
+from starlette.requests import Request
+from starlette.responses import Response
 from starlette.routing import BaseRoute
 from starlette.types import ExceptionHandler, Lifespan
 
+from ludic.types import BaseElement
+
 from .datastructures import URLPath
 from .endpoints import Endpoint
+from .responses import LudicResponse, extract_from_request
 from .routing import Router
 
 TCallable = TypeVar("TCallable", bound=Callable[..., Any])
@@ -52,31 +60,31 @@ class LudicApp(Starlette):
             routes, on_startup=on_startup, on_shutdown=on_shutdown, lifespan=lifespan
         )
 
-    def get(self, path: str, **kwargs: Any) -> Callable[..., Any]:
+    def get(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
         """Register GET endpoint to the application."""
         return self.register_route(path, method="GET", **kwargs)
 
-    def head(self, path: str, **kwargs: Any) -> Callable[..., Any]:
+    def head(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
         """Register GET endpoint to the application."""
         return self.register_route(path, method="HEAD", **kwargs)
 
-    def post(self, path: str, **kwargs: Any) -> Callable[..., Any]:
+    def post(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
         """Register POST endpoint to the application."""
         return self.register_route(path, method="POST", **kwargs)
 
-    def put(self, path: str, **kwargs: Any) -> Callable[..., Any]:
+    def put(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
         """Register PUT endpoint to the application."""
         return self.register_route(path, method="PUT", **kwargs)
 
-    def delete(self, path: str, **kwargs: Any) -> Callable[..., Any]:
+    def delete(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
         """Register DELETE endpoint to the application."""
         return self.register_route(path, method="DELETE", **kwargs)
 
-    def patch(self, path: str, **kwargs: Any) -> Callable[..., Any]:
+    def patch(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
         """Register PATCH endpoint to the application."""
         return self.register_route(path, method="PATCH", **kwargs)
 
-    def options(self, path: str, **kwargs: Any) -> Callable[..., Any]:
+    def options(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
         """Register OPTIONS endpoint to the application."""
         return self.register_route(path, method="OPTIONS", **kwargs)
 
@@ -139,4 +147,48 @@ class LudicApp(Starlette):
         )
 
     def url_path_for(self, name: str, /, **path_params: Any) -> URLPath:
+        """Get the URL path for an endpoint.
+
+        Args:
+            name: The name of the endpoint.
+            **path_params: The path parameters.
+
+        Returns:
+            The URL path.
+        """
         return self.router.url_path_for(name, **path_params)
+
+    def exception_handler(
+        self, exc_class_or_status_code: int | type[Exception]
+    ) -> Callable[[TCallable], TCallable]:
+        """Register an exception handler to the application.
+
+        Example:
+
+            @app.exception_handler(404)
+            async def not_found(request: Request, exc: HTTPException):
+                return Page(
+                    Header("Page Could Not Be Found"),
+                    Body(f"Here is the reason: {exc.detail}")
+                )
+        """
+
+        def decorator(handler: TCallable) -> TCallable:
+            @wraps(handler)
+            async def wrapper(request: Request, exc: Exception) -> Response:
+                handler_kw = await extract_from_request(handler, request)
+                is_async = is_async_callable(handler)
+
+                if is_async:
+                    response = await handler(**handler_kw)
+                else:
+                    response = await run_in_threadpool(handler, **handler_kw)
+
+                if isinstance(response, BaseElement):
+                    return LudicResponse(response, getattr(exc, "status_code", 500))
+                return response
+
+            self.add_exception_handler(exc_class_or_status_code, wrapper)
+            return handler
+
+        return decorator

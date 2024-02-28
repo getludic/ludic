@@ -1,6 +1,7 @@
 from dataclasses import asdict, dataclass
 from typing import Any
 
+from ludic.attrs import NoAttrs
 from ludic.catalog.styles import ComponentsStyles
 from ludic.catalog.typography import Paragraph
 from ludic.html import (
@@ -15,7 +16,13 @@ from ludic.html import (
     script,
     title,
 )
-from ludic.types import AnyChild, BaseAttrs, BaseElement, Component, PrimitiveChild
+from ludic.types import (
+    AnyChild,
+    BaseElement,
+    Component,
+    ComponentStrict,
+    PrimitiveChild,
+)
 from ludic.web import LudicApp
 
 
@@ -85,7 +92,7 @@ db = DB(
 )
 
 
-class Page(Component[AnyChild, BaseAttrs]):
+class Page(Component[AnyChild, NoAttrs]):
     def render(self) -> BaseElement:
         return html(
             head(
@@ -101,32 +108,32 @@ class Page(Component[AnyChild, BaseAttrs]):
         )
 
 
-class Header(Component[PrimitiveChild, BaseAttrs]):
+class Header(ComponentStrict[PrimitiveChild, NoAttrs]):
     def render(self) -> header:
         return header(
             h1(f"Example - {self.children[0]}"),
         )
 
 
-class Body(Component[AnyChild, BaseAttrs]):
+class Body(Component[AnyChild, NoAttrs]):
     def render(self) -> div:
         return div(*self.children)
 
 
-class NotFoundPage(Page):
-    def render(self) -> Page:
-        return Page(
-            Header("Page Not Found"),
-            Body(Paragraph("The page you are looking for was not found.")),
-        )
-
-
-class ServerErrorPage(Page):
-    def render(self) -> Page:
-        return Page(
-            Header("Server Error"),
-            Body(Paragraph("Server encountered an error during processing.")),
-        )
-
-
 app = LudicApp(debug=True)
+
+
+@app.exception_handler(404)
+def not_found() -> Page:
+    return Page(
+        Header("Page Not Found"),
+        Body(Paragraph("The page you are looking for was not found.")),
+    )
+
+
+@app.exception_handler(500)
+async def server_error() -> Page:
+    return Page(
+        Header("Server Error"),
+        Body(Paragraph("Server encountered an error during processing.")),
+    )
