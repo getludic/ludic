@@ -219,7 +219,7 @@ class BaseElement(metaclass=ABCMeta):
         while dom.html_name is None:
             dom = dom.render()
 
-        hidden = type(dom) is Children
+        hidden = dom.html_name == "hidden"
         element_tag = "" if hidden else f"<{dom.html_name}"
 
         if dom.has_attributes():
@@ -351,6 +351,8 @@ class Children(Element[TChild, NoAttrs]):
     The purpose of this element is to be able to return only children
     when rendering a component.
     """
+
+    html_name = "hidden"
 
     def __init__(self, *children: TChild) -> None:
         super().__init__(*children)

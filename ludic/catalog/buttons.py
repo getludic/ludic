@@ -1,6 +1,6 @@
 from ludic.attrs import ButtonAttrs
 from ludic.html import button
-from ludic.types import BaseElement, ComponentStrict, OnlyPrimitive
+from ludic.types import ComponentStrict, OnlyPrimitive
 
 
 class Button(ComponentStrict[OnlyPrimitive, ButtonAttrs]):
@@ -9,9 +9,13 @@ class Button(ComponentStrict[OnlyPrimitive, ButtonAttrs]):
     The component creates a button with the ``btn`` class.
     """
 
-    def render(self) -> BaseElement:
-        if extra_class := self.attrs.get("class_"):
-            self.attrs["class_"] = f"{extra_class} btn"
+    class_name = "btn"
+
+    def render(self) -> button:
+        if extra_class := self.attrs.get("class_", ""):
+            self.attrs["class_"] = f"{extra_class} {self.class_name}"
+        else:
+            self.attrs["class_"] = self.class_name
         return button(self.children[0], **self.attrs)
 
 
@@ -21,10 +25,7 @@ class ButtonPrimary(Button):
     The component creates a button with the ``btn btn-primary`` class.
     """
 
-    def render(self) -> Button:
-        if extra_class := self.attrs.get("class_"):
-            self.attrs["class_"] = f"{extra_class} btn-primary"
-        return Button(self.children[0], **self.attrs)
+    class_name = "btn btn-primary"
 
 
 class ButtonSecondary(Button):
@@ -33,10 +34,7 @@ class ButtonSecondary(Button):
     The component creates a button with the ``btn btn-secondary`` class.
     """
 
-    def render(self) -> Button:
-        if extra_class := self.attrs.get("class_"):
-            self.attrs["class_"] = f"{extra_class} btn-secondary"
-        return Button(self.children[0], **self.attrs)
+    class_name = "btn btn-secondary"
 
 
 class ButtonDanger(Button):
@@ -45,10 +43,7 @@ class ButtonDanger(Button):
     The component creates a button with the ``btn btn-danger`` class.
     """
 
-    def render(self) -> Button:
-        if extra_class := self.attrs.get("class_"):
-            self.attrs["class_"] = f"{extra_class} btn-danger"
-        return Button(self.children[0], **self.attrs)
+    class_name = "btn btn-danger"
 
 
 class ButtonWarning(Button):
@@ -57,10 +52,7 @@ class ButtonWarning(Button):
     The component creates a button with the ``btn btn-warning`` class.
     """
 
-    def render(self) -> Button:
-        if extra_class := self.attrs.get("class_"):
-            self.attrs["class_"] = f"{extra_class} btn-warning"
-        return Button(self.children[0], **self.attrs)
+    class_name = "btn btn-warning"
 
 
 class ButtonInfo(Button):
@@ -69,7 +61,4 @@ class ButtonInfo(Button):
     The component creates a button with the ``btn btn-info`` class.
     """
 
-    def render(self) -> Button:
-        if extra_class := self.attrs.get("class_"):
-            self.attrs["class_"] = f"{extra_class} btn-info"
-        return Button(self.children[0], **self.attrs)
+    class_name = "btn btn-info"
