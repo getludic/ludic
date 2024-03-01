@@ -39,7 +39,7 @@ Example usage:
 """
 
 
-def _parse_children(string: str) -> tuple["AllowAny", ...]:
+def _parse_children(string: str) -> tuple["TChild", ...]:
     element = parse_element(f"<div>{string}</div>", _ELEMENT_REGISTRY)
     return tuple(
         Safe(child) if isinstance(child, str) else child for child in element.children
@@ -216,10 +216,10 @@ class BaseElement(metaclass=ABCMeta):
     def to_html(self) -> str:
         """Convert the element tree to an HTML string."""
         dom = self
-        while dom.html_name is None:
-            dom = dom.render()
+        while dom != (rendered_dom := dom.render()):
+            dom = rendered_dom
 
-        hidden = dom.html_name == "hidden"
+        hidden = dom.html_name == "__hidden__"
         element_tag = "" if hidden else f"<{dom.html_name}"
 
         if dom.has_attributes():
@@ -266,7 +266,7 @@ Primitive children are ``str``, ``bool``, ``int`` and ``float``.
 """
 
 OnlyComplex: TypeAlias = BaseElement
-"""Type alias for elements that are allowd to have only non-primitive children."""
+"""Type alias for elements that are allowed to have only non-primitive children."""
 
 AllowAny: TypeAlias = OnlyPrimitive | OnlyComplex | Safe
 """Type alias for elements that are allowed to have any children."""
@@ -292,7 +292,7 @@ class Element(Generic[TChild, TAttrs], BaseElement):
 
     Args:
         *children (TChild): The children of the element.
-        **attributes (Unpack[TAttrs]): The attributes of the element.
+        **attrs (Unpack[TAttrs]): The attributes of the element.
     """
 
     children: tuple[TChild, ...]
@@ -306,10 +306,14 @@ class Element(Generic[TChild, TAttrs], BaseElement):
     ) -> None:
         self.attrs = cast(TAttrs, attributes)
 
-        if len(children) == 1 and isinstance(children[0], Safe):
-            children = _parse_children(children[0])  # type: ignore
+        parsed_children: list[TChild] = []
+        for child in children:
+            if isinstance(child, Safe):
+                parsed_children.extend(_parse_children(child))
+            else:
+                parsed_children.append(child)
 
-        self.children = children
+        self.children = tuple(parsed_children)
 
     @override
     def render(self) -> BaseElement:
@@ -321,7 +325,7 @@ class ElementStrict(Generic[*TChildTuple, TAttrs], BaseElement):
 
     Args:
         *children (*TChildTuple): The children of the element.
-        **attributes (**TAttrs): The attributes of the element.
+        **attrs (Unpack[TAttrs]): The attributes of the element.
     """
 
     children: tuple[*TChildTuple]
@@ -331,14 +335,18 @@ class ElementStrict(Generic[*TChildTuple, TAttrs], BaseElement):
         self,
         *children: *TChildTuple,
         # FIXME: https://github.com/python/typing/issues/1399
-        **attributes: Unpack[TAttrs],  # type: ignore
+        **attrs: Unpack[TAttrs],  # type: ignore
     ) -> None:
-        self.attrs = cast(TAttrs, attributes)
+        self.attrs = cast(TAttrs, attrs)
 
-        if 1 <= len(children) > 0 and isinstance(children[0], Safe):
-            children = _parse_children(children[0])  # type: ignore
+        child_list: list[Any] = []
+        for child in children:
+            if isinstance(child, Safe):
+                child_list.extend(_parse_children(child))
+            else:
+                child_list.append(child)
 
-        self.children = children
+        self.children = cast(tuple[*TChildTuple], tuple(children))
 
     @override
     def render(self) -> BaseElement:
@@ -352,10 +360,14 @@ class Children(Element[TChild, NoAttrs]):
     when rendering a component.
     """
 
-    html_name = "hidden"
+    html_name = "__hidden__"
 
     def __init__(self, *children: TChild) -> None:
         super().__init__(*children)
+
+    @override
+    def render(self) -> BaseElement:
+        return self
 
 
 class Component(Element[TChild, TAttrs], metaclass=ABCMeta):
