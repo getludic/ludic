@@ -1,30 +1,35 @@
-import os
 import random
+import re
 import string
-from collections.abc import Mapping
 from typing import (
     Annotated,
     Any,
     Final,
-    Generic,
-    TypedDict,
     TypeVar,
     get_args,
     get_origin,
     get_type_hints,
 )
-from xml.etree.ElementTree import ParseError, XMLParser
-
-LUDIC_MAX_ELEMENT_DEPTH: Final[int] = int(os.getenv("LUDIC_MAX_ELEMENT_DEPTH", 50))
-
 
 _T = TypeVar("_T", covariant=True)
 
+EXTRACT_NUMBER_RE: Final[re.Pattern] = re.compile(r"\{(\d+):id\}")
 
-class _ParsedElement(Generic[_T], TypedDict):
-    tag: str
-    children: list[_T | str]
-    attrs: dict[str, str]
+
+def extract_identifiers(text: str) -> list[str | int]:
+    """Extract numbers from a string.
+
+    Args:
+        text (str): The string to extract numbers from.
+
+    Returns:
+        Iterable[int]: The extracted numbers.
+    """
+    return [
+        int(match) if str(match).isdigit() else match
+        for match in EXTRACT_NUMBER_RE.split(text)
+        if match
+    ]
 
 
 def random_string(n: int) -> str:
@@ -37,63 +42,6 @@ def random_string(n: int) -> str:
         random.SystemRandom().choice(string.ascii_uppercase + string.digits)
         for _ in range(n)
     )
-
-
-class _LudicElementHandler(Generic[_T]):
-    """Parse HTML elements from a string and collects them as ParsedElement's."""
-
-    def __init__(self, registry: Mapping[str, list[type[_T]]]) -> None:
-        self.registry = registry
-        self.finished: _T | None = None
-        self.elements: list[_ParsedElement[_T]] = []
-
-    def start(self, tag: str, attrs: dict[str, str]) -> None:
-        if len(self.elements) > LUDIC_MAX_ELEMENT_DEPTH:
-            raise RuntimeError("Max element depth reached")
-        self.elements.append(_ParsedElement(tag=tag, children=[], attrs=attrs))
-
-    def end(self, tag: str) -> None:
-        element = self.elements.pop()
-        if tag not in self.registry:
-            raise TypeError(
-                f"Element or component {tag!r} not found in registry, "
-                "maybe you forgot to import it?"
-            )
-
-        element_type = self.registry[tag][0]
-        attrs = parse_attrs(element_type, element["attrs"])
-
-        new_element: _T = element_type(*element["children"], **attrs)
-        if self.elements:
-            self.elements[-1]["children"].append(new_element)
-        else:
-            self.finished = new_element
-
-    def data(self, data: str) -> None:
-        self.elements[-1]["children"].append(data)
-
-    def close(self) -> _T:
-        if self.finished is None:
-            raise TypeError("Element is not finished")
-        return self.finished
-
-
-def parse_element(tree: str, registry: Mapping[str, list[type[_T]]]) -> _T:
-    """Parse HTML elements from a string.
-
-    Args:
-        tree (str): The string to parse.
-        registry (dict[str, Any]): The element registry.
-
-    Returns:
-        list[ParsedElement | str]: A list of parsed elements and text.
-    """
-    parser = XMLParser(target=_LudicElementHandler(registry))  # noqa
-    try:
-        parser.feed(tree)
-    except ParseError as err:
-        raise TypeError("The given string is not a valid XHTML.") from err
-    return parser.close()
 
 
 def get_element_generic_args(cls_or_obj: Any) -> tuple[type, ...] | None:

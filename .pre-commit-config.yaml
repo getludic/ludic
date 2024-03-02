@@ -29,3 +29,5 @@ repos:
     hooks:
       - id: mypy
         args: ["--ignore-missing-imports"]
+        additional_dependencies:
+          - types-cachetools

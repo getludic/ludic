@@ -1,4 +1,5 @@
 import html
+import random
 from abc import ABCMeta, abstractmethod
 from collections.abc import Callable, Iterator, Mapping, Sequence
 from typing import (
@@ -10,16 +11,16 @@ from typing import (
     TypedDict,
     Unpack,
     cast,
-    override,
 )
 
+from cachetools import TTLCache
 from typing_extensions import TypeVar, TypeVarTuple
 
 from .css import CSSProperties
 from .utils import (
+    extract_identifiers,
     format_attrs,
     get_element_attrs_annotations,
-    parse_element,
 )
 
 _ELEMENT_REGISTRY: dict[str, list[type["BaseElement"]]] = {}
@@ -37,13 +38,6 @@ Example usage:
             },
         }
 """
-
-
-def _parse_children(string: str) -> tuple["TChild", ...]:
-    element = parse_element(f"<div>{string}</div>", _ELEMENT_REGISTRY)
-    return tuple(
-        Safe(child) if isinstance(child, str) else child for child in element.children
-    )
 
 
 def default_html_formatter(child: "AllowAny") -> str:
@@ -69,14 +63,6 @@ class Safe(str):
         >>> Paragraph(Safe(f"Hello, how {b('are you')}?")).to_html()
         >>> <p>Hello, how <b>are you</b>?</p>
     """
-
-    @staticmethod
-    def parse(string: str) -> "AllowAny | tuple[AllowAny, ...]":
-        result = _parse_children(string)
-        if len(result) == 1:
-            return result[0]
-        else:
-            return result
 
 
 class BaseAttrs(TypedDict, total=False):
@@ -112,6 +98,10 @@ class BaseElement(metaclass=ABCMeta):
     children: Sequence[Any]
     attrs: Mapping[str, Any]
 
+    _element_format_cache: ClassVar[TTLCache[int, "BaseElement"]] = TTLCache(
+        maxsize=1e9, ttl=1
+    )
+
     def __init_subclass__(cls) -> None:
         _ELEMENT_REGISTRY.setdefault(cls.__name__, [])
         _ELEMENT_REGISTRY[cls.__name__].append(cls)
@@ -120,7 +110,9 @@ class BaseElement(metaclass=ABCMeta):
         return self.to_string()
 
     def __format__(self, _: str) -> str:
-        return self.to_string(pretty=False)
+        random_id = random.getrandbits(256)
+        self._element_format_cache[random_id] = self
+        return f"{{{random_id}:id}}"
 
     def __len__(self) -> int:
         return len(self.children)
@@ -137,6 +129,21 @@ class BaseElement(metaclass=ABCMeta):
             and self.children == other.children
             and self.attrs == other.attrs
         )
+
+    def _extract_children_from_memory(self, *children: Any) -> list[Any]:
+        extracted_children: list[Any] = []
+        for child in children:
+            if isinstance(child, str) and (parts := extract_identifiers(child)):
+                extracted_children.extend(
+                    self._element_format_cache.pop(part)
+                    if isinstance(part, int)
+                    else part
+                    for part in parts
+                    if not isinstance(part, int) or part in self._element_format_cache
+                )
+            else:
+                extracted_children.append(child)
+        return extracted_children
 
     def _format_attributes(self, html: bool = False) -> str:
         attrs: dict[str, Any]
@@ -251,9 +258,8 @@ class BaseElement(metaclass=ABCMeta):
             if key in get_element_attrs_annotations(cls)
         }
 
-    @abstractmethod
     def render(self) -> "BaseElement":
-        raise NotImplementedError()
+        return self
 
 
 NotAllowed: TypeAlias = Never
@@ -305,19 +311,7 @@ class Element(Generic[TChild, TAttrs], BaseElement):
         **attributes: Unpack[TAttrs],  # type: ignore
     ) -> None:
         self.attrs = cast(TAttrs, attributes)
-
-        parsed_children: list[TChild] = []
-        for child in children:
-            if isinstance(child, Safe):
-                parsed_children.extend(_parse_children(child))
-            else:
-                parsed_children.append(child)
-
-        self.children = tuple(parsed_children)
-
-    @override
-    def render(self) -> BaseElement:
-        return self
+        self.children = tuple(self._extract_children_from_memory(*children))
 
 
 class ElementStrict(Generic[*TChildTuple, TAttrs], BaseElement):
@@ -338,19 +332,7 @@ class ElementStrict(Generic[*TChildTuple, TAttrs], BaseElement):
         **attrs: Unpack[TAttrs],  # type: ignore
     ) -> None:
         self.attrs = cast(TAttrs, attrs)
-
-        child_list: list[Any] = []
-        for child in children:
-            if isinstance(child, Safe):
-                child_list.extend(_parse_children(child))
-            else:
-                child_list.append(child)
-
-        self.children = cast(tuple[*TChildTuple], tuple(children))
-
-    @override
-    def render(self) -> BaseElement:
-        return self
+        self.children = tuple(self._extract_children_from_memory(*children))
 
 
 class Children(Element[TChild, NoAttrs]):
@@ -364,10 +346,6 @@ class Children(Element[TChild, NoAttrs]):
 
     def __init__(self, *children: TChild) -> None:
         super().__init__(*children)
-
-    @override
-    def render(self) -> BaseElement:
-        return self
 
 
 class Component(Element[TChild, TAttrs], metaclass=ABCMeta):
@@ -438,37 +416,3 @@ class ComponentStrict(ElementStrict[*TChildTuple, TAttrs], metaclass=ABCMeta):
     @abstractmethod
     def render(self) -> BaseElement:
         """Render the component as an instance of :class:`BaseElement`."""
-
-
-def locate_element(
-    name: str, base_class: type[BaseElement] = BaseElement
-) -> type[BaseElement]:
-    """Get the element class by its name.
-
-    Args:
-        name (str): The name of the element.
-
-    Returns:
-        type[TChild]: The element class.
-    """
-    result = []
-    if "." in name:
-        module, element_name = name.rsplit(".", 1)
-    else:
-        module = ""
-        element_name = name
-
-    for element in _ELEMENT_REGISTRY[element_name]:
-        if issubclass(element, base_class):
-            if not module:
-                result.append(element)
-            submodules = element.__module__.split(".")
-            if all(submodule in submodules for submodule in module.split(".")):
-                result.append(element)
-
-    if len(result) == 1:
-        return result[0]
-    elif len(result) > 1:
-        raise ValueError(f"Multiple elements found for {name!r}: {result!r}.")
-    else:
-        raise ValueError(f"Could not locate element: {name!r}.")

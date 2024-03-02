@@ -1,4 +1,3 @@
-from ludic.base import Safe
 from ludic.css import CSSProperties
 from ludic.html import (
     a,
@@ -18,9 +17,7 @@ from ludic.html import (
 
 
 def test_paragraph():
-    paragraph = p(
-        Safe(f"Hello, World! {b("Something bold")} and {i("Something italic")}")
-    )
+    paragraph = p(f"Hello, World! {b("Something bold")} and {i("Something italic")}")
     assert paragraph.to_html() == (
         "<p>Hello, World! <b>Something bold</b> and <i>Something italic</i></p>"
     )

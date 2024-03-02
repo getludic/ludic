@@ -1,4 +1,3 @@
-from ludic.base import Safe
 from ludic.catalog.navigation import Navigation, NavItem
 from ludic.catalog.typography import Link, Paragraph
 from ludic.html import b
@@ -11,9 +10,7 @@ def test_link():
 
 def test_component_with_f_string():
     paragraph = Paragraph(
-        Safe(
-            f"Hello, how {b("are you")}? Click {Link("here", to="https://example.com")}."
-        )
+        f"Hello, how {b("are you")}? Click {Link("here", to="https://example.com")}.",
     )
     assert isinstance(paragraph.children[3], Link)
     assert paragraph.children[3].attrs["to"] == "https://example.com"
