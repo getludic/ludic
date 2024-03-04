@@ -2,14 +2,22 @@ from typing import Self, Unpack
 
 from .attrs import (
     AreaAttrs,
+    AudioAttrs,
+    BaseAttrs,
     BlockquoteAttrs,
     ButtonAttrs,
+    CanvasAttrs,
     ColAttrs,
+    DataAttrs,
     DelAttrs,
+    DetailsAttrs,
+    DialogAttrs,
+    EmbedAttrs,
     FieldsetAttrs,
     FormAttrs,
     GlobalAttrs,
     HeadLinkAttrs,
+    HtmlAttrs,
     HtmlTagAttrs,
     HyperlinkAttrs,
     IframeAttrs,
@@ -18,18 +26,29 @@ from .attrs import (
     InsAttrs,
     LabelAttrs,
     LiAttrs,
+    MapAttrs,
     MetaAttrs,
+    MeterAttrs,
     NoAttrs,
+    ObjectAttrs,
+    OlAttrs,
     OptgroupAttrs,
     OptionAttrs,
     OutputAttrs,
+    ParamAttrs,
+    ProgressAttrs,
+    QAttrs,
     ScriptAttrs,
     SelectAttrs,
+    SourceAttrs,
     StyleAttrs,
     SvgAttrs,
     TdAttrs,
     TextAreaAttrs,
     ThAttrs,
+    TimeAttrs,
+    TrackAttrs,
+    VideoAttrs,
 )
 from .styles import collect_from_components, collect_from_loaded, format_styles
 from .types import (
@@ -112,7 +131,7 @@ class ul(Element[ComplexChildren, GlobalAttrs]):
     html_name = "ul"
 
 
-class ol(Element[ComplexChildren, GlobalAttrs]):
+class ol(Element[ComplexChildren, OlAttrs]):
     html_name = "ol"
 
 
@@ -369,3 +388,167 @@ class colgroup(Element[AnyChildren, GlobalAttrs]):
 
 class area(Element[NoChildren, AreaAttrs]):
     html_name = "area"
+
+
+class aside(Element[AnyChildren, GlobalAttrs]):
+    html_name = "aside"
+
+
+class source(Element[NoChildren, SourceAttrs]):
+    html_name = "source"
+
+
+class audio(Element[AnyChildren, AudioAttrs]):
+    html_name = "audio"
+
+
+class base(Element[NoChildren, BaseAttrs]):
+    html_name = "base"
+
+
+class bdi(Element[AnyChildren, GlobalAttrs]):
+    html_name = "bdi"
+
+
+class bdo(Element[AnyChildren, GlobalAttrs]):
+    html_name = "bdo"
+
+
+class canvas(Element[AnyChildren, CanvasAttrs]):
+    html_name = "canvas"
+
+
+class data(Element[AnyChildren, DataAttrs]):
+    html_name = "data"
+
+
+class datalist(Element[AnyChildren, GlobalAttrs]):
+    html_name = "datalist"
+
+
+class details(Element[AnyChildren, DetailsAttrs]):
+    html_name = "details"
+
+
+class dfn(Element[AnyChildren, GlobalAttrs]):
+    html_name = "dfn"
+
+
+class dialog(Element[AnyChildren, DialogAttrs]):
+    html_name = "dialog"
+
+
+class embed(Element[NoChildren, EmbedAttrs]):
+    html_name = "embed"
+
+
+class figcaption(Element[AnyChildren, GlobalAttrs]):
+    html_name = "figcaption"
+
+
+class figure(Element[AnyChildren, GlobalAttrs]):
+    html_name = "figure"
+
+
+class hrgroup(Element[AnyChildren, GlobalAttrs]):
+    html_name = "hrgroup"
+
+
+class hr(Element[NoChildren, GlobalAttrs]):
+    html_name = "hr"
+
+
+class kbd(Element[AnyChildren, GlobalAttrs]):
+    html_name = "kbd"
+
+
+class map(Element[AnyChildren, MapAttrs]):
+    html_name = "map"
+
+
+class menu(Element[AnyChildren, GlobalAttrs]):
+    html_name = "menu"
+
+
+class meter(Element[AnyChildren, MeterAttrs]):
+    html_name = "meter"
+
+
+class nav(Element[AnyChildren, GlobalAttrs]):
+    html_name = "nav"
+
+
+class object(Element[AnyChildren, ObjectAttrs]):
+    html_name = "object"
+
+
+class param(Element[NoChildren, ParamAttrs]):
+    html_name = "param"
+
+
+class picture(Element[AnyChildren, GlobalAttrs]):
+    html_name = "picture"
+
+
+class progress(Element[AnyChildren, ProgressAttrs]):
+    html_name = "progress"
+
+
+class q(Element[AnyChildren, QAttrs]):
+    html_name = "q"
+
+
+class rp(Element[AnyChildren, GlobalAttrs]):
+    html_name = "rp"
+
+
+class rt(Element[AnyChildren, GlobalAttrs]):
+    html_name = "rt"
+
+
+class ruby(Element[AnyChildren, GlobalAttrs]):
+    html_name = "ruby"
+
+
+class samp(Element[AnyChildren, GlobalAttrs]):
+    html_name = "samp"
+
+
+class search(Element[AnyChildren, GlobalAttrs]):
+    html_name = "search"
+
+
+class sub(Element[AnyChildren, GlobalAttrs]):
+    html_name = "sub"
+
+
+class summary(Element[AnyChildren, GlobalAttrs]):
+    html_name = "summary"
+
+
+class sup(Element[AnyChildren, GlobalAttrs]):
+    html_name = "sup"
+
+
+class template(Element[AnyChildren, HtmlAttrs]):
+    html_name = "template"
+
+
+class time(Element[AnyChildren, TimeAttrs]):
+    html_name = "time"
+
+
+class track(Element[NoChildren, TrackAttrs]):
+    html_name = "track"
+
+
+class var(Element[AnyChildren, GlobalAttrs]):
+    html_name = "var"
+
+
+class video(Element[AnyChildren, VideoAttrs]):
+    html_name = "video"
+
+
+class wbr(Element[NoChildren, GlobalAttrs]):
+    html_name = "wbr"

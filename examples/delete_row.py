@@ -4,19 +4,19 @@ from examples import Body, Header, Page, app, db
 from ludic.catalog.buttons import ButtonDanger
 from ludic.catalog.tables import TableHead, TableRow
 from ludic.html import table, tbody, thead
-from ludic.types import BaseAttrs
+from ludic.types import Attrs
 from ludic.web.endpoints import Endpoint
 from ludic.web.exceptions import NotFoundError
 
 
-class PersonAttrs(BaseAttrs):
+class PersonAttrs(Attrs):
     id: str
     name: str
     email: str
     active: bool
 
 
-class PeopleAttrs(BaseAttrs):
+class PeopleAttrs(Attrs):
     people: list[PersonAttrs]
 
 

@@ -41,16 +41,31 @@ Example usage:
 
 
 class Safe(str):
-    """Marker for a safe string."""
+    """Marker for a string that is safe to use as is without HTML escaping.
+
+    That means the content of the string is not escaped when rendered.
+
+    Usage:
+
+        >>> div(Safe("Hello <b>World!</b>")).to_html()
+        '<div>Hello <b>World!</b></div>'
+    """
 
     escape = False
 
 
 class JavaScript(Safe):
-    """Marker for a JavaScript string."""
+    """Marker for a JavaScript string.
+
+    The content of this string is not escaped when rendered.
+
+    Usage:
+
+        js = JavaScript("alert('Hello World!')")
+    """
 
 
-class BaseAttrs(TypedDict, total=False):
+class Attrs(TypedDict, total=False):
     """Attributes of an element or component.
 
     Example usage::
@@ -130,10 +145,10 @@ class BaseElement(metaclass=ABCMeta):
                 extracted_children.append(child)
         return extracted_children
 
-    def _format_attributes(self, html: bool = False) -> str:
+    def _format_attributes(self, is_html: bool = False) -> str:
         attrs: dict[str, Any]
-        if html:
-            attrs = format_attrs(type(self), dict(self.attrs), is_html=True)
+        if is_html:
+            attrs = format_attrs(type(self), dict(self.attrs), True)
         else:
             attrs = self.aliased_attrs
         return " ".join(f'{key}="{value}"' for key, value in attrs.items())
@@ -208,7 +223,7 @@ class BaseElement(metaclass=ABCMeta):
         element_tag = "" if hidden else f"<{dom.html_name}"
 
         if dom.has_attributes():
-            attributes_str = dom._format_attributes(html=True)
+            attributes_str = dom._format_attributes(is_html=True)
             element_tag += f" {attributes_str}"
 
         if dom.children or dom.always_pair:
@@ -267,7 +282,7 @@ TChildrenArgs = TypeVarTuple("TChildrenArgs", default=Unpack[tuple[AnyChildren, 
 See also: :class:`ludic.types.ComponentStrict`.
 """
 
-TAttrs = TypeVar("TAttrs", bound=BaseAttrs, default=BaseAttrs, covariant=True)
+TAttrs = TypeVar("TAttrs", bound=Attrs, default=Attrs, covariant=True)
 """Type variable for elements representing type of attributes (the type of **kwargs)."""
 
 

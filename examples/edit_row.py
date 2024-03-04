@@ -4,19 +4,19 @@ from examples import Body, Header, Page, app, db
 from ludic.catalog.buttons import ButtonPrimary, ButtonSecondary
 from ludic.catalog.tables import ColumnMeta, TableHead, TableRow
 from ludic.html import div, input, table, tbody, thead
-from ludic.types import BaseAttrs, JavaScript
+from ludic.types import Attrs, JavaScript
 from ludic.web.endpoints import Endpoint
 from ludic.web.exceptions import NotFoundError
 from ludic.web.parsers import Parser
 
 
-class PersonAttrs(BaseAttrs):
+class PersonAttrs(Attrs):
     id: NotRequired[str]
     name: Annotated[str, ColumnMeta()]
     email: Annotated[str, ColumnMeta()]
 
 
-class PeopleAttrs(BaseAttrs):
+class PeopleAttrs(Attrs):
     people: list[PersonAttrs]
 
 

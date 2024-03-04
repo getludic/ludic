@@ -5,7 +5,7 @@ from ludic.catalog.buttons import ButtonDanger, ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form, create_fields
 from ludic.catalog.lists import Pairs
 from ludic.html import div
-from ludic.types import BaseAttrs
+from ludic.types import Attrs
 from ludic.web.endpoints import Endpoint
 from ludic.web.exceptions import NotFoundError
 from ludic.web.parsers import Parser, ValidationError
@@ -17,7 +17,7 @@ def email_validator(email: str) -> str:
     return email
 
 
-class ContactAttrs(BaseAttrs):
+class ContactAttrs(Attrs):
     id: NotRequired[str]
     first_name: Annotated[str, FieldMeta(label="First Name")]
     last_name: Annotated[str, FieldMeta(label="Last Name")]

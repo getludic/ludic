@@ -4,7 +4,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Any, Literal, get_type_hints, override
 
-from ludic.attrs import BaseAttrs, FormAttrs, InputAttrs, TextAreaAttrs
+from ludic.attrs import Attrs, FormAttrs, InputAttrs, TextAreaAttrs
 from ludic.html import div, form, input, label, textarea
 from ludic.types import (
     BaseElement,
@@ -76,7 +76,7 @@ class FieldMeta:
         return self.parse(value)
 
 
-class FieldAttrs(BaseAttrs, total=False):
+class FieldAttrs(Attrs, total=False):
     """Shared attributes between custom form fields."""
 
     label: str
@@ -149,7 +149,7 @@ class Form(Component[ComplexChildren, FormAttrs]):
         return form(*self.children, **self.attrs)
 
 
-def create_fields(attrs: BaseAttrs, spec: type[TAttrs]) -> tuple[ComplexChildren, ...]:
+def create_fields(attrs: Attrs, spec: type[TAttrs]) -> tuple[ComplexChildren, ...]:
     """Create form fields from the given attributes.
 
     Example:

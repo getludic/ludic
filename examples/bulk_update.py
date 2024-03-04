@@ -5,12 +5,12 @@ from ludic.catalog.buttons import ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form
 from ludic.catalog.tables import ColumnMeta, Table, create_rows
 from ludic.html import span
-from ludic.types import BaseAttrs
+from ludic.types import Attrs
 from ludic.web.endpoints import Endpoint
 from ludic.web.parsers import ListParser
 
 
-class PersonAttrs(BaseAttrs, total=False):
+class PersonAttrs(Attrs, total=False):
     id: Annotated[str, ColumnMeta(identifier=True)]
     name: Annotated[str, ColumnMeta()]
     email: Annotated[str, ColumnMeta()]
@@ -20,7 +20,7 @@ class PersonAttrs(BaseAttrs, total=False):
     ]
 
 
-class PeopleAttrs(BaseAttrs):
+class PeopleAttrs(Attrs):
     people: list[PersonAttrs]
 
 

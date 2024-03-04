@@ -4,18 +4,18 @@ from examples import Body, Header, Page, app
 from ludic.attrs import ButtonAttrs
 from ludic.catalog.buttons import ButtonPrimary
 from ludic.catalog.tables import Table, TableHead, TableRow
-from ludic.types import BaseAttrs, Children, Component, ComponentStrict
+from ludic.types import Attrs, Children, Component, ComponentStrict
 from ludic.web import Endpoint
 from ludic.web.datastructures import QueryParams
 
 
-class ContactAttrs(BaseAttrs):
+class ContactAttrs(Attrs):
     id: str
     name: str
     email: str
 
 
-class ContactsSliceAttrs(BaseAttrs):
+class ContactsSliceAttrs(Attrs):
     page: int
     contacts: list[ContactAttrs]
 
@@ -47,7 +47,7 @@ class LoadMoreButton(ComponentStrict[LoadMoreAttrs]):
         )
 
 
-class ContactsTable(Component[TableRow, BaseAttrs]):
+class ContactsTable(Component[TableRow, Attrs]):
     def render(self) -> Table:
         return Table(
             TableHead("ID", "Name", "Email"),

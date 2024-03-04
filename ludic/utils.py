@@ -24,11 +24,15 @@ def extract_identifiers(text: str) -> list[str | int]:
     Returns:
         Iterable[int]: The extracted numbers.
     """
-    return [
+    parts = [
         int(match) if str(match).isdigit() else match
         for match in EXTRACT_NUMBER_RE.split(text)
         if match
     ]
+    if any(isinstance(part, int) for part in parts):
+        return parts
+    else:
+        return []
 
 
 def get_element_generic_args(cls_or_obj: Any) -> tuple[type, ...] | None:
@@ -94,7 +98,7 @@ def get_annotations_metadata_of_type(
     return result
 
 
-def _format_attr_value(key: str, value: Any, is_html: bool = False) -> str:
+def format_attr_value(key: str, value: Any, is_html: bool = False) -> str:
     """Format an HTML attribute with the given key and value.
 
     Args:
@@ -109,12 +113,14 @@ def _format_attr_value(key: str, value: Any, is_html: bool = False) -> str:
             for dict_key, dict_value in value.items()
         )
     elif isinstance(value, bool):
-        if is_html:
+        if is_html and not key.startswith("hx"):
             value = html.escape(key) if value else ""
         else:
             value = "true" if value else "false"
-    elif getattr(value, "escape", True):
+    elif isinstance(value, str) and getattr(value, "escape", True):
         value = html.escape(value)
+    else:
+        value = str(value)
     return value
 
 
@@ -157,7 +163,7 @@ def format_attrs(
 
     result = {}
     for key, value in attrs.items():
-        if formatted_value := _format_attr_value(key, value, is_html=is_html):
+        if formatted_value := format_attr_value(key, value, is_html=is_html):
             result[_get_key(key)] = formatted_value
     return result
 

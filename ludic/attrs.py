@@ -1,6 +1,6 @@
 from typing import Annotated, Literal
 
-from .base import BaseAttrs
+from .base import Attrs
 from .base import NoAttrs as NoAttrs
 from .css import CSSProperties
 
@@ -9,14 +9,14 @@ class Alias(str):
     """Alias type for attributes."""
 
 
-class HtmlAttrs(BaseAttrs, total=False):
+class HtmlAttrs(Attrs, total=False):
     """Common attributes for HTML elements."""
 
     id: str
     accesskey: str
     class_: Annotated[str, Alias("class")]
     contenteditable: Literal["true", "false"]
-    dir: Literal["ltr", "rtl"]
+    dir: Literal["ltr", "rtl", "auto"]
     draggable: Literal["true", "false"]
     enterkeyhint: Literal["enter", "done", "go", "next", "previous", "search", "send"]
     hidden: Literal["true", "false"]
@@ -33,7 +33,7 @@ class HtmlAttrs(BaseAttrs, total=False):
     translate: Literal["yes", "no"]
 
 
-class HtmxAttrs(BaseAttrs, total=False):
+class HtmxAttrs(Attrs, total=False):
     """HTMX attributes for HTML elements.
 
     See: https://htmx.org/
@@ -50,6 +50,8 @@ class HtmxAttrs(BaseAttrs, total=False):
     hx_confirm: Annotated[str, Alias("hx-confirm")]
     hx_trigger: Annotated[str, Alias("hx-trigger")]
     hx_target: Annotated[Literal["this", "next", "previous"] | str, Alias("hx-target")]
+    hx_select: Annotated[str, Alias("hx-select")]
+    hx_select_oob: Annotated[str, Alias("hx-select-oob")]
     hx_swap: Annotated[
         Literal[
             "innerHTML",
@@ -64,9 +66,31 @@ class HtmxAttrs(BaseAttrs, total=False):
         | str,
         Alias("hx-swap"),
     ]
+    hx_swap_oob: Annotated[str, Alias("hx-swap-oob")]
+    hx_vals: Annotated[str, Alias("hx-vals")]
+    hx_sync: Annotated[str, Alias("hx-sync")]
+    hx_boost: Annotated[bool, Alias("hx-boost")]
+    hx_indicator: Annotated[str, Alias("hx-indicator")]
+    hx_push_url: Annotated[bool, Alias("hx-push-url")]
+    hx_history: Annotated[bool, Alias("hx-history")]
+    hx_history_elt: Annotated[str, Alias("hx-history-elt")]
+    hx_ext: Annotated[str, Alias("hx-ext")]
+    hx_disable: Annotated[bool, Alias("hx-disable")]
+    hx_disabled_ext: Annotated[str, Alias("hx-disabled-ext")]
+    hx_disinherit: Annotated[str, Alias("hx-disinherit")]
+    hx_encoding: Annotated[str, Alias("hx-encoding")]
+    hx_headers: Annotated[str, Alias("hx-headers")]
+    hx_params: Annotated[str, Alias("hx-params")]
+    hx_preserve: Annotated[bool, Alias("hx-preserve")]
+    hx_prompt: Annotated[str, Alias("hx-prompt")]
+    hx_replace_url: Annotated[str, Alias("hx-replace-url")]
+    hx_request: Annotated[str, Alias("hx-request")]
+    hx_validate: Annotated[bool, Alias("hx-validate")]
+    hx_ws: Annotated[str, Alias("hx-ws")]
+    hx_sse: Annotated[str, Alias("hx-sse")]
 
 
-class WindowEventAttrs(BaseAttrs, total=False):
+class WindowEventAttrs(Attrs, total=False):
     """Event Attributes for HTML elements."""
 
     onafterprint: str
@@ -87,7 +111,7 @@ class WindowEventAttrs(BaseAttrs, total=False):
     onunload: str
 
 
-class FormEventAttrs(BaseAttrs, total=False):
+class FormEventAttrs(Attrs, total=False):
     """Event Attributes for HTML Form elements."""
 
     onblur: str
@@ -102,7 +126,7 @@ class FormEventAttrs(BaseAttrs, total=False):
     onsubmit: str
 
 
-class KeyboardEventAttrs(BaseAttrs, total=False):
+class KeyboardEventAttrs(Attrs, total=False):
     """Event Attributes for Keyboard events."""
 
     onkeydown: str
@@ -110,7 +134,7 @@ class KeyboardEventAttrs(BaseAttrs, total=False):
     onkeyup: str
 
 
-class MouseEventAttrs(BaseAttrs, total=False):
+class MouseEventAttrs(Attrs, total=False):
     """Event Attributes for Mouse events."""
 
     onclick: str
@@ -123,7 +147,7 @@ class MouseEventAttrs(BaseAttrs, total=False):
     onwheel: str
 
 
-class DragEventAttrs(BaseAttrs, total=False):
+class DragEventAttrs(Attrs, total=False):
     """Event Attributes for Drag events."""
 
     ondrag: str
@@ -135,7 +159,7 @@ class DragEventAttrs(BaseAttrs, total=False):
     ondrop: str
 
 
-class ClipboardEventAttrs(BaseAttrs, total=False):
+class ClipboardEventAttrs(Attrs, total=False):
     """Event Attributes for Clipboard events."""
 
     oncopy: str
@@ -163,7 +187,7 @@ class GlobalAttrs(HtmxAttrs, HtmlAndEventAttrs, total=False):
     """Global attributes for HTML elements."""
 
 
-class HtmlTagAttrs(BaseAttrs, total=False):
+class HtmlTagAttrs(Attrs, total=False):
     xmlns: str
 
 
@@ -509,3 +533,119 @@ class AreaAttrs(GlobalAttrs, total=False):
     rel: str
     shape: Literal["rect", "circle", "poly", "default"]
     target: str
+
+
+class SourceAttrs(GlobalAttrs, total=False):
+    media: str
+    sizes: str
+    src: str
+    srcset: str
+    type: str
+
+
+class AudioAttrs(GlobalAttrs, total=False):
+    src: str
+    preload: Literal["auto", "metadata", "none"]
+    autoplay: bool
+    controls: bool
+    loop: bool
+    muted: bool
+    mediagroup: str
+
+
+class BaseAttrs(GlobalAttrs, total=False):
+    href: str
+    target: str
+
+
+class CanvasAttrs(GlobalAttrs, total=False):
+    width: int
+    height: int
+
+
+class DataAttrs(GlobalAttrs, total=False):
+    value: str
+
+
+class DetailsAttrs(GlobalAttrs, total=False):
+    open: bool
+
+
+class DialogAttrs(GlobalAttrs, total=False):
+    open: bool
+
+
+class EmbedAttrs(GlobalAttrs, total=False):
+    height: int
+    src: str
+    type: str
+    width: int
+
+
+class MapAttrs(GlobalAttrs, total=False):
+    name: str
+
+
+class MeterAttrs(GlobalAttrs, total=False):
+    form: str
+    high: int
+    low: int
+    max: int
+    min: int
+    optimum: int
+    value: int
+
+
+class ObjectAttrs(GlobalAttrs, total=False):
+    data: str
+    form: str
+    height: int
+    name: str
+    type: str
+    typemustmatch: bool
+    usemap: str
+    width: int
+
+
+class OlAttrs(GlobalAttrs, total=False):
+    reversed: bool
+    start: int
+    type: Literal["1", "a", "A", "i", "I"]
+
+
+class ParamAttrs(GlobalAttrs, total=False):
+    name: str
+    value: str
+
+
+class ProgressAttrs(GlobalAttrs, total=False):
+    max: int
+    value: int
+
+
+class QAttrs(HtmlAttrs, total=False):
+    cite: str
+
+
+class TimeAttrs(GlobalAttrs, total=False):
+    datetime: str
+
+
+class TrackAttrs(GlobalAttrs, total=False):
+    default: bool
+    kind: Literal["subtitles", "captions", "descriptions", "chapters", "metadata"]
+    label: str
+    src: str
+    srclang: str
+
+
+class VideoAttrs(GlobalAttrs, total=False):
+    autoplay: bool
+    controls: bool
+    height: int
+    loop: bool
+    muted: bool
+    poster: str
+    preload: Literal["auto", "metadata", "none"]
+    src: str
+    width: int

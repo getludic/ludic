@@ -1,6 +1,6 @@
 from .base import (
     AnyChildren,
-    BaseAttrs,
+    Attrs,
     BaseElement,
     Children,
     ComplexChildren,
@@ -20,7 +20,7 @@ from .base import (
 
 __all__ = (
     "AnyChildren",
-    "BaseAttrs",
+    "Attrs",
     "BaseElement",
     "ComplexChildren",
     "Component",

@@ -4,14 +4,14 @@ from ludic.attrs import GlobalAttrs
 from ludic.html import a, p
 from ludic.types import (
     AnyChildren,
-    BaseAttrs,
+    Attrs,
     Component,
     ComponentStrict,
     PrimitiveChildren,
 )
 
 
-class LinkAttrs(BaseAttrs):
+class LinkAttrs(Attrs):
     to: str
 
 
