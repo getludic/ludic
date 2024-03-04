@@ -16,6 +16,8 @@ python-multipart = {version = "^0.0.9", optional = true}
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
 types-cachetools = "^5.3.0.7"
+httpx = "^0.27.0"
+pytest-cov = "^4.1.0"
 
 [tool.poetry.extras]
 starlette = ["starlette", "python-multipart"]
@@ -56,3 +58,8 @@ known-first-party = ["ludic"]
 
 [tool.mypy]
 python_version = "3.12"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore:The \\'app\\' shortcut is now deprecated. Use the explicit style \\'transport=WSGITransport\\(app=\\.\\.\\.\\)\\' instead\\.",
+]

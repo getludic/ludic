@@ -85,6 +85,6 @@ class ContactForm(Endpoint[ContactAttrs]):
             *create_fields(self.attrs, spec=ContactAttrs),
             ButtonPrimary("Submit"),
             ButtonDanger("Cancel", hx_get=self.url_for(Contact)),
-            hx_put=self.url_for("Contact"),
+            hx_put=self.url_for(Contact),
             hx_target="this",
         )

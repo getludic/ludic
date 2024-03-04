@@ -21,17 +21,17 @@ class PeopleAttrs(BaseAttrs):
 
 
 @app.get("/")
-async def index() -> Page:
+def index() -> Page:
     return Page(
         Header("Delete Row"),
-        Body(await PeopleTable.get()),
+        Body(PeopleTable.get()),
     )
 
 
 @app.endpoint("/people/{id}")
 class PersonRow(Endpoint[PersonAttrs]):
     @classmethod
-    async def delete(cls, id: str) -> None:
+    def delete(cls, id: str) -> None:
         try:
             db.people.pop(id)
         except KeyError:
@@ -56,7 +56,7 @@ class PeopleTable(Endpoint[PeopleAttrs]):
     }
 
     @classmethod
-    async def get(cls) -> Self:
+    def get(cls) -> Self:
         return cls(people=[person.dict() for person in db.people.values()])
 
     def render(self) -> table:

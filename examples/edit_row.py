@@ -4,7 +4,7 @@ from examples import Body, Header, Page, app, db
 from ludic.catalog.buttons import ButtonPrimary, ButtonSecondary
 from ludic.catalog.tables import ColumnMeta, TableHead, TableRow
 from ludic.html import div, input, table, tbody, thead
-from ludic.types import BaseAttrs
+from ludic.types import BaseAttrs, JavaScript
 from ludic.web.endpoints import Endpoint
 from ludic.web.exceptions import NotFoundError
 from ludic.web.parsers import Parser
@@ -30,7 +30,8 @@ async def index() -> Page:
 
 @app.endpoint("/people/{id}")
 class PersonRow(Endpoint[PersonAttrs]):
-    onclick_script: str = """
+    onclick_script: JavaScript = JavaScript(
+        """
         let editing = document.querySelector('.editing')
 
         if (editing) {
@@ -38,7 +39,8 @@ class PersonRow(Endpoint[PersonAttrs]):
         } else {
             htmx.trigger(this, 'edit')
         }
-    """
+        """
+    )
 
     @classmethod
     async def put(cls, id: str, data: Parser[PersonAttrs]) -> Self:

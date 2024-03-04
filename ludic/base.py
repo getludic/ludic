@@ -1,4 +1,3 @@
-import html
 import random
 from abc import ABCMeta, abstractmethod
 from collections.abc import Callable, Iterator, Mapping, Sequence
@@ -20,6 +19,7 @@ from .css import CSSProperties
 from .utils import (
     extract_identifiers,
     format_attrs,
+    format_element,
     get_element_attrs_annotations,
 )
 
@@ -40,22 +40,14 @@ Example usage:
 """
 
 
-def default_html_formatter(child: "AnyChildren") -> str:
-    """Default HTML formatter.
-
-    Args:
-        child (AnyChild): The HTML element or text to format.
-    """
-    if isinstance(child, str) and not isinstance(child, Safe):
-        return html.escape(child)
-    elif isinstance(child, BaseElement):
-        return child.to_html()
-    else:
-        return str(child)
-
-
 class Safe(str):
     """Marker for a safe string."""
+
+    escape = False
+
+
+class JavaScript(Safe):
+    """Marker for a JavaScript string."""
 
 
 class BaseAttrs(TypedDict, total=False):
@@ -141,14 +133,14 @@ class BaseElement(metaclass=ABCMeta):
     def _format_attributes(self, html: bool = False) -> str:
         attrs: dict[str, Any]
         if html:
-            attrs = format_attrs(type(self), dict(self.attrs), html=True)
+            attrs = format_attrs(type(self), dict(self.attrs), is_html=True)
         else:
             attrs = self.aliased_attrs
         return " ".join(f'{key}="{value}"' for key, value in attrs.items())
 
     def _format_children(
         self,
-        formatter: Callable[[Any], str] = default_html_formatter,
+        formatter: Callable[[Any], str] = format_element,
     ) -> str:
         return "".join(formatter(child) for child in self.children)
 
@@ -166,7 +158,7 @@ class BaseElement(metaclass=ABCMeta):
 
     def is_simple(self) -> bool:
         """Check if the element is simple (i.e. contains only primitive types)."""
-        return len(self) == 1 and not isinstance(self.children[0], BaseElement)
+        return len(self) == 1 and isinstance(self.children[0], str | int | float | bool)
 
     def has_attributes(self) -> bool:
         """Check if the element has any attributes."""
@@ -183,31 +175,24 @@ class BaseElement(metaclass=ABCMeta):
         """
         indent = "  " * _level if pretty else ""
         name = self.__class__.__name__
-        element = f"{indent}<{name}"
-
-        if _level > 0 and pretty:
-            element = f"\n{element}"
+        element = f"<{name}"
 
         if self.has_attributes():
             element += f" {self._format_attributes()}"
 
         if self.children:
-            children_str = self._format_children(
-                lambda child: child.to_string(pretty=pretty, _level=_level + 1)
+            prefix, sep, suffix = "", "", ""
+            if pretty and (not self.is_simple() or self.has_attributes()):
+                prefix, sep, suffix = f"\n{indent}  ", f"\n{indent}  ", f"\n{indent}"
+
+            children_str = sep.join(
+                child.to_string(pretty=pretty, _level=_level + 1)
                 if isinstance(child, BaseElement)
                 else str(child)
+                for child in self.children
             )
 
-            if pretty:
-                if self.is_simple():
-                    if self.has_attributes():
-                        element += f">\n{indent}  {children_str}\n{indent}</{name}>"
-                    else:
-                        element += f">{children_str}</{name}>"
-                else:
-                    element += f">{indent}  {children_str}\n{indent}</{name}>"
-            else:
-                element += f">{children_str}</{name}>"
+            element += f">{prefix}{children_str}{suffix}</{name}>"
         else:
             element += " />"
 
