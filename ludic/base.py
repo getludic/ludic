@@ -40,7 +40,7 @@ Example usage:
 """
 
 
-def default_html_formatter(child: "AllowAny") -> str:
+def default_html_formatter(child: "AnyChildren") -> str:
     """Default HTML formatter.
 
     Args:
@@ -55,14 +55,7 @@ def default_html_formatter(child: "AllowAny") -> str:
 
 
 class Safe(str):
-    """Marker for a safe string.
-
-    The marker makes it possible to use e.g. f-string notation to render
-    elements like here:
-
-        >>> Paragraph(Safe(f"Hello, how {b('are you')}?")).to_html()
-        >>> <p>Hello, how <b>are you</b>?</p>
-    """
+    """Marker for a safe string."""
 
 
 class BaseAttrs(TypedDict, total=False):
@@ -99,7 +92,7 @@ class BaseElement(metaclass=ABCMeta):
     attrs: Mapping[str, Any]
 
     _element_format_cache: ClassVar[TTLCache[int, "BaseElement"]] = TTLCache(
-        maxsize=1e9, ttl=1
+        maxsize=1e9, ttl=600
     )
 
     def __init_subclass__(cls) -> None:
@@ -125,7 +118,7 @@ class BaseElement(metaclass=ABCMeta):
 
     def __eq__(self, other: Any) -> bool:
         return (
-            isinstance(other, type(self))
+            type(self) is type(other)
             and self.children == other.children
             and self.attrs == other.attrs
         )
@@ -262,28 +255,28 @@ class BaseElement(metaclass=ABCMeta):
         return self
 
 
-NotAllowed: TypeAlias = Never
+NoChildren: TypeAlias = Never
 """Type alias for elements that are not allowed to have children."""
 
-OnlyPrimitive: TypeAlias = str | bool | int | float
+PrimitiveChildren: TypeAlias = str | bool | int | float
 """Type alias for elements that are allowed to have only primitive children.
 
 Primitive children are ``str``, ``bool``, ``int`` and ``float``.
 """
 
-OnlyComplex: TypeAlias = BaseElement
+ComplexChildren: TypeAlias = BaseElement
 """Type alias for elements that are allowed to have only non-primitive children."""
 
-AllowAny: TypeAlias = OnlyPrimitive | OnlyComplex | Safe
+AnyChildren: TypeAlias = PrimitiveChildren | ComplexChildren | Safe
 """Type alias for elements that are allowed to have any children."""
 
-TChild = TypeVar("TChild", bound=AllowAny, default=AllowAny, covariant=True)
+TChildren = TypeVar("TChildren", bound=AnyChildren, default=AnyChildren, covariant=True)
 """Type variable for elements representing type of children (the type of *args).
 
 See also: :class:`ludic.types.Component`.
 """
 
-TChildTuple = TypeVarTuple("TChildTuple", default=Unpack[tuple[AllowAny, ...]])
+TChildrenArgs = TypeVarTuple("TChildrenArgs", default=Unpack[tuple[AnyChildren, ...]])
 """Type variable for strict elements representing type of children (the type of *args).
 
 See also: :class:`ludic.types.ComponentStrict`.
@@ -293,7 +286,7 @@ TAttrs = TypeVar("TAttrs", bound=BaseAttrs, default=BaseAttrs, covariant=True)
 """Type variable for elements representing type of attributes (the type of **kwargs)."""
 
 
-class Element(Generic[TChild, TAttrs], BaseElement):
+class Element(Generic[TChildren, TAttrs], BaseElement):
     """Base class for Ludic elements.
 
     Args:
@@ -301,12 +294,12 @@ class Element(Generic[TChild, TAttrs], BaseElement):
         **attrs (Unpack[TAttrs]): The attributes of the element.
     """
 
-    children: tuple[TChild, ...]
+    children: tuple[TChildren, ...]
     attrs: TAttrs
 
     def __init__(
         self,
-        *children: TChild,
+        *children: TChildren,
         # FIXME: https://github.com/python/typing/issues/1399
         **attributes: Unpack[TAttrs],  # type: ignore
     ) -> None:
@@ -314,7 +307,7 @@ class Element(Generic[TChild, TAttrs], BaseElement):
         self.children = tuple(self._extract_children_from_memory(*children))
 
 
-class ElementStrict(Generic[*TChildTuple, TAttrs], BaseElement):
+class ElementStrict(Generic[*TChildrenArgs, TAttrs], BaseElement):
     """Base class for strict elements (elements with concrete types of children).
 
     Args:
@@ -322,12 +315,12 @@ class ElementStrict(Generic[*TChildTuple, TAttrs], BaseElement):
         **attrs (Unpack[TAttrs]): The attributes of the element.
     """
 
-    children: tuple[*TChildTuple]
+    children: tuple[*TChildrenArgs]
     attrs: TAttrs
 
     def __init__(
         self,
-        *children: *TChildTuple,
+        *children: *TChildrenArgs,
         # FIXME: https://github.com/python/typing/issues/1399
         **attrs: Unpack[TAttrs],  # type: ignore
     ) -> None:
@@ -335,7 +328,7 @@ class ElementStrict(Generic[*TChildTuple, TAttrs], BaseElement):
         self.children = tuple(self._extract_children_from_memory(*children))
 
 
-class Children(Element[TChild, NoAttrs]):
+class Children(Element[TChildren, NoAttrs]):
     """Element representing no element at all, just children.
 
     The purpose of this element is to be able to return only children
@@ -344,11 +337,11 @@ class Children(Element[TChild, NoAttrs]):
 
     html_name = "__hidden__"
 
-    def __init__(self, *children: TChild) -> None:
-        super().__init__(*children)
+    def __init__(self, *children: TChildren) -> None:
+        super().__init__(*self._extract_children_from_memory(*children))
 
 
-class Component(Element[TChild, TAttrs], metaclass=ABCMeta):
+class Component(Element[TChildren, TAttrs], metaclass=ABCMeta):
     """Base class for components.
 
     A component subclasses an :class:`Element` and represents any element
@@ -380,7 +373,7 @@ class Component(Element[TChild, TAttrs], metaclass=ABCMeta):
         """Render the component as an instance of :class:`BaseElement`."""
 
 
-class ComponentStrict(ElementStrict[*TChildTuple, TAttrs], metaclass=ABCMeta):
+class ComponentStrict(ElementStrict[*TChildrenArgs, TAttrs], metaclass=ABCMeta):
     """Base class for strict components.
 
     A component subclasses an :class:`ElementStrict` and represents any

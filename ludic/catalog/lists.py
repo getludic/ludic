@@ -4,12 +4,12 @@ from typing import override
 from ludic.attrs import GlobalAttrs
 from ludic.base import Component
 from ludic.html import dd, dl, dt
-from ludic.types import OnlyPrimitive
+from ludic.types import PrimitiveChildren
 
 from .utils import attr_to_camel
 
 
-class Key(Component[OnlyPrimitive, GlobalAttrs]):
+class Key(Component[PrimitiveChildren, GlobalAttrs]):
     """Simple component rendering as the HTML ``dt`` element."""
 
     @override
@@ -17,7 +17,7 @@ class Key(Component[OnlyPrimitive, GlobalAttrs]):
         return dt(*self.children, **self.attrs)
 
 
-class Value(Component[OnlyPrimitive, GlobalAttrs]):
+class Value(Component[PrimitiveChildren, GlobalAttrs]):
     """Simple component rendering as the HTML ``dd`` element."""
 
     @override
@@ -28,7 +28,7 @@ class Value(Component[OnlyPrimitive, GlobalAttrs]):
 class PairsAttrs(GlobalAttrs, total=False):
     """Attributes of the component ``Pairs``."""
 
-    items: Iterable[tuple[str, OnlyPrimitive]]
+    items: Iterable[tuple[str, PrimitiveChildren]]
 
 
 class Pairs(Component[Key | Value, PairsAttrs]):

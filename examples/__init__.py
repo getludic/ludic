@@ -2,7 +2,6 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 from ludic.attrs import NoAttrs
-from ludic.catalog.styles import ComponentsStyles
 from ludic.catalog.typography import Paragraph
 from ludic.html import (
     body,
@@ -14,14 +13,15 @@ from ludic.html import (
     main,
     meta,
     script,
+    style,
     title,
 )
 from ludic.types import (
-    AllowAny,
+    AnyChildren,
     BaseElement,
     Component,
     ComponentStrict,
-    OnlyPrimitive,
+    PrimitiveChildren,
 )
 from ludic.web import LudicApp
 
@@ -92,12 +92,12 @@ db = DB(
 )
 
 
-class Page(Component[AllowAny, NoAttrs]):
+class Page(Component[AnyChildren, NoAttrs]):
     def render(self) -> BaseElement:
         return html(
             head(
                 title("Ludic Example"),
-                ComponentsStyles(),
+                style.load(),
                 meta(charset="utf-8"),
                 meta(name="viewport", content="width=device-width, initial-scale=1.0"),
             ),
@@ -108,14 +108,14 @@ class Page(Component[AllowAny, NoAttrs]):
         )
 
 
-class Header(ComponentStrict[OnlyPrimitive, NoAttrs]):
+class Header(ComponentStrict[PrimitiveChildren, NoAttrs]):
     def render(self) -> header:
         return header(
             h1(f"Example - {self.children[0]}"),
         )
 
 
-class Body(Component[AllowAny, NoAttrs]):
+class Body(Component[AnyChildren, NoAttrs]):
     def render(self) -> div:
         return div(*self.children)
 

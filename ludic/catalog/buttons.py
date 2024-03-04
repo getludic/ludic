@@ -1,9 +1,9 @@
 from ludic.attrs import ButtonAttrs
 from ludic.html import button
-from ludic.types import ComponentStrict, OnlyPrimitive
+from ludic.types import ComponentStrict, PrimitiveChildren
 
 
-class Button(ComponentStrict[OnlyPrimitive, ButtonAttrs]):
+class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
     """Simple component creating an HTML button.
 
     The component creates a button with the ``btn`` class.

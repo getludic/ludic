@@ -8,9 +8,13 @@ def test_link():
     assert link.to_html() == '<a href="https://example.com">A link!</a>'
 
 
-def test_component_with_f_string():
+def test_paragraph():
     paragraph = Paragraph(
-        f"Hello, how {b("are you")}? Click {Link("here", to="https://example.com")}.",
+        "Hello, how ",
+        b("are you"),
+        "? Click ",
+        Link("here", to="https://example.com"),
+        ".",
     )
     assert isinstance(paragraph.children[3], Link)
     assert paragraph.children[3].attrs["to"] == "https://example.com"

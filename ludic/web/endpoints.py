@@ -7,7 +7,7 @@ from starlette.requests import Request
 from starlette.routing import Route
 
 from ludic.html import div
-from ludic.types import AllowAny, Component, NotAllowed, TAttrs
+from ludic.types import AnyChildren, Component, NoChildren, TAttrs
 from ludic.utils import get_element_generic_args
 
 from .datastructures import URLPath
@@ -51,7 +51,7 @@ class HTTPEndpoint(BaseEndpoint):
         await response(self.scope, self.receive, self.send)
 
 
-class Endpoint(Component[NotAllowed, TAttrs]):
+class Endpoint(Component[NoChildren, TAttrs]):
     """Base class for Ludic endpoints."""
 
     route: ClassVar[Route]
@@ -60,7 +60,7 @@ class Endpoint(Component[NotAllowed, TAttrs]):
     def lazy_load(
         self,
         endpoint: type[RoutedProtocol],
-        placeholder: AllowAny = "Loading ...",
+        placeholder: AnyChildren = "Loading ...",
         **kwargs: Any,
     ) -> div:
         """Lazy load an endpoint's content.

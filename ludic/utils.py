@@ -1,6 +1,7 @@
 import random
 import re
 import string
+from html import escape
 from typing import (
     Annotated,
     Any,
@@ -88,10 +89,10 @@ def _format_attr_value(key: str, value: Any, html: bool = False) -> str:
         str: The formatted HTML attribute.
     """
     if isinstance(value, dict):
-        value = ";".join(f"{dkey}:{dvalue}" for dkey, dvalue in value.items())  # type: ignore
+        value = ";".join(f"{dkey}:{escape(dvalue)}" for dkey, dvalue in value.items())  # type: ignore
     if isinstance(value, bool):
         if html:
-            value = key if value else ""
+            value = escape(key) if value else ""
         else:
             value = "true" if value else "false"
     return value

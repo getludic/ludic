@@ -9,11 +9,11 @@ from typing_extensions import TypeVar
 from ludic.attrs import GlobalAttrs
 from ludic.html import table, tbody, td, th, thead, tr
 from ludic.types import (
-    AllowAny,
+    AnyChildren,
     BaseElement,
     Component,
     ComponentStrict,
-    OnlyPrimitive,
+    PrimitiveChildren,
     TAttrs,
 )
 from ludic.utils import get_annotations_metadata_of_type
@@ -43,23 +43,23 @@ class ColumnMeta:
     identifier: bool = False
     label: str | None = None
     kind: Literal["text"] | FieldMeta = "text"
-    parser: Callable[[Any], OnlyPrimitive] | None = None
+    parser: Callable[[Any], PrimitiveChildren] | None = None
 
-    def format(self, key: str, value: Any) -> AllowAny:
+    def format(self, key: str, value: Any) -> AnyChildren:
         if isinstance(self.kind, FieldMeta):
             return self.kind.format(key, value)
         return value
 
-    def parse(self, value: Any) -> OnlyPrimitive:
+    def parse(self, value: Any) -> PrimitiveChildren:
         if self.kind == "text":
             return value if self.parser is None else self.parser(value)
         return self.kind(value)
 
-    def __call__(self, value: Any) -> OnlyPrimitive:
+    def __call__(self, value: Any) -> PrimitiveChildren:
         return self.parse(value)
 
 
-class TableRow(Component[AllowAny, GlobalAttrs]):
+class TableRow(Component[AnyChildren, GlobalAttrs]):
     """Simple component rendering as the HTML ``tr`` element."""
 
     def get_text(self, index: int) -> str:
@@ -73,11 +73,11 @@ class TableRow(Component[AllowAny, GlobalAttrs]):
         return tr(*map(td, self.children), **self.attrs)
 
 
-class TableHead(Component[AllowAny, GlobalAttrs]):
+class TableHead(Component[AnyChildren, GlobalAttrs]):
     """Simple component rendering as the HTML ``tr`` element."""
 
     @property
-    def header(self) -> tuple[OnlyPrimitive, ...]:
+    def header(self) -> tuple[PrimitiveChildren, ...]:
         return tuple(
             child.text if isinstance(child, BaseElement) else str(child)
             for child in self.children
@@ -125,11 +125,11 @@ class Table(TableType[TableHead, TableRow]):
     """
 
     @property
-    def header(self) -> tuple[OnlyPrimitive, ...]:
+    def header(self) -> tuple[PrimitiveChildren, ...]:
         return self.children[0].header
 
-    def getlist(self, key: str) -> list[OnlyPrimitive | None]:
-        result: list[OnlyPrimitive | None] = []
+    def getlist(self, key: str) -> list[PrimitiveChildren | None]:
+        result: list[PrimitiveChildren | None] = []
 
         for idx, head in enumerate(self.header):
             if key != head:
@@ -183,7 +183,7 @@ def create_rows(
 
     rows: list[TableRow] = []
     for idx, attrs in enumerate(attrs_list):
-        cells: list[AllowAny] = []
+        cells: list[AnyChildren] = []
 
         for key, value in attrs.items():
             if meta := matadata.get(key):
