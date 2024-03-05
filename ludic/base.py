@@ -1,6 +1,5 @@
-import random
 from abc import ABCMeta, abstractmethod
-from collections.abc import Callable, Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, MutableMapping, Sequence
 from typing import (
     Any,
     ClassVar,
@@ -12,26 +11,21 @@ from typing import (
     cast,
 )
 
-from cachetools import TTLCache
 from typing_extensions import TypeVar, TypeVarTuple
 
 from .css import CSSProperties
-from .utils import (
-    extract_identifiers,
-    format_attrs,
-    format_element,
-    get_element_attrs_annotations,
-)
+from .format import FormatContext, format_attrs, format_element
+from .utils import get_element_attrs_annotations
 
-_ELEMENT_REGISTRY: dict[str, list[type["BaseElement"]]] = {}
+ELEMENT_REGISTRY: MutableMapping[str, list[type["BaseElement"]]] = {}
 
-GlobalStyles = dict[str, CSSProperties]
+GlobalStyles = Mapping[str, CSSProperties]
 """CSS styles for elements or components which are defined by setting the ``styles``
 class property.
 
 Example usage:
 
-    class Page(Component[AllowAny, NoAttrs]):
+    class Page(Component[AnyChildren, NoAttrs]):
         styles = {
             "body": {
                 "background-color": "red",
@@ -95,24 +89,20 @@ class BaseElement(metaclass=ABCMeta):
     always_pair: ClassVar[bool] = False
     styles: ClassVar[GlobalStyles] = {}
 
+    formatter: ClassVar[FormatContext] = FormatContext("element_formatter")
+
     children: Sequence[Any]
     attrs: Mapping[str, Any]
 
-    _element_format_cache: ClassVar[TTLCache[int, "BaseElement"]] = TTLCache(
-        maxsize=1e9, ttl=600
-    )
-
     def __init_subclass__(cls) -> None:
-        _ELEMENT_REGISTRY.setdefault(cls.__name__, [])
-        _ELEMENT_REGISTRY[cls.__name__].append(cls)
+        ELEMENT_REGISTRY.setdefault(cls.__name__, [])
+        ELEMENT_REGISTRY[cls.__name__].append(cls)
 
     def __str__(self) -> str:
         return self.to_string()
 
     def __format__(self, _: str) -> str:
-        random_id = random.getrandbits(256)
-        self._element_format_cache[random_id] = self
-        return f"{{{random_id}:id}}"
+        return self.formatter.append(self)
 
     def __len__(self) -> int:
         return len(self.children)
@@ -130,21 +120,6 @@ class BaseElement(metaclass=ABCMeta):
             and self.attrs == other.attrs
         )
 
-    def _extract_children_from_memory(self, *children: Any) -> list[Any]:
-        extracted_children: list[Any] = []
-        for child in children:
-            if isinstance(child, str) and (parts := extract_identifiers(child)):
-                extracted_children.extend(
-                    self._element_format_cache.pop(part)
-                    if isinstance(part, int)
-                    else part
-                    for part in parts
-                    if not isinstance(part, int) or part in self._element_format_cache
-                )
-            else:
-                extracted_children.append(child)
-        return extracted_children
-
     def _format_attributes(self, is_html: bool = False) -> str:
         attrs: dict[str, Any]
         if is_html:
@@ -155,9 +130,9 @@ class BaseElement(metaclass=ABCMeta):
 
     def _format_children(
         self,
-        formatter: Callable[[Any], str] = format_element,
+        format_fun: Callable[[Any], str] = format_element,
     ) -> str:
-        return "".join(formatter(child) for child in self.children)
+        return "".join(format_fun(child) for child in self.children)
 
     @property
     def aliased_attrs(self) -> dict[str, Any]:
@@ -172,7 +147,7 @@ class BaseElement(metaclass=ABCMeta):
         )
 
     def is_simple(self) -> bool:
-        """Check if the element is simple (i.e. contains only primitive types)."""
+        """Check if the element is simple (i.e. contains only one primitive type)."""
         return len(self) == 1 and isinstance(self.children[0], str | int | float | bool)
 
     def has_attributes(self) -> bool:
@@ -243,7 +218,7 @@ class BaseElement(metaclass=ABCMeta):
         without having to pass them from a parent one by one.
 
         Args:
-            cls (type): The element to get the attributes of.
+            cls (type[BaseElement]): The element to get the attributes of.
         """
         return {
             key: value
@@ -304,7 +279,7 @@ class Element(Generic[TChildren, TAttrs], BaseElement):
         **attributes: Unpack[TAttrs],  # type: ignore
     ) -> None:
         self.attrs = cast(TAttrs, attributes)
-        self.children = tuple(self._extract_children_from_memory(*children))
+        self.children = tuple(self.formatter.extract(*children))
 
 
 class ElementStrict(Generic[*TChildrenArgs, TAttrs], BaseElement):
@@ -325,7 +300,7 @@ class ElementStrict(Generic[*TChildrenArgs, TAttrs], BaseElement):
         **attrs: Unpack[TAttrs],  # type: ignore
     ) -> None:
         self.attrs = cast(TAttrs, attrs)
-        self.children = tuple(self._extract_children_from_memory(*children))
+        self.children = tuple(self.formatter.extract(*children))
 
 
 class Children(Element[TChildren, NoAttrs]):
@@ -338,7 +313,7 @@ class Children(Element[TChildren, NoAttrs]):
     html_name = "__hidden__"
 
     def __init__(self, *children: TChildren) -> None:
-        super().__init__(*self._extract_children_from_memory(*children))
+        super().__init__(*self.formatter.extract(*children))
 
 
 class Component(Element[TChildren, TAttrs], metaclass=ABCMeta):

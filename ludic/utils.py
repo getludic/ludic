@@ -1,9 +1,6 @@
-import html
-import re
 from typing import (
     Annotated,
     Any,
-    Final,
     TypeVar,
     get_args,
     get_origin,
@@ -11,28 +8,6 @@ from typing import (
 )
 
 _T = TypeVar("_T", covariant=True)
-
-EXTRACT_NUMBER_RE: Final[re.Pattern] = re.compile(r"\{(\d+):id\}")
-
-
-def extract_identifiers(text: str) -> list[str | int]:
-    """Extract numbers from a string.
-
-    Args:
-        text (str): The string to extract numbers from.
-
-    Returns:
-        Iterable[int]: The extracted numbers.
-    """
-    parts = [
-        int(match) if str(match).isdigit() else match
-        for match in EXTRACT_NUMBER_RE.split(text)
-        if match
-    ]
-    if any(isinstance(part, int) for part in parts):
-        return parts
-    else:
-        return []
 
 
 def get_element_generic_args(cls_or_obj: Any) -> tuple[type, ...] | None:
@@ -96,87 +71,3 @@ def get_annotations_metadata_of_type(
             if default is not None:
                 result[name] = default
     return result
-
-
-def format_attr_value(key: str, value: Any, is_html: bool = False) -> str:
-    """Format an HTML attribute with the given key and value.
-
-    Args:
-        key (str): The key of the attribute.
-        value (Any): The value of the attribute, can be a string or a dictionary.
-    Returns:
-        str: The formatted HTML attribute.
-    """
-    if isinstance(value, dict):
-        value = ";".join(
-            f"{dict_key}:{html.escape(dict_value)}"
-            for dict_key, dict_value in value.items()
-        )
-    elif isinstance(value, bool):
-        if is_html and not key.startswith("hx"):
-            value = html.escape(key) if value else ""
-        else:
-            value = "true" if value else "false"
-    elif isinstance(value, str) and getattr(value, "escape", True):
-        value = html.escape(value)
-    else:
-        value = str(value)
-    return value
-
-
-def format_attrs(
-    attrs_type: Any, attrs: dict[str, Any], is_html: bool = False
-) -> dict[str, Any]:
-    """Format the given attributes according to the element's attributes.
-
-    Here is an example of TypedDict definition:
-
-        class PersonAttrs(TypedDict):
-            name: str
-            class_: Annotated[str, "class"]
-            is_adult: bool
-
-    And here is the attrs that will be formatted:
-
-        attrs = {"name": "John", "class_": "person", "is_adult": True}
-
-    The result will be:
-
-        >>> format_attrs(PersonAttrs, attrs)
-        >>> {"name": "John", "class": "person"}
-
-    Args:
-        attrs_type (Any): The element.
-        attrs (dict[str, Any]): The attributes to format.
-
-    Returns:
-        dict[str, Any]: The formatted attributes.
-    """
-    hints = get_element_attrs_annotations(attrs_type, include_extras=True)
-
-    def _get_key(key: str) -> str:
-        if get_origin(hints[key]) is Annotated:
-            args = get_args(hints[key])
-            if len(args) > 1 and isinstance(args[1], str):
-                return args[1]
-        return key
-
-    result = {}
-    for key, value in attrs.items():
-        if formatted_value := format_attr_value(key, value, is_html=is_html):
-            result[_get_key(key)] = formatted_value
-    return result
-
-
-def format_element(child: Any) -> str:
-    """Default HTML formatter.
-
-    Args:
-        child (AnyChild): The HTML element or text to format.
-    """
-    if isinstance(child, str) and getattr(child, "escape", True):
-        return html.escape(child)
-    elif hasattr(child, "to_html"):
-        return child.to_html()
-    else:
-        return str(child)

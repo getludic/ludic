@@ -1,6 +1,6 @@
 import inspect
 from collections.abc import Callable
-from typing import Any, get_origin
+from typing import Any, ParamSpec, TypeVar, get_origin
 
 from starlette._utils import is_async_callable
 from starlette.concurrency import run_in_threadpool
@@ -30,6 +30,19 @@ __all__ = (
     "RedirectResponse",
 )
 
+T = TypeVar("T")
+P = ParamSpec("P")
+
+
+async def _run_in_threadpool(
+    func: Callable[P, T], *args: P.args, **kwargs: P.kwargs
+) -> T:
+    def func_wrapped(*args: P.args, **kwargs: P.kwargs) -> T:
+        with BaseElement.formatter:
+            return func(*args, **kwargs)
+
+    return await run_in_threadpool(func_wrapped, *args, **kwargs)
+
 
 async def prepare_response(
     handler: Callable[..., Any],
@@ -52,9 +65,10 @@ async def prepare_response(
     is_async = is_async_callable(handler)
 
     if is_async:
-        response = await handler(**handler_kw)
+        with BaseElement.formatter:
+            response = await handler(**handler_kw)
     else:
-        response = await run_in_threadpool(handler, **handler_kw)
+        response = await _run_in_threadpool(handler, **handler_kw)
 
     if isinstance(response, tuple):
         if len(response) == 2:
