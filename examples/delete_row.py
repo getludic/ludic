@@ -1,4 +1,4 @@
-from typing import Self
+from typing import Self, override
 
 from examples import Body, Header, Page, app, db
 from ludic.catalog.buttons import ButtonDanger
@@ -37,6 +37,7 @@ class PersonRow(Endpoint[PersonAttrs]):
         except KeyError:
             raise NotFoundError("Person not found")
 
+    @override
     def render(self) -> TableRow:
         return TableRow(
             self.attrs["name"],
@@ -59,6 +60,7 @@ class PeopleTable(Endpoint[PeopleAttrs]):
     def get(cls) -> Self:
         return cls(people=[person.dict() for person in db.people.values()])
 
+    @override
     def render(self) -> table:
         return table(
             thead(TableHead("Name", "Email", "Active", "")),

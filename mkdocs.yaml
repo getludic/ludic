@@ -1,0 +1,28 @@
+site_name: "Ludic Framework"
+site_description: Dynamic Web Pages Built Easily.
+
+theme:
+  name: "material"
+  features:
+    - content.code.copy
+
+nav:
+  - Introduction: index.md
+  - Getting Started: getting-started.md
+  - Components: components.md
+  - CSS Styles: styles.md
+  - HTMX Support: htmx.md
+  - Web Framework: web.md
+  - Component Catalog: catalog.md
+  - Examples: examples.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences

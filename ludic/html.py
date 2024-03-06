@@ -1,4 +1,4 @@
-from typing import Self, Unpack
+from typing import Self, Unpack, override
 
 from .attrs import (
     AreaAttrs,
@@ -54,12 +54,14 @@ from .styles import collect_from_components, collect_from_loaded, format_styles
 from .types import (
     AnyChildren,
     BaseElement,
+    Blank,
     ComplexChildren,
     Element,
     ElementStrict,
     GlobalStyles,
     NoChildren,
     PrimitiveChildren,
+    Safe,
 )
 
 
@@ -328,6 +330,7 @@ class style(BaseElement):
             f"</{dom.html_name}>"
         )
 
+    @override
     def render(self) -> BaseElement:
         return self
 
@@ -360,6 +363,10 @@ class footer(Element[AnyChildren, GlobalAttrs]):
 
 class html(ElementStrict[head, body, HtmlTagAttrs]):
     html_name = "html"
+
+    @override
+    def render(self) -> Blank:
+        return Blank(Safe("<!doctype html>\n"), *self.children)
 
 
 class iframe(Element[NoChildren, IframeAttrs]):

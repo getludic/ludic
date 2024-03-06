@@ -34,7 +34,7 @@ T = TypeVar("T")
 P = ParamSpec("P")
 
 
-async def _run_in_threadpool(
+async def run_in_threadpool_safe(
     func: Callable[P, T], *args: P.args, **kwargs: P.kwargs
 ) -> T:
     def func_wrapped(*args: P.args, **kwargs: P.kwargs) -> T:
@@ -68,7 +68,7 @@ async def prepare_response(
         with BaseElement.formatter:
             response = await handler(**handler_kw)
     else:
-        response = await _run_in_threadpool(handler, **handler_kw)
+        response = await run_in_threadpool_safe(handler, **handler_kw)
 
     if isinstance(response, tuple):
         if len(response) == 2:
@@ -95,7 +95,8 @@ async def prepare_response(
 
 
 async def extract_from_request(
-    handler: Callable[..., Any], request: Request
+    handler: Callable[..., Any],
+    request: Request,
 ) -> dict[str, Any]:
     """Extracts parameters for given handler from the request.
 

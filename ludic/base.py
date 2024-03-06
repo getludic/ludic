@@ -189,7 +189,7 @@ class BaseElement(metaclass=ABCMeta):
         return element
 
     def to_html(self) -> str:
-        """Convert the element tree to an HTML string."""
+        """Convert an element tree to an HTML string."""
         dom = self
         while dom != (rendered_dom := dom.render()):
             dom = rendered_dom
@@ -303,7 +303,7 @@ class ElementStrict(Generic[*TChildrenArgs, TAttrs], BaseElement):
         self.children = tuple(self.formatter.extract(*children))
 
 
-class Children(Element[TChildren, NoAttrs]):
+class Blank(Element[TChildren, NoAttrs]):
     """Element representing no element at all, just children.
 
     The purpose of this element is to be able to return only children

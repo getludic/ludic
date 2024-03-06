@@ -1,4 +1,4 @@
-from typing import Annotated, Self
+from typing import Annotated, Self, override
 
 from examples import Body, Header, Page, app, db
 from ludic.catalog.buttons import ButtonPrimary
@@ -39,6 +39,7 @@ class Toast(span):
         },
     }
 
+    @override
     def render(self) -> span:
         return span(*self.children, id=self.id)
 
@@ -70,6 +71,7 @@ class PeopleTable(Endpoint[PeopleAttrs]):
     async def get(cls) -> Self:
         return cls(people=[person.dict() for person in db.people.values()])
 
+    @override
     def render(self) -> Form:
         return Form(
             Table(*create_rows(self.attrs["people"], spec=PersonAttrs)),

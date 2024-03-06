@@ -1,4 +1,4 @@
-from typing import Annotated, NotRequired, Self
+from typing import Annotated, NotRequired, Self, override
 
 from examples import Body, Header, Page, app, db
 from ludic.catalog.buttons import ButtonDanger, ButtonPrimary
@@ -57,6 +57,7 @@ class Contact(Endpoint[ContactAttrs]):
 
         return await cls.get(id)
 
+    @override
     def render(self) -> div:
         return div(
             Pairs(items=self.attrs.items()),
@@ -80,6 +81,7 @@ class ContactForm(Endpoint[ContactAttrs]):
 
         return cls(**contact.dict())
 
+    @override
     def render(self) -> Form:
         return Form(
             *create_fields(self.attrs, spec=ContactAttrs),

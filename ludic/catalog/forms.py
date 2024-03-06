@@ -35,7 +35,7 @@ class FieldMeta:
                 raise ValidationError("Invalid email")
             return email
 
-        class CustomerAttrs(BaseAttrs):
+        class CustomerAttrs(Attrs):
             id: str
             name: Annotated[
                 str,
@@ -149,25 +149,25 @@ class Form(Component[ComplexChildren, FormAttrs]):
         return form(*self.children, **self.attrs)
 
 
-def create_fields(attrs: Attrs, spec: type[TAttrs]) -> tuple[ComplexChildren, ...]:
+def create_fields(attrs: Any, spec: type[TAttrs]) -> tuple[ComplexChildren, ...]:
     """Create form fields from the given attributes.
 
     Example:
 
-        class CustomerAttrs(BaseAttrs):
+        class CustomerAttrs(Attrs):
             id: str
             name: Annotated[
                 str,
                 FieldMeta(label="Customer Name"),
             ]
 
-        customer = Customer(id=1, name="John Doe")
+        customer = CustomerAttrs(id=1, name="John Doe")
         fields = create_fields(customer, spec=CustomerAttrs)
 
         form = Form(*fields)
 
     Args:
-        attrs (BaseAttrs): The attributes to create form fields from.
+        attrs (Any): The attributes to create form fields from.
         spec (type[TAttrs]): The specification of the attributes.
 
     Returns:
@@ -178,7 +178,7 @@ def create_fields(attrs: Attrs, spec: type[TAttrs]) -> tuple[ComplexChildren, ..
     fields: list[ComplexChildren] = []
 
     for name, metadata in metadata_list.items():
-        if value := attrs.get(name):
+        if value := (attrs.get(name) or getattr(attrs, name, None)):
             field = metadata.format(name, value)
             fields.append(field)
 

@@ -1,4 +1,4 @@
-from typing import Annotated, NotRequired, Self
+from typing import Annotated, NotRequired, Self, override
 
 from examples import Body, Header, Page, app, db
 from ludic.catalog.buttons import ButtonPrimary, ButtonSecondary
@@ -63,6 +63,7 @@ class PersonRow(Endpoint[PersonAttrs]):
 
         return cls(**person.dict())
 
+    @override
     def render(self) -> TableRow:
         return TableRow(
             self.attrs["name"],
@@ -87,6 +88,7 @@ class PersonForm(Endpoint[PersonAttrs]):
 
         return cls(**person.dict())
 
+    @override
     def render(self) -> TableRow:
         return TableRow(
             input(name="name", value=self.attrs["name"]),
@@ -109,6 +111,7 @@ class PeopleTable(Endpoint[PeopleAttrs]):
     async def get(cls) -> Self:
         return cls(people=[person.dict() for person in db.people.values()])
 
+    @override
     def render(self) -> table:
         return table(
             thead(TableHead("Name", "Email", "Action")),

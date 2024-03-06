@@ -76,12 +76,14 @@ class Endpoint(Component[NoChildren, TAttrs]):
             hx_trigger="load",
         )
 
-    def url_for(self, endpoint: type[RoutedProtocol] | str, **kwargs: Any) -> URLPath:
+    def url_for(
+        self, endpoint: type[RoutedProtocol] | str, **path_params: Any
+    ) -> URLPath:
         """Get URL for an endpoint.
 
         Args:
             endpoint: The endpoint.
-            **kwargs: URL path parameters.
+            **path_params: URL path parameters.
 
         Returns:
             The URL.
@@ -103,7 +105,7 @@ class Endpoint(Component[NoChildren, TAttrs]):
             ):
                 kwargs = {
                     key: value
-                    for key, value in {**self.attrs, **kwargs}.items()
+                    for key, value in {**self.attrs, **path_params}.items()
                     if key in endpoint.route.param_convertors
                 }
 

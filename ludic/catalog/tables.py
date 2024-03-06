@@ -28,7 +28,7 @@ class ColumnMeta:
 
     Example:
 
-        class PersonAttrs(BaseAttrs):
+        class PersonAttrs(Attrs):
             id: str
             name: Annotated[
                 str,
@@ -150,7 +150,7 @@ def create_rows(
 
     Example:
 
-        class PersonAttrs(BaseAttrs):
+        class PersonAttrs(Attrs):
             id: Annotated[int, ColumnMeta(identifier=True)]
             name: Annotated[str, ColumnMeta(label="Full Name")]
             email: Annotated[str, ColumnMeta(label="Email")]

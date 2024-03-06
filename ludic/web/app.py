@@ -1,10 +1,10 @@
+import inspect
 from collections.abc import Callable, Mapping, Sequence
 from functools import wraps
 from typing import Any, Literal, TypeVar
 
 from starlette._utils import is_async_callable
 from starlette.applications import AppType, Starlette
-from starlette.concurrency import run_in_threadpool
 from starlette.middleware import Middleware
 from starlette.requests import Request
 from starlette.responses import Response
@@ -15,7 +15,7 @@ from ludic.types import BaseElement
 
 from .datastructures import URLPath
 from .endpoints import Endpoint
-from .responses import LudicResponse, extract_from_request
+from .responses import LudicResponse, run_in_threadpool_safe
 from .routing import Router
 
 TCallable = TypeVar("TCallable", bound=Callable[..., Any])
@@ -176,13 +176,21 @@ class LudicApp(Starlette):
         def decorator(handler: TCallable) -> TCallable:
             @wraps(handler)
             async def wrapper(request: Request, exc: Exception) -> Response:
-                handler_kw = await extract_from_request(handler, request)
+                parameters = inspect.signature(handler).parameters
+                handler_kw: dict[str, Any] = {}
                 is_async = is_async_callable(handler)
 
+                for name, param in parameters.items():
+                    if issubclass(param.annotation, Exception):
+                        handler_kw[name] = exc
+                    elif issubclass(param.annotation, Request):
+                        handler_kw[name] = request
+
                 if is_async:
-                    response = await handler(**handler_kw)
+                    with BaseElement.formatter:
+                        response = await handler(**handler_kw)
                 else:
-                    response = await run_in_threadpool(handler, **handler_kw)
+                    response = await run_in_threadpool_safe(handler, **handler_kw)
 
                 if isinstance(response, BaseElement):
                     return LudicResponse(response, getattr(exc, "status_code", 500))

@@ -38,7 +38,7 @@ class Paragraph(Component[AnyChildren, GlobalAttrs]):
 
     Example usage:
 
-        Paragraph(Safe(f"Hello, {b("World")}!"))
+        Paragraph(f"Hello, {b("World")}!")
     """
 
     @override

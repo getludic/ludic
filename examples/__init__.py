@@ -1,5 +1,5 @@
 from dataclasses import asdict, dataclass
-from typing import Any
+from typing import Any, override
 
 from ludic.attrs import NoAttrs
 from ludic.catalog.typography import Paragraph
@@ -93,6 +93,7 @@ db = DB(
 
 
 class Page(Component[AnyChildren, NoAttrs]):
+    @override
     def render(self) -> BaseElement:
         return html(
             head(
@@ -109,6 +110,7 @@ class Page(Component[AnyChildren, NoAttrs]):
 
 
 class Header(ComponentStrict[PrimitiveChildren, NoAttrs]):
+    @override
     def render(self) -> header:
         return header(
             h1(f"Example - {self.children[0]}"),
@@ -116,6 +118,7 @@ class Header(ComponentStrict[PrimitiveChildren, NoAttrs]):
 
 
 class Body(Component[AnyChildren, NoAttrs]):
+    @override
     def render(self) -> div:
         return div(*self.children)
 
