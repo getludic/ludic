@@ -33,7 +33,7 @@ full = [
     "starlette",
     "python-multipart>=0.0.9",
 ]
-tests = [
+test = [
     "pytest",
     "pytest-cov",
     "httpx",
