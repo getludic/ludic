@@ -1,6 +1,8 @@
 # Ludic
 
-[![test](https://github.com/paveldedik/ludic/actions/workflows/test.yaml/badge.svg)](https://github.com/paveldedik/ludic/actions) [![codecov](https://codecov.io/gh/paveldedik/ludic/graph/badge.svg?token=BBDNJWHMGX)](https://codecov.io/gh/paveldedik/ludic) [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-312/) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
+[![test](https://github.com/paveldedik/ludic/actions/workflows/test.yaml/badge.svg)](https://github.com/paveldedik/ludic/actions) [![codecov](https://codecov.io/gh/paveldedik/ludic/graph/badge.svg?token=BBDNJWHMGX)](https://codecov.io/gh/paveldedik/ludic) [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-312/) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/) [![Documentation Status](https://readthedocs.org/projects/ludic/badge/?version=latest)](https://ludic.readthedocs.io/en/latest/?badge=latest)
+
+**Documentation**: https://ludic.readthedocs.io/
 
 Ludic is a lightweight framework for building HTML pages with component approach similar to [React](https://react.dev/). It is built to be used together with [htmx.org](https://htmx.org/) so that developers don't need to write almost any JavaScript to create dynamic web services. It's potential can be leveraged together with its web framework which is a wrapper around powerful [Starlette](https://www.starlette.io/) framework. It is built with the latest Python 3.12 features heavily incorporating typing.
 
@@ -27,7 +29,7 @@ Similar to Starlette, you'll also want to install an [ASGI](https://asgi.readthe
 pip install uvicorn
 ```
 
-## Examples
+## Example
 
 **components.py**:
 
@@ -76,6 +78,6 @@ To run the application:
 uvicorn web:app
 ```
 
-### Examples
+### More Examples
 
 For more complex usage incorporating all capabilities of the framework, please visit the folder with examples [on GitHub](https://github.com/paveldedik/ludic/tree/master/examples/).
