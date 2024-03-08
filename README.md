@@ -36,6 +36,7 @@ pip install uvicorn
 ```python
 from typing import override
 
+from ludic.html import a
 from ludic.types import Attrs, Component
 
 class LinkAttrs(Attrs):
