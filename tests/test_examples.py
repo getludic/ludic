@@ -60,7 +60,7 @@ def test_delete_row():
 
 
 def test_edit_row():
-    from examples.delete_row import app
+    from examples.edit_row import app
 
     client = TestClient(app)
 
