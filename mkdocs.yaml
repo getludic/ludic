@@ -1,10 +1,17 @@
 site_name: "Ludic Framework"
-site_description: Dynamic Web Pages Built Easily.
+site_description: Lightweight framework for building HTML pages in pure Python.
+site_url: https://ludic.readthedocs.io/
+repo_url: https://github.com/paveldedik/ludic
 
 theme:
   name: "material"
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    primary: deep purple
   features:
     - content.code.copy
+    - content.action.edit
 
 nav:
   - Introduction: index.md
