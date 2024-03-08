@@ -6,7 +6,7 @@ build:
     python: "3.12"
 
 mkdocs:
-  configuration: mkdocs.yml
+  configuration: mkdocs.yaml
 
 python:
   install:
