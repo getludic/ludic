@@ -16,7 +16,7 @@ Python 3.12+
 ## Installation
 
 ```
-pip install ludic[web]
+pip install ludic[full]
 ```
 
 Similar to Starlette, you'll also want to install an [ASGI](https://asgi.readthedocs.io/en/latest/) server:
@@ -39,7 +39,7 @@ class LinkAttrs(Attrs):
 
 class Link(Component[str, LinkAttrs]):
     @override
-    def render(self):
+    def render(self) -> a:
         return a(
             *self.children,
             href=self.attrs["to"],
@@ -64,8 +64,8 @@ from .components import Link
 app = LudicApp()
 
 @app.get("/")
-async def homepage():
-    return p(f"Hello {b("stranger")}! Click {Link("here", to="https://example.com")}!")
+async def homepage() -> p:
+    return p(f"Hello {b("Stranger")}! Click {Link("here", to="https://example.com")}!")
 ```
 
 To run the application:

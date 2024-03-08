@@ -18,7 +18,7 @@ from ludic.web import LudicApp
 app = LudicApp()
 
 @app.get("/")
-async def homepage() -> div:
+async def homepage() -> p:
     return p(f"Hello {b("world")}!", id="greetings")
 ```
 
@@ -29,7 +29,7 @@ Python 3.12+
 ## Installation
 
 ```
-pip install ludic[web]
+pip install ludic[full]
 ```
 
 As similar for Starlette, you'll also want to install an [ASGI](https://asgi.readthedocs.io/en/latest/) server:
