@@ -1,5 +1,5 @@
 import json
-from collections.abc import Mapping, MutableMapping
+from collections.abc import MutableMapping
 from typing import Any
 from urllib.parse import urlencode
 
@@ -12,6 +12,8 @@ from starlette.datastructures import (
     URLPath as BaseURLPath,
 )
 
+from ludic import types
+
 __all__ = ("FormData", "Headers", "QueryParams", "URLPath")
 
 
@@ -20,7 +22,7 @@ class Headers(BaseHeaders):
 
     def __init__(
         self,
-        headers: Mapping[str, Any] | None = None,
+        headers: types.Headers | None = None,
         raw: list[tuple[bytes, bytes]] | None = None,
         scope: MutableMapping[str, Any] | None = None,
     ) -> None:

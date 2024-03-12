@@ -1,4 +1,4 @@
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from typing import TypedDict
 
 from .base import (
@@ -22,11 +22,14 @@ from .base import (
     TChildrenArgs,
 )
 
-Headers = Mapping[str, str | Mapping[str, str]]
+JSONType = (
+    Mapping[str, "JSONType"] | Iterable["JSONType"] | str | int | float | bool | None
+)
+Headers = Mapping[str, JSONType]
 HXHeaders = TypedDict(
     "HXHeaders",
     {
-        "HX-Location": str | Mapping[str, str],
+        "HX-Location": JSONType,
         "HX-Push-Url": str,
         "HX-Redirect": str,
         "HX-Refresh": bool,
@@ -34,9 +37,9 @@ HXHeaders = TypedDict(
         "HX-Reswap": str,
         "HX-Retarget": str,
         "HX-Reselect": str,
-        "HX-Trigger": str | Mapping[str, str],
-        "HX-Trigger-After-Settle": str | Mapping[str, str],
-        "HX-Trigger-After-Swap": str | Mapping[str, str],
+        "HX-Trigger": JSONType,
+        "HX-Trigger-After-Settle": JSONType,
+        "HX-Trigger-After-Swap": JSONType,
     },
     total=False,
 )

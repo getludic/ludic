@@ -14,14 +14,14 @@ Ludic is a lightweight framework for building HTML pages with component approach
 ## Example
 
 ```python
-from ludic.html import b, p
+from ludic.html import b, span
 from ludic.web import LudicApp
 
 app = LudicApp()
 
 @app.get("/")
-async def homepage() -> p:
-    return p(f"Hello {b("world")}!", id="greetings")
+async def homepage() -> span:
+    return span(f"Hello {b("world")}!", id="greetings")
 ```
 
 ## Requirements
