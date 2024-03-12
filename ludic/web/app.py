@@ -1,7 +1,7 @@
 import inspect
 from collections.abc import Callable, Mapping, Sequence
 from functools import wraps
-from typing import Any, Literal, TypeVar
+from typing import Any, Literal, TypeVar, cast
 
 from starlette._utils import is_async_callable
 from starlette.applications import AppType, Starlette
@@ -194,7 +194,7 @@ class LudicApp(Starlette):
 
                 if isinstance(response, BaseElement):
                     return LudicResponse(response, getattr(exc, "status_code", 500))
-                return response
+                return cast(Response, response)
 
             self.add_exception_handler(exc_class_or_status_code, wrapper)
             return handler

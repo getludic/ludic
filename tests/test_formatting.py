@@ -4,7 +4,7 @@ from ludic.html import b, div, i, p, strong
 from ludic.types import BaseElement
 
 
-def test_format_attr_value():
+def test_format_attr_value() -> None:
     assert format_attr_value("foo", "bar") == "bar"
     assert format_attr_value("foo", "bar", is_html=True) == "bar"
 
@@ -29,7 +29,7 @@ def test_format_attr_value():
     )
 
 
-def test_format_context():
+def test_format_context() -> None:
     with FormatContext("test_context") as ctx:
         first = ctx.append("foo")
         second = ctx.append({"bar": "baz"})
@@ -38,7 +38,7 @@ def test_format_context():
     assert extracts == ["test ", "foo", " ", {"bar": "baz"}]
 
 
-def test_format_context_in_elements():
+def test_format_context_in_elements() -> None:
     context = BaseElement.formatter
     assert context.get() == {}
 
@@ -59,7 +59,7 @@ def test_format_context_in_elements():
     assert context.get() == {}
 
 
-def test_component_with_f_string():
+def test_component_with_f_string() -> None:
     paragraph = Paragraph(
         f"Hello, how {strong("are you")}? Click {Link("here", to="https://example.com")}.",
     )
@@ -75,7 +75,7 @@ def test_component_with_f_string():
     )
 
 
-def test_escaping_works():
+def test_escaping_works() -> None:
     link = '<a href="https://example.com">test</a>'
     dom = p(f"Hello, how <b>are you</b>? Click {link}.")
     assert dom.to_html() == (

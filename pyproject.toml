@@ -71,6 +71,8 @@ known-first-party = ["ludic"]
 
 [tool.mypy]
 python_version = "3.12"
+strict = true
+disallow_subclassing_any = false
 
 [tool.pytest.ini_options]
 filterwarnings = [

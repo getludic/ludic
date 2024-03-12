@@ -18,7 +18,7 @@ from ludic.html import (
 )
 
 
-def test_empty_element():
+def test_empty_element() -> None:
     dom = div()
     assert dom.to_html() == "<div />"
     assert dom.to_string() == "<div />"
@@ -32,7 +32,7 @@ def test_empty_element():
     assert dom3.to_string() == "<script />"
 
 
-def test_html_paragraph():
+def test_html_paragraph() -> None:
     paragraph = p(f"Hello, World! {b("Something bold")} and {i("Something italic")}")
     assert paragraph.to_html() == (
         "<p>Hello, World! <b>Something bold</b> and <i>Something italic</i></p>"
@@ -47,7 +47,7 @@ def test_html_paragraph():
     )  # fmt: skip
 
 
-def test_html_link():
+def test_html_link() -> None:
     link = a("A link!", href="https://example.com")
     assert link.to_html() == '<a href="https://example.com">A link!</a>'
     assert link.to_string() == (
@@ -57,7 +57,7 @@ def test_html_link():
     )  # fmt: skip
 
 
-def test_html_table():
+def test_html_table() -> None:
     dom = table(
         thead(
             tr(
@@ -95,7 +95,7 @@ def test_html_table():
     )  # fmt: skip
 
 
-def test_button_get():
+def test_button_get() -> None:
     dom = div(
         div(label("First Name"), ": Joe"),
         div(label("Last Name"), ": Blow"),
@@ -144,7 +144,7 @@ def test_button_get():
     )
 
 
-def test_expand_nested():
+def test_expand_nested() -> None:
     div_dom = div(p(1), p(2), p(3))
     span_dom = span(*div_dom)
 
@@ -152,7 +152,7 @@ def test_expand_nested():
     assert span_dom.to_html() == "<span><p>1</p><p>2</p><p>3</p></span>"
 
 
-def test_repr_and_str():
+def test_repr_and_str() -> None:
     dom = div(p(1), p(2), p(3), id="test")
     assert repr(dom) == '<div id="test"><p>1</p><p>2</p><p>3</p></div>'
     assert str(dom) == (

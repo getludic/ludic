@@ -1,8 +1,8 @@
 from ludic.html import style
-from ludic.types import Component
+from ludic.types import AnyChildren, Attrs, Component
 
 
-class A(Component):
+class A(Component[AnyChildren, Attrs]):
     styles = {
         "a": {
             "color": "red",
@@ -18,7 +18,7 @@ class A(Component):
     }
 
 
-class B(Component):
+class B(Component[AnyChildren, Attrs]):
     styles = {
         "a.test": {
             "color": "blue",
@@ -26,7 +26,7 @@ class B(Component):
     }
 
 
-def test_styles_formatting():
+def test_styles_formatting() -> None:
     assert style(
         {
             "a": {
@@ -46,7 +46,7 @@ def test_styles_formatting():
     )
 
 
-def test_styles_collection():
+def test_styles_collection() -> None:
     assert style.from_components(A, B).to_html() == (
         "<style>\n"
         "a { color: red; }\n"

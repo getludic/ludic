@@ -42,7 +42,8 @@ async def run_in_threadpool_safe(
         with BaseElement.formatter:
             return func(*args, **kwargs)
 
-    return await run_in_threadpool(func_wrapped, *args, **kwargs)
+    response: T = await run_in_threadpool(func_wrapped, *args, **kwargs)
+    return response
 
 
 async def prepare_response(
@@ -67,34 +68,39 @@ async def prepare_response(
 
     if is_async:
         with BaseElement.formatter:
-            response = await handler(**handler_kw)
+            raw_response = await handler(**handler_kw)
     else:
-        response = await run_in_threadpool_safe(handler, **handler_kw)
+        raw_response = await run_in_threadpool_safe(handler, **handler_kw)
 
-    if isinstance(response, tuple):
-        if len(response) == 2:
-            response, status_or_headers = response
+    if isinstance(raw_response, tuple):
+        if len(raw_response) == 2:
+            raw_response, status_or_headers = raw_response
             if isinstance(status_or_headers, dict):
                 headers = ds.Headers(status_or_headers)
             else:
                 status_code = status_or_headers
-        elif len(response) == 3:
-            response, status_code, headers = response
+        elif len(raw_response) == 3:
+            raw_response, status_code, headers = raw_response
             headers = ds.Headers(headers)
         else:
-            raise ValueError(f"Invalid response tuple: {response}")
+            raise ValueError(f"Invalid response tuple: {raw_response}")
 
-    if response is None:
-        response = ""
+    if raw_response is None:
+        raw_response = ""
 
-    if isinstance(response, BaseElement):
+    response: Response
+    if isinstance(raw_response, BaseElement):
         response = LudicResponse(
-            response, status_code=status_code or 200, headers=headers
+            raw_response, status_code=status_code or 200, headers=headers
         )
     elif isinstance(response, str | bool | int | float):
         response = PlainTextResponse(
             str(response), status_code=status_code or 200, headers=headers
         )
+    elif isinstance(raw_response, Response):
+        response = raw_response
+    else:
+        raise ValueError(f"Invalid response type: {type(response)}")
 
     return response
 

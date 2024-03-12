@@ -6,7 +6,7 @@ from typing import Annotated, Any, Final, TypeVar, get_args, get_origin
 
 from .utils import get_element_attrs_annotations
 
-EXTRACT_NUMBER_RE: Final[re.Pattern] = re.compile(r"\{(\d+):id\}")
+EXTRACT_NUMBER_RE: Final[re.Pattern[str]] = re.compile(r"\{(\d+):id\}")
 
 T = TypeVar("T")
 
@@ -32,9 +32,7 @@ def format_attr_value(key: str, value: Any, is_html: bool = False) -> str:
             value = "true" if value else "false"
     elif isinstance(value, str) and getattr(value, "escape", True):
         value = html.escape(value)
-    else:
-        value = str(value)
-    return value
+    return str(value)
 
 
 def format_attrs(
@@ -90,7 +88,7 @@ def format_element(child: Any) -> str:
     if isinstance(child, str) and getattr(child, "escape", True):
         return html.escape(child)
     elif hasattr(child, "to_html"):
-        return child.to_html()
+        return child.to_html()  # type: ignore
     else:
         return str(child)
 
@@ -201,7 +199,7 @@ class FormatContext:
                 extracted_args.append(arg)
         return extracted_args
 
-    def clear(self):
+    def clear(self) -> None:
         """Clear the context memory."""
         self._context.set({})
 

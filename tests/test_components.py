@@ -3,12 +3,12 @@ from ludic.catalog.typography import Link, Paragraph
 from ludic.html import b
 
 
-def test_link():
+def test_link() -> None:
     link = Link("A link!", to="https://example.com")
     assert link.to_html() == '<a href="https://example.com">A link!</a>'
 
 
-def test_paragraph():
+def test_paragraph() -> None:
     paragraph = Paragraph(
         "Hello, how ",
         b("are you"),
@@ -28,7 +28,7 @@ def test_paragraph():
     )
 
 
-def test_navigation():
+def test_navigation() -> None:
     navigation = Navigation(
         NavItem("Home", to="/"),
         NavItem("About", to="/about"),

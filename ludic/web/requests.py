@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from typing import Any
 
-from starlette.datastructures import URL
+from starlette.datastructures import URL, URLPath
 from starlette.requests import Request as StarletteRequest
 from starlette.routing import Route, Router, get_name
 
@@ -18,6 +18,7 @@ class Request(StarletteRequest):
         Returns:
             The URL.
         """
+        url_path: URLPath
         if (
             not isinstance(endpoint, str)
             and (route := getattr(endpoint, "route", None))

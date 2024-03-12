@@ -45,7 +45,7 @@ class ColumnMeta:
     kind: Literal["text"] | FieldMeta = "text"
     parser: Callable[[Any], PrimitiveChildren] | None = None
 
-    def format(self, key: str, value: Any) -> AnyChildren:
+    def format(self, key: str, value: Any) -> Any:
         if isinstance(self.kind, FieldMeta):
             return self.kind.format(key, value)
         return value
