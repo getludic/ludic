@@ -93,14 +93,14 @@ async def prepare_response(
         response = LudicResponse(
             raw_response, status_code=status_code or 200, headers=headers
         )
-    elif isinstance(response, str | bool | int | float):
+    elif isinstance(raw_response, str | bool | int | float):
         response = PlainTextResponse(
-            str(response), status_code=status_code or 200, headers=headers
+            str(raw_response), status_code=status_code or 200, headers=headers
         )
     elif isinstance(raw_response, Response):
         response = raw_response
     else:
-        raise ValueError(f"Invalid response type: {type(response)}")
+        raise ValueError(f"Invalid response type: {type(raw_response)}")
 
     return response
 
