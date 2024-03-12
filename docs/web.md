@@ -190,6 +190,27 @@ This method is available on a component based endpoint. It has one small advanta
 - If these attributes types are not equal, you need to specify the URL path parameter explicitly, e.g. `ContactForm(...).url_for(Foo, id=self.attrs["foo_id"])`
 - if the first argument to `url_for` is a the name of the endpoint, you need to always specify the URL path parameters explicitly.
 
+### Handler Responses
+
+Your handler is not required to return only a valid element or component, you can also modify headers, status code, or return a `JSONResponse`:
+
+```python
+from ludic import types
+from ludic.html import div
+
+@app.get("/")
+def index() -> tuple[div, types.Headers]:
+    return div("Headers Example"), {"Content-Type": "..."}
+```
+
+When it comes to handler's return type, you have the following options:
+
+- `BaseElement` - any element or component
+- `tuple[BaseElement, int]` - any element or component and a status code
+- `tuple[BaseElement, types.Headers]` - any element or component and headers as a dict
+- `tuple[BaseElement, int, types.Headers]` - any element or component, status code, and headers
+- `starlette.responses.Response` - valid Starlette `Response` object
+
 ### Handler Arguments
 
 Here is a list of arguments that your handlers can optionally define (they need to be correctly type annotated):

@@ -69,6 +69,21 @@ page = Page(
 )
 ```
 
+## Headers
+
+It is possible to return custom HTMX headers in responses, here is an example:
+
+```python
+from ludic import types
+from ludic.html import div
+
+@app.get("/")
+def index() -> tuple[div, types.HXHeaders]:
+    return div("Headers Example", id="test"), {"HX-Location": {"path": "/", "target": "#test"}}
+```
+
+You can also type your endpoint with `tuple[div, types.Headers]`, however, it allows arbitrary headers.
+
 ## Rendering JavaScript
 
 In some cases, HTMX components require some JavaScript code. For that purpose, there is the `ludic.types.JavaScript` class:

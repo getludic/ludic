@@ -30,7 +30,7 @@ class ContactAttrs(Attrs):
 async def index() -> Page:
     return Page(
         Header("Click To Edit"),
-        Body(*[await Contact.get(contact_id) for contact_id in db.contacts]),
+        Body(*[Contact(**contact.dict()) for contact in db.contacts.values()]),
     )
 
 
@@ -55,7 +55,7 @@ class Contact(Endpoint[ContactAttrs]):
         for key, value in attrs.validate().items():
             setattr(contact, key, value)
 
-        return await cls.get(id)
+        return cls(**contact.dict())
 
     @override
     def render(self) -> div:

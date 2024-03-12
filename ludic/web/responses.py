@@ -17,6 +17,7 @@ from starlette.responses import (
 )
 
 from ludic.types import BaseElement
+from ludic.web import datastructures as ds
 from ludic.web.parsers import BaseParser
 
 __all__ = (
@@ -72,10 +73,14 @@ async def prepare_response(
 
     if isinstance(response, tuple):
         if len(response) == 2:
-            response, status_code = response
+            response, status_or_headers = response
+            if isinstance(status_or_headers, dict):
+                headers = ds.Headers(status_or_headers)
+            else:
+                status_code = status_or_headers
         elif len(response) == 3:
             response, status_code, headers = response
-            headers = Headers(headers)
+            headers = ds.Headers(headers)
         else:
             raise ValueError(f"Invalid response tuple: {response}")
 
