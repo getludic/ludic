@@ -9,6 +9,7 @@ on:
 jobs:
 
   lint:
+    name: Run pre-commit hooks
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -26,8 +27,21 @@ jobs:
       run: |
         pre-commit run -a --show-diff-on-failure
 
+  commitsar:
+    name: Verify commit messages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3.0.0
+        with:
+          fetch-depth: 0
+      - name: Run commitsar
+        uses: aevea/commitsar@v0.20.2
+
   test:
-    needs: [lint]
+    name: Run Unit Tests
+    needs: [lint, commitsar]
     runs-on: ubuntu-latest
 
     strategy:
