@@ -14,10 +14,10 @@ def test_safe() -> None:
 
 def test_javascript() -> None:
     assert (
-        div("alert('Hello World!')").to_html()
-        == "<div>alert(&#x27;Hello World!&#x27;)</div>"
+        div("document.write('<h2>HTML</h2>');").to_html()
+        == "<div>document.write('&lt;h2&gt;HTML&lt;/h2&gt;');</div>"
     )
     assert (
-        script(JavaScript("alert('Hello World!')")).to_html()
-        == "<script>alert('Hello World!')</script>"
+        script(JavaScript("document.write('<h2>HTML</h2>');")).to_html()
+        == "<script>document.write('<h2>HTML</h2>');</script>"
     )

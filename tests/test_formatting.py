@@ -80,5 +80,10 @@ def test_escaping_works() -> None:
     dom = p(f"Hello, how <b>are you</b>? Click {link}.")
     assert dom.to_html() == (
         "<p>Hello, how &lt;b&gt;are you&lt;/b&gt;? "
-        "Click &lt;a href=&quot;https://example.com&quot;&gt;test&lt;/a&gt;.</p>"
+        'Click &lt;a href="https://example.com"&gt;test&lt;/a&gt;.</p>'
     )
+
+
+def test_quotes_not_escaped() -> None:
+    dom = p("It's alive <3.")
+    assert dom.to_html() == "<p>It's alive &lt;3.</p>"
