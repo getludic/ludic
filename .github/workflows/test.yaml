@@ -28,22 +28,9 @@ jobs:
       run: |
         pre-commit run -a --show-diff-on-failure
 
-  commitsar:
-    name: Verify commit messages
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Run commitsar
-        uses: docker://aevea/commitsar:0.20.2
-
   test:
     name: Run Unit Tests
-    needs: [lint, commitsar]
+    needs: [lint]
     runs-on: ubuntu-latest
 
     strategy:
