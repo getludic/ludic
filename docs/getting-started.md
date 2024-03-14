@@ -54,7 +54,7 @@ class Page(Component[AnyChildren, NoAttrs]):
 
 Notice the `script` element loading the htmx library.
 
-You probably want to modify this page to include other stuff like fonts, favicon and so on. Now you might create a `Header` and `Body` component and use it like this:
+You probably want to modify this page to include other stuff like fonts, favicon and so on. Now you might create a `Header` and `Body` components and use it like this:
 
 ```python
 Page(
@@ -67,7 +67,7 @@ This would render as a valid HTML document.
 
 ## `server.py`
 
-Here you would create the `LudicApp` instance, you could also register error handlers:
+The module instantiates the `LudicApp` class and registers routes (by importing the endpoints module). You can also register error handlers. Here is what it can look like:
 
 ```python
 from ludic.web import LudicApp
@@ -86,7 +86,7 @@ async def not_found():
     )
 
 
-from  import endpoints as _  # noqa
+from . import endpoints as _  # noqa
 ```
 
 ## `endpoints.py`
@@ -157,7 +157,7 @@ You can create any components you like and combine them in the `render()` method
 
 ## `attrs.py`
 
-Here you would define attributes for your endpoints. It is probably better to keep regular component's attributes close to them, here we would probably only define attributes for endpoints:
+This module can be used to define attributes for your endpoints. Note that it is probably better to keep regular component's attributes close to them, so this module serves for definition of endpoint's attribute only:
 
 ```python
 from typing import NotRequired

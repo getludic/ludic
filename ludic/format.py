@@ -22,16 +22,16 @@ def format_attr_value(key: str, value: Any, is_html: bool = False) -> str:
     """
     if isinstance(value, dict):
         value = ";".join(
-            f"{dict_key}:{html.escape(dict_value)}"
+            f"{dict_key}:{html.escape(dict_value, False)}"
             for dict_key, dict_value in value.items()
         )
     elif isinstance(value, bool):
         if is_html and not key.startswith("hx"):
-            value = html.escape(key) if value else ""
+            value = html.escape(key, False) if value else ""
         else:
             value = "true" if value else "false"
     elif isinstance(value, str) and getattr(value, "escape", True):
-        value = html.escape(value)
+        value = html.escape(value, False)
     return str(value)
 
 
@@ -86,7 +86,7 @@ def format_element(child: Any) -> str:
         child (AnyChild): The HTML element or text to format.
     """
     if isinstance(child, str) and getattr(child, "escape", True):
-        return html.escape(child)
+        return html.escape(child, False)
     elif hasattr(child, "to_html"):
         return child.to_html()  # type: ignore
     else:
