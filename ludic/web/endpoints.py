@@ -103,11 +103,11 @@ class Endpoint(Component[NoChildren, TAttrs]):
                 and self_generic_args
                 and endpoint_generic_args[-1] is self_generic_args[-1]
             ):
-                kwargs = {
+                path_params = {
                     key: value
                     for key, value in {**self.attrs, **path_params}.items()
                     if key in endpoint.route.param_convertors
                 }
 
         endpoint_name = endpoint if isinstance(endpoint, str) else endpoint.route.name
-        return self.app.url_path_for(endpoint_name, **kwargs)
+        return self.app.url_path_for(endpoint_name, **path_params)
