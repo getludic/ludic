@@ -3,3 +3,4 @@ verbose: true
 commits:
   strict: true
   disabled: false
+  upstreamBranch: origin/main
