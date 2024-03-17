@@ -300,10 +300,10 @@ class link(Element[PrimitiveChildren, HeadLinkAttrs]):
 class style(BaseElement):
     html_name = "style"
 
-    children: tuple[GlobalStyles]
+    children: tuple[GlobalStyles | str]
     attrs: StyleAttrs
 
-    def __init__(self, styles: GlobalStyles, **attrs: Unpack[StyleAttrs]) -> None:
+    def __init__(self, styles: GlobalStyles | str, **attrs: Unpack[StyleAttrs]) -> None:
         self.children = (styles,)
         self.attrs = attrs
 
@@ -324,10 +324,12 @@ class style(BaseElement):
         if formatted_attrs := dom._format_attributes():
             attributes = f" {formatted_attrs}"
 
+        css_styles = self.children[0]
+        if not isinstance(css_styles, str):
+            css_styles = format_styles(dom.children[0])
+
         return (
-            f"<{dom.html_name}{attributes}>\n"
-            f"{format_styles(dom.children[0])}\n"
-            f"</{dom.html_name}>"
+            f"<{dom.html_name}{attributes}>\n" f"{css_styles}\n" f"</{dom.html_name}>"
         )
 
     @override
