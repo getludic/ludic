@@ -15,8 +15,7 @@ from .responses import prepare_response
 
 
 class AppProtocol(Protocol):
-    def url_path_for(self, name: str, /, **path_params: Any) -> URLPath:
-        ...
+    def url_path_for(self, name: str, /, **path_params: Any) -> URLPath: ...
 
 
 class RoutedProtocol(Protocol):
