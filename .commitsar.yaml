@@ -1,6 +1,0 @@
-version: 1
-verbose: true
-commits:
-  strict: true
-  disabled: false
-  upstreamBranch: origin/main
