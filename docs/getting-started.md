@@ -32,12 +32,12 @@ Here is a sample `Page` component which represents the base for all other pages:
 from typing import override
 
 from ludic.html import head, title, style, body, html, main, script
-from ludic.types import AnyChildren, BaseElement, Component, NoAttrs
+from ludic.types import AnyChildren, Component, NoAttrs
 
 
 class Page(Component[AnyChildren, NoAttrs]):
     @override
-    def render(self) -> BaseElement:
+    def render(self) -> html:
         return html(
             head(
                 title("Ludic Example"),
