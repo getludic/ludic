@@ -24,10 +24,10 @@ jobs:
           cache: pip
           cache-dependency-path: "**/pyproject.toml"
 
-      - run: pip install hatchling
+      - run: pip install hatch
 
       - name: Build Package
-        run: hatchling build
+        run: hatch build
 
       - name: Publish Release Notes
         id: release

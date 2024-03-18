@@ -128,3 +128,6 @@ cython_debug/
 # IDEs
 .vscode
 .idea
+
+# Version file
+**/_version.py
