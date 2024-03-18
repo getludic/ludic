@@ -31,8 +31,8 @@ Here is a sample `Page` component which represents the base for all other pages:
 ```python
 from typing import override
 
-from ludic.html import head, title, style, meta, body, html, main, script
-from ludic.types import AnyChildren, Component, NoAttrs
+from ludic.html import head, title, style, body, html, main, script
+from ludic.types import AnyChildren, BaseElement, Component, NoAttrs
 
 
 class Page(Component[AnyChildren, NoAttrs]):
@@ -42,8 +42,6 @@ class Page(Component[AnyChildren, NoAttrs]):
             head(
                 title("Ludic Example"),
                 style.load(),
-                meta(charset="utf-8"),
-                meta(name="viewport", content="width=device-width, initial-scale=1.0"),
             ),
             body(
                 main(*self.children),
