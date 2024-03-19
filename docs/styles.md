@@ -121,7 +121,7 @@ class Page(Component[AnyChildren, NoAttrs]):
 
 ### Caching The Styles
 
-Note the `style.load(cache=True)` from the previous section in the `Page` component. As already mentioned, this caches loaded element during the first render. The problem is that the first request to your application renders the styles without cache so the response is slower. If you want to cache the styles before your `Page` component even renders, you can use the `lifespan` argument for the `LudicApp` class:
+As mentioned before, passing `cache=True` to `style.load` caches loaded elements' styles during the first render. The problem is that the first request to your application renders the styles without the cache, so the response is a bit slower. If you want to cache the styles before your component even renders for the first time, you can use the `lifespan` argument of the `LudicApp` class:
 
 ```python
 from collections.abc import AsyncIterator
