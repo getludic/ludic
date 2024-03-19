@@ -19,7 +19,10 @@ from .utils import get_element_attrs_annotations
 
 ELEMENT_REGISTRY: MutableMapping[str, list[type["BaseElement"]]] = {}
 
-GlobalStyles = Mapping[str, CSSProperties]
+# FIXME: Currently, it is impossible to properly type nested CSS properties
+# defined similar as in SCSS, it will be possible when the following PEP is
+# implemented and supported by type checkers: https://peps.python.org/pep-0728/
+GlobalStyles = Mapping[str, "CSSProperties | GlobalStyles"]
 """CSS styles for elements or components which are defined by setting the ``styles``
 class property.
 

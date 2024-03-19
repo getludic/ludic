@@ -6,21 +6,20 @@ from examples import app, db
 def test_bulk_update() -> None:
     import examples.bulk_update as _  # noqa
 
-    client = TestClient(app)
+    with TestClient(app) as client:
+        assert client.get("/").status_code == 200
+        assert client.get("/people/").status_code == 200
+        assert db.people["1"].active
+        assert db.people["2"].active
+        assert db.people["3"].active
+        assert not db.people["4"].active
 
-    assert client.get("/").status_code == 200
-    assert client.get("/people/").status_code == 200
-    assert db.people["1"].active
-    assert db.people["2"].active
-    assert db.people["3"].active
-    assert not db.people["4"].active
-
-    activate_data = {"active:id:1": "on", "active:id:2": "on"}
-    assert client.post("/people/", data=activate_data).status_code == 200
-    assert db.people["1"].active
-    assert db.people["2"].active
-    assert not db.people["3"].active
-    assert not db.people["4"].active
+        activate_data = {"active:id:1": "on", "active:id:2": "on"}
+        assert client.post("/people/", data=activate_data).status_code == 200
+        assert db.people["1"].active
+        assert db.people["2"].active
+        assert not db.people["3"].active
+        assert not db.people["4"].active
 
 
 def test_click_to_edit() -> None:

@@ -312,8 +312,8 @@ class style(BaseElement):
         return cls(collect_from_components(*components))
 
     @classmethod
-    def load(cls) -> Self:
-        return cls(collect_from_loaded())
+    def load(cls, cache: bool = False) -> Self:
+        return cls(collect_from_loaded(cache=cache))
 
     def to_html(self) -> str:
         dom: BaseElement = self
