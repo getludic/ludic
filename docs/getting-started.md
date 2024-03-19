@@ -41,7 +41,7 @@ class Page(Component[AnyChildren, NoAttrs]):
         return html(
             head(
                 title("Ludic Example"),
-                style.load(),
+                style.load(cache=True),
             ),
             body(
                 main(*self.children),
@@ -72,6 +72,7 @@ from ludic.web import LudicApp
 
 from your_app.components import Body, Header
 from your_app.components.pages import Page
+
 
 app = LudicApp(debug=True)
 

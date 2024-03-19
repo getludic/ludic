@@ -5,30 +5,37 @@ from ludic.base import ELEMENT_REGISTRY
 from ludic.css import CSSProperties
 from ludic.types import BaseElement, GlobalStyles
 
+GLOBAL_STYLES_CACHE: GlobalStyles = {}
 
-def format_styles(styles: GlobalStyles) -> str:
+
+def format_styles(styles: GlobalStyles, separator: str = "\n") -> str:
     """Format styles from all registered elements.
 
     Args:
         styles (GlobalStyles): Styles to format.
     """
     result: list[str] = []
-    nodes_to_parse: list[tuple[list[str], Mapping[str, Any]]] = [([], styles)]
+    nodes_to_parse: list[tuple[list[str], str | Mapping[str, Any]]] = [([], styles)]
 
     while nodes_to_parse:
         parents, node = nodes_to_parse.pop(0)
 
         content = []
-        for key, value in node.items():
-            if isinstance(value, str):
-                content.append(f"{key}: {value};")
-            elif isinstance(value, Mapping):
-                nodes_to_parse.append(([*parents, key], value))
+        if isinstance(node, str):
+            content.append(node)
+        else:
+            for key, value in node.items():
+                if isinstance(value, str):
+                    content.append(f"{key}: {value};")
+                elif isinstance(value, Mapping):
+                    if key.startswith("@"):
+                        value = format_styles(value, separator=" ")
+                    nodes_to_parse.append(([*parents, key], value))
 
         if content:
-            result.append(f"{" ".join(parents)} {{ {" ".join(content)} }}\n")
+            result.append(f"{" ".join(parents)} {{ {" ".join(content)} }}")
 
-    return "".join(result).rstrip()
+    return separator.join(result)
 
 
 def collect_from_components(*components: type[BaseElement]) -> GlobalStyles:
@@ -53,7 +60,7 @@ def collect_from_components(*components: type[BaseElement]) -> GlobalStyles:
     This would render an HTML page containing the ``<style>`` element
     with the styles the given components.
     """
-    styles: dict[str, CSSProperties] = {}
+    styles: dict[str, CSSProperties | GlobalStyles] = {}
     for component in components:
         if not component.styles:
             continue
@@ -64,12 +71,27 @@ def collect_from_components(*components: type[BaseElement]) -> GlobalStyles:
     return styles
 
 
-def collect_from_loaded() -> GlobalStyles:
-    """Global styles collector from loaded components."""
+def collect_from_loaded(cache: bool = False) -> GlobalStyles:
+    """Global styles collector from loaded components.
+
+    Args:
+        cache (bool): Whether to cache the result Default is False.
+
+    Returns:
+        GlobalStyles: Collected styles from loaded components.
+    """
+    global GLOBAL_STYLES_CACHE
+
+    if cache and GLOBAL_STYLES_CACHE:
+        return GLOBAL_STYLES_CACHE
+
     loaded = (
         element
         for elements in ELEMENT_REGISTRY.values()
         for element in elements
         if element.styles
     )
-    return collect_from_components(*loaded)
+    result = collect_from_components(*loaded)
+    if cache:
+        GLOBAL_STYLES_CACHE = result
+    return result

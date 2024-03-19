@@ -1,3 +1,5 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass
 from typing import Any, override
 
@@ -98,7 +100,7 @@ class Page(Component[AnyChildren, NoAttrs]):
         return html(
             head(
                 title("Ludic Example"),
-                style.load(),
+                style.load(cache=True),
                 meta(charset="utf-8"),
                 meta(name="viewport", content="width=device-width, initial-scale=1.0"),
             ),
@@ -123,7 +125,13 @@ class Body(Component[AnyChildren, NoAttrs]):
         return div(*self.children)
 
 
-app = LudicApp(debug=True)
+@asynccontextmanager
+async def lifespan(_: LudicApp) -> AsyncIterator[None]:
+    style.load(cache=True)
+    yield
+
+
+app = LudicApp(debug=True, lifespan=lifespan)
 
 
 @app.exception_handler(404)

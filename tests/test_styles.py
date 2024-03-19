@@ -46,6 +46,66 @@ def test_styles_formatting() -> None:
     )
 
 
+def test_styles_nested_formatting() -> None:
+    assert (
+        style(
+            {
+                "p.message": {
+                    "color": "black",  # type: ignore[dict-item]
+                    "background": "yellow",  # type: ignore[dict-item]
+                    "padding": "10px",  # type: ignore[dict-item]
+                    "a": {
+                        "color": "red",
+                        "text-decoration": "none",
+                    },
+                    "a:hover": {
+                        "text-decoration": "underline",
+                    },
+                },
+            }
+        ).to_html()
+        == (
+            "<style>\n"
+            "p.message { color: black; background: yellow; padding: 10px; }\n"
+            "p.message a { color: red; text-decoration: none; }\n"
+            "p.message a:hover { text-decoration: underline; }\n"
+            "</style>"
+        )
+    )
+
+
+def test_styles_with_at_rule() -> None:
+    assert (
+        style(
+            {
+                ".htmx-settling": {
+                    "opacity": "100",
+                },
+                "@keyframes lds-ellipsis1": {
+                    "0%": {
+                        "transform": "scale(0)",
+                        "color": "red",
+                    }
+                },
+                "@layer state": {
+                    ".alert": {
+                        "background-color": "brown",
+                    },
+                    "p": {
+                        "padding": "10px",
+                    },
+                },
+            }
+        ).to_html()
+    ) == (
+        "<style>\n"
+        ".htmx-settling { opacity: 100; }\n"
+        "@keyframes lds-ellipsis1 { 0% { transform: scale(0); color: red; } }\n"
+        "@layer state { .alert { background-color: brown; } p { padding: 10px; } }\n"
+        "</style>"
+    )
+
+
 def test_styles_collection() -> None:
     assert style.from_components(A, B).to_html() == (
         "<style>\n"
