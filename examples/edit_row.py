@@ -1,6 +1,6 @@
 from typing import Annotated, NotRequired, Self, override
 
-from examples import Body, Header, Page, app, db
+from examples import Body, Header, Page, app, init_db
 from ludic.catalog.buttons import ButtonPrimary, ButtonSecondary
 from ludic.catalog.tables import ColumnMeta, TableHead, TableRow
 from ludic.html import div, input, table, tbody, thead
@@ -8,6 +8,8 @@ from ludic.types import Attrs, JavaScript
 from ludic.web.endpoints import Endpoint
 from ludic.web.exceptions import NotFoundError
 from ludic.web.parsers import Parser
+
+db = init_db()
 
 
 class PersonAttrs(Attrs):

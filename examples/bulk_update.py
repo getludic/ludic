@@ -1,6 +1,6 @@
 from typing import Annotated, Self, override
 
-from examples import Body, Header, Page, app, db
+from examples import Body, Header, Page, app, init_db
 from ludic.catalog.buttons import ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form
 from ludic.catalog.tables import ColumnMeta, Table, create_rows
@@ -8,6 +8,8 @@ from ludic.html import span
 from ludic.types import Attrs
 from ludic.web.endpoints import Endpoint
 from ludic.web.parsers import ListParser
+
+db = init_db()
 
 
 class PersonAttrs(Attrs, total=False):

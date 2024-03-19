@@ -1,6 +1,6 @@
 from typing import Annotated, NotRequired, Self, override
 
-from examples import Body, Header, Page, app, db
+from examples import Body, Header, Page, app, init_db
 from ludic.catalog.buttons import ButtonDanger, ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form, create_fields
 from ludic.catalog.lists import Pairs
@@ -9,6 +9,8 @@ from ludic.types import Attrs
 from ludic.web.endpoints import Endpoint
 from ludic.web.exceptions import NotFoundError
 from ludic.web.parsers import Parser, ValidationError
+
+db = init_db()
 
 
 def email_validator(email: str) -> str:
