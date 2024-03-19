@@ -1,12 +1,14 @@
 from typing import Self, override
 
-from examples import Body, Header, Page, app, db
+from examples import Body, Header, Page, app, init_db
 from ludic.catalog.buttons import ButtonDanger
 from ludic.catalog.tables import TableHead, TableRow
 from ludic.html import table, tbody, thead
 from ludic.types import Attrs
 from ludic.web.endpoints import Endpoint
 from ludic.web.exceptions import NotFoundError
+
+db = init_db()
 
 
 class PersonAttrs(Attrs):

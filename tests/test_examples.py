@@ -1,10 +1,11 @@
 from starlette.testclient import TestClient
 
-from examples import app, db
+from examples import app
 
 
 def test_bulk_update() -> None:
-    import examples.bulk_update as _  # noqa
+    app.routes.clear()
+    from examples.bulk_update import db
 
     with TestClient(app) as client:
         assert client.get("/").status_code == 200
@@ -23,51 +24,62 @@ def test_bulk_update() -> None:
 
 
 def test_click_to_edit() -> None:
-    import examples.click_to_edit as _  # noqa
+    app.routes.clear()
+    from examples.click_to_edit import db
 
-    client = TestClient(app)
+    with TestClient(app) as client:
+        assert client.get("/").status_code == 200
+        assert client.get("/contacts/1").status_code == 200
+        assert client.get("/contacts/1/form/").status_code == 200
+        assert client.get("/contacts/123").status_code == 404
+        assert client.get("/contacts/123/form/").status_code == 404
+        assert db.contacts["1"].first_name == "John"
 
-    assert client.get("/").status_code == 200
-    assert client.get("/contacts/1").status_code == 200
-    assert client.get("/contacts/1/form/").status_code == 200
-    assert client.get("/contacts/123").status_code == 404
-    assert client.get("/contacts/123/form/").status_code == 404
-    assert db.contacts["1"].first_name == "John"
-
-    edit_data = {"first_name": "Test", "last_name": "Doe", "email": "test@example.com"}
-    assert client.put("/contacts/1", data=edit_data).status_code == 200
-    assert db.contacts["1"].first_name == "Test"
+        edit_data = {
+            "first_name": "Test",
+            "last_name": "Doe",
+            "email": "test@example.com",
+        }
+        assert client.put("/contacts/1", data=edit_data).status_code == 200
+        assert db.contacts["1"].first_name == "Test"
 
 
 def test_click_to_load() -> None:
+    app.routes.clear()
     import examples.click_to_load as _  # noqa
 
-    client = TestClient(app)
-
-    assert client.get("/").status_code == 200
-    assert client.get("/contacts/").status_code == 200
-    assert client.get("/contacts/?page=2").status_code == 200
+    with TestClient(app) as client:
+        assert client.get("/").status_code == 200
+        assert client.get("/contacts/").status_code == 200
+        assert client.get("/contacts/?page=2").status_code == 200
 
 
 def test_delete_row() -> None:
-    import examples.delete_row as _  # noqa
+    app.routes.clear()
+    from examples.delete_row import db
 
-    client = TestClient(app)
-
-    assert client.get("/").status_code == 200
-    assert client.get("/people/").status_code == 200
-    assert client.delete("/people/1").status_code == 200
-    assert client.delete("/people/123").status_code == 404
+    with TestClient(app) as client:
+        assert client.get("/").status_code == 200
+        assert client.get("/people/").status_code == 200
+        assert client.delete("/people/1").status_code == 200
+        assert client.delete("/people/123").status_code == 404
+        assert db.people.get("1") is None
 
 
 def test_edit_row() -> None:
-    import examples.edit_row as _  # noqa
+    app.routes.clear()
+    from examples.edit_row import db
 
-    client = TestClient(app)
+    with TestClient(app) as client:
+        assert client.get("/").status_code == 200
+        assert client.get("/people/").status_code == 200
+        assert client.get("/people/1").status_code == 200
+        assert client.get("/people/1/form/").status_code == 200
+        assert client.get("/people/123").status_code == 404
+        assert client.get("/people/123/form/").status_code == 404
 
-    assert client.get("/").status_code == 200
-    assert client.get("/contacts/").status_code == 200
-    assert client.get("/contacts/1").status_code == 200
-    assert client.get("/contacts/1/form/").status_code == 200
-    assert client.get("/contacts/123").status_code == 404
-    assert client.get("/contacts/123/form/").status_code == 404
+        assert db.people["1"].name == "Joe Smith"
+        edit_data = {"name": "Test", "email": "test@example.com"}
+        assert client.put("/people/1", data=edit_data).status_code == 200
+        assert db.people["1"].name == "Test"
+        assert db.people["1"].email == "test@example.com"
