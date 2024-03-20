@@ -96,6 +96,84 @@ def init_db() -> DB:
 
 
 class Page(Component[AnyChildren, NoAttrs]):
+    styles = {
+        "body": {
+            "display": "flex",
+            "flex-direction": "column",
+            "align-items": "center",
+            "min-height": "100vh",
+            "margin": "0",
+            "font-family": "'Arial', sans-serif",
+        },
+        "main": {
+            "width": "80%",
+            "max-width": "800px",
+            "padding": "20px",
+        },
+        "header": {
+            "text-align": "center",
+        },
+        "h1": {
+            "font-size": "3.5em",
+            "line-height": "1.2",
+            "margin-bottom": "35px",
+        },
+        "table": {
+            "width": "100%",
+            "border-collapse": "collapse",
+        },
+        "th": {
+            "border": "1px solid #ddd",
+            "padding": "12px",
+        },
+        "td": {
+            "border": "1px solid #ddd",
+            "padding": "12px",
+        },
+        "thead": {
+            "background-color": "#f5f5f5",
+        },
+        "button.btn": {
+            "margin": "10px 5px",
+            "padding": "10px 20px",
+            "background-color": "#f5f5f5",
+            "border": "1px solid #ddd",
+            "border-radius": "4px",
+            "cursor": "pointer",
+            "transition": "background-color 0.3s ease",
+        },
+        "button.btn-primary": {
+            "background-color": "#2196f3",
+            "border-color": "#2196f3",
+            "color": "#fff",
+        },
+        "dl": {
+            "margin-top": "20px",
+            "margin-bottom": "20px",
+        },
+        "dt": {
+            "font-weight": "bold",
+            "margin-bottom": "5px",
+        },
+        "dd": {
+            "margin-left": "20px",
+            "margin-bottom": "10px",
+        },
+        "label": {
+            "display": "block",
+            "margin-top": "10px",
+            "margin-bottom": "10px",
+            "font-weight": "bold",
+        },
+        "input": {
+            "width": "100%",
+            "padding": "10px",
+            "border": "1px solid #ddd",
+            "border-radius": "4px",
+            "box-sizing": "border-box",
+        },
+    }
+
     @override
     def render(self) -> BaseElement:
         return html(
@@ -124,6 +202,76 @@ class Body(Component[AnyChildren, NoAttrs]):
     @override
     def render(self) -> div:
         return div(*self.children)
+
+
+class Loading(Component[AnyChildren, NoAttrs]):
+    styles = {
+        ".loader": {
+            "text-align": "center",
+        },
+        ".lds-ellipsis": {
+            "display": "inline-block",
+            "position": "relative",
+            "width": "80px",
+            "height": "80px",
+        },
+        ".lds-ellipsis div": {
+            "position": "absolute",
+            "top": "33px",
+            "width": "13px",
+            "height": "13px",
+            "border-radius": "50%",
+            "background": "#555",
+            "animation-timing-function": "cubic-bezier(0, 1, 1, 0)",
+        },
+        ".lds-ellipsis div:nth-child(1)": {
+            "left": "8px",
+            "animation": "lds-ellipsis1 0.6s infinite",
+        },
+        ".lds-ellipsis div:nth-child(2)": {
+            "left": "8px",
+            "animation": "lds-ellipsis2 0.6s infinite",
+        },
+        ".lds-ellipsis div:nth-child(3)": {
+            "left": "32px",
+            "animation": "lds-ellipsis2 0.6s infinite",
+        },
+        ".lds-ellipsis div:nth-child(4)": {
+            "left": "56px",
+            "animation": "lds-ellipsis3 0.6s infinite",
+        },
+        "@keyframes lds-ellipsis1": {
+            "0%": {
+                "transform": "scale(0)",
+            },
+            "100%": {
+                "transform": "scale(1)",
+            },
+        },
+        "@keyframes lds-ellipsis3": {
+            "0%": {
+                "transform": "scale(1)",
+            },
+            "100%": {
+                "transform": "scale(0)",
+            },
+        },
+        "@keyframes lds-ellipsis2": {
+            "0%": {
+                "transform": "translate(0, 0)",
+            },
+            "100%": {
+                "transform": "translate(24px, 0)",
+            },
+        },
+    }
+
+    @override
+    def render(self) -> div:
+        return div(
+            div(div(""), div(""), div(""), div(""), class_="lds-ellipsis"),
+            class_="loader",
+        )
 
 
 @asynccontextmanager

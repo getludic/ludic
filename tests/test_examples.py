@@ -4,7 +4,6 @@ from examples import app
 
 
 def test_bulk_update() -> None:
-    app.routes.clear()
     from examples.bulk_update import db
 
     with TestClient(app) as client:
@@ -22,9 +21,10 @@ def test_bulk_update() -> None:
         assert not db.people["3"].active
         assert not db.people["4"].active
 
+    app.routes.clear()
+
 
 def test_click_to_edit() -> None:
-    app.routes.clear()
     from examples.click_to_edit import db
 
     with TestClient(app) as client:
@@ -43,9 +43,10 @@ def test_click_to_edit() -> None:
         assert client.put("/contacts/1", data=edit_data).status_code == 200
         assert db.contacts["1"].first_name == "Test"
 
+    app.routes.clear()
+
 
 def test_click_to_load() -> None:
-    app.routes.clear()
     import examples.click_to_load as _  # noqa
 
     with TestClient(app) as client:
@@ -53,9 +54,10 @@ def test_click_to_load() -> None:
         assert client.get("/contacts/").status_code == 200
         assert client.get("/contacts/?page=2").status_code == 200
 
+    app.routes.clear()
+
 
 def test_delete_row() -> None:
-    app.routes.clear()
     from examples.delete_row import db
 
     with TestClient(app) as client:
@@ -65,9 +67,10 @@ def test_delete_row() -> None:
         assert client.delete("/people/123").status_code == 404
         assert db.people.get("1") is None
 
+    app.routes.clear()
+
 
 def test_edit_row() -> None:
-    app.routes.clear()
     from examples.edit_row import db
 
     with TestClient(app) as client:
@@ -83,3 +86,17 @@ def test_edit_row() -> None:
         assert client.put("/people/1", data=edit_data).status_code == 200
         assert db.people["1"].name == "Test"
         assert db.people["1"].email == "test@example.com"
+
+    app.routes.clear()
+
+
+def test_lazy_loading() -> None:
+    import examples.lazy_loading as _  # noqa
+
+    with TestClient(app) as client:
+        assert client.get("/").status_code == 200
+        response = client.get("/load/0")
+        assert response.status_code == 200
+        assert b"Content Loaded" in response.content
+
+    app.routes.clear()

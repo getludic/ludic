@@ -54,14 +54,12 @@ from .styles import collect_from_components, collect_from_loaded, format_styles
 from .types import (
     AnyChildren,
     BaseElement,
-    Blank,
     ComplexChildren,
     Element,
     ElementStrict,
     GlobalStyles,
     NoChildren,
     PrimitiveChildren,
-    Safe,
 )
 
 
@@ -364,11 +362,8 @@ class footer(Element[AnyChildren, GlobalAttrs]):
 
 
 class html(ElementStrict[head, body, HtmlTagAttrs]):
+    html_header = "<!doctype html>"
     html_name = "html"
-
-    @override
-    def render(self) -> Blank:
-        return Blank(Safe("<!doctype html>\n"), *self.children)
 
 
 class iframe(Element[NoChildren, IframeAttrs]):

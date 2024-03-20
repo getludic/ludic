@@ -88,7 +88,9 @@ class NoAttrs(TypedDict):
 
 
 class BaseElement(metaclass=ABCMeta):
+    html_header: ClassVar[str | None] = None
     html_name: ClassVar[str | None] = None
+
     always_pair: ClassVar[bool] = False
     styles: ClassVar[GlobalStyles] = {}
 
@@ -196,6 +198,8 @@ class BaseElement(metaclass=ABCMeta):
         dom = self
         while dom != (rendered_dom := dom.render()):
             dom = rendered_dom
+
+        element_tag = f"{dom.html_header}\n" if dom.html_header else ""
 
         hidden = dom.html_name == "__hidden__"
         element_tag = "" if hidden else f"<{dom.html_name}"
