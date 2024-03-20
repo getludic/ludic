@@ -6,7 +6,7 @@ from typing import Annotated, Any, Final, TypeVar, get_args, get_origin
 
 from .utils import get_element_attrs_annotations
 
-EXTRACT_NUMBER_RE: Final[re.Pattern[str]] = re.compile(r"\{(\d+):id\}")
+EXTRACT_NUMBER_RE: Final[re.Pattern[str]] = re.compile(r"\{(\d+:id)\}")
 
 T = TypeVar("T")
 
@@ -93,6 +93,12 @@ def format_element(child: Any) -> str:
         return str(child)
 
 
+def _extract_match(text: str | Any) -> int | str:
+    if text.endswith(":id") and text[:-3].isdigit():
+        return int(text[:-3])
+    return str(text)
+
+
 def extract_identifiers(text: str) -> list[str | int]:
     """Extract numbers from a string.
 
@@ -102,11 +108,7 @@ def extract_identifiers(text: str) -> list[str | int]:
     Returns:
         Iterable[int]: The extracted numbers.
     """
-    parts = [
-        int(match) if str(match).isdigit() else match
-        for match in EXTRACT_NUMBER_RE.split(text)
-        if match
-    ]
+    parts = [_extract_match(match) for match in EXTRACT_NUMBER_RE.split(text) if match]
     if any(isinstance(part, int) for part in parts):
         return parts
     else:
@@ -188,7 +190,7 @@ class FormatContext:
         extracted_args: list[Any] = []
         for arg in args:
             if isinstance(arg, str) and (parts := extract_identifiers(arg)):
-                cache = self._context.get()
+                cache = self.get()
                 extracted_args.extend(
                     cache.pop(part) if isinstance(part, int) else part
                     for part in parts

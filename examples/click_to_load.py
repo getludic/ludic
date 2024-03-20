@@ -4,6 +4,7 @@ from examples import Body, Header, Page, app
 from ludic.attrs import ButtonAttrs
 from ludic.catalog.buttons import ButtonPrimary
 from ludic.catalog.tables import Table, TableHead, TableRow
+from ludic.html import td
 from ludic.types import Attrs, Blank, Component, ComponentStrict
 from ludic.web import Endpoint
 from ludic.web.datastructures import QueryParams
@@ -83,7 +84,12 @@ class ContactsSlice(Endpoint[ContactsSliceAttrs]):
                 for contact in self.attrs["contacts"]
             ),
             TableRow(
-                LoadMoreButton(url=self.url_for(ContactsSlice).query(page=next_page)),
+                td(
+                    LoadMoreButton(
+                        url=self.url_for(ContactsSlice).query(page=next_page)
+                    ),
+                    colspan=3,
+                ),
                 id=LoadMoreButton.target,
             ),
         )

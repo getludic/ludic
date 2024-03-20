@@ -467,6 +467,8 @@ class ImgAttrs(GlobalAttrs, total=False):
 
 
 class SvgAttrs(GlobalAttrs, total=False):
+    version: str
+    xmlns: str
     height: int
     width: int
 

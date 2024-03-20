@@ -70,7 +70,10 @@ class TableRow(Component[AnyChildren, GlobalAttrs]):
 
     @override
     def render(self) -> tr:
-        return tr(*map(td, self.children), **self.attrs)
+        return tr(
+            *(child if isinstance(child, td) else td(child) for child in self.children),
+            **self.attrs,
+        )
 
 
 class TableHead(Component[AnyChildren, GlobalAttrs]):
@@ -86,7 +89,10 @@ class TableHead(Component[AnyChildren, GlobalAttrs]):
 
     @override
     def render(self) -> tr:
-        return tr(*map(th, self.children), **self.attrs)
+        return tr(
+            *(child if isinstance(child, th) else th(child) for child in self.children),
+            **self.attrs,
+        )
 
 
 THead = TypeVar("THead", bound=BaseElement, default=TableHead)
