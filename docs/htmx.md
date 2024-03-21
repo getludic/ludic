@@ -1,8 +1,10 @@
-# HTMX Support
+# Using HTMX with Ludic
 
-[HTMX](https://htmx.org/) is a library that allows you to create web pages with dynamic behavior, like those found in single-page applications, without having to write JavaScript. It's built on top of HTML, CSS, and JavaScript, and it enables you to enhance server-rendered HTML by adding client-side interactivity through simple attributes in your HTML markup.
+[HTMX](https://htmx.org/) is a powerful library that simplifies the creation of dynamic, interactive web pages. It lets you achieve the responsiveness of single-page applications without the complexity of writing extensive JavaScript code. HTMX works by extending standard HTML with special attributes that control how elements interact with the server.
 
-All elements in the `ludic.html` module automatically support HTMX attributes. Here is an example:
+## HTMX Integration in Ludic
+
+The `ludic.html` module seamlessly supports HTMX attributes, making it easy to add dynamic functionality to your pages. Let's see a simple example:
 
 ```python
 from ludic.html import button
@@ -10,7 +12,7 @@ from ludic.html import button
 button("Click Me", hx_post="/clicked", hx_swap="outerHTML")
 ```
 
-This would render as:
+This code would generate the following HTML:
 
 ```html
 <button hx-post="/clicked" hx-swap="outerHTML">
@@ -18,83 +20,94 @@ This would render as:
 </button>
 ```
 
-## Creating HTMX Page
+## Setting up an HTMX-Enabled Page
 
-You need to add the CDN link for HTMX to all components. Fortunately, you can just create the Page component like this:
+1. **Include the HTMX library:** Add the HTMX script to your base HTML component:
 
-```python
-from ludic.html import html, head, body, style, title, main, script
-from ludic.types import AnyChildren, Component, NoAttrs
+    ```python
+    from ludic.html import html, head, body, style, title, main, script
+    from ludic.types import AnyChildren, Component, NoAttrs
 
 
-class Page(Component[AnyChildren, NoAttrs]):
-    @override
-    def render(self) -> html:
-        return html(
-            head(
-                title("Example"),
-                style.load()
-            ),
-            body(
-                main(*self.children),
-                script(src="https://unpkg.com/htmx.org@latest"),
-            ),
-        )
-```
+    class Page(Component[AnyChildren, NoAttrs]):
+        @override
+        def render(self) -> html:
+            return html(
+                head(
+                    title("Example"),
+                    style.load()
+                ),
+                body(
+                    main(*self.children),
+                    script(src="https://unpkg.com/htmx.org@latest"),
+                ),
+            )
+    ```
 
-You should probably replace the link pinning a specific version of HTMX. Or you can download a copy and link the file path.
+2. **Use the `Page` component:** Employ the `Page` component as the foundation for your HTML documents to ensure they load the necessary HTMX script.
 
-Now you can use the component everywhere you need to render a valid HTML document, like this:
+## A Practical Example
+
+Let's illustrate how to create a dynamic page with HTMX and Ludic:
 
 ```python
 from ludic.html import div, h1, p, button
+from ludic.web import LudicApp, Request
 
 from your_app.pages import Page
 
+app = LudicApp()
 
-page = Page(
-    div(
+@app.get("/")
+def homepage(request: Request) -> Page:
+    return Page(
         h1("Hello Stranger!"),
-        p(
-            "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. "
-            "Maecenas fermentum, sem in pharetra pellentesque, velit turpis "
-            "volutpat ante, in pharetra metus odio a lectus. Nullam sit amet "
-            "magna in magna gravida vehicula. Vestibulum fermentum tortor id "
-            "mi. Phasellus enim erat, vestibulum vel, aliquam a, posuere eu, "
-            "velit."
-        ),
-        button("Load Content", hx_get="/content", hx_swap="outerHTML"),
-        class_="container",
+        p("This is a simple example with one button performing the hx-swap operation."),
+        button("Show Content", hx_get=request.url_for(content), hx_swap="outerHTML"),
     )
-)
+
+@app.get("/content")
+def content() -> div:
+    return div(h2("Content"), p("This is the content."))
 ```
+
+**Explanation:**
+
+* **Button Behavior:** Clicking the button triggers an HTTP GET request to `/content`. The response replaces the original button with the content returned from the `/content` endpoint due to the `hx_swap="outerHTML"` attribute.
+* **Web Framework:** Ludic acts as a web framework (built on [Starlette](https://www.starlette.io/responses/)), empowering you to define endpoints and handle requests. Explore the [Web Framework section](web-framework.md) of the documentation for in-depth information.
 
 ## Headers
 
-It is possible to return custom HTMX headers in responses, here is an example:
+It is possible to append custom HTMX headers in responses, here is an example:
 
 ```python
 from ludic import types
 from ludic.html import div
 
+from your_app.server import app
+
 @app.get("/")
 def index() -> tuple[div, types.HXHeaders]:
-    return div("Headers Example", id="test"), {"HX-Location": {"path": "/", "target": "#test"}}
+    return div("Example"), {"HX-Location": {"path": "/", "target": "#test"}}
 ```
 
-You can also type your endpoint with `tuple[div, types.Headers]`, however, it allows arbitrary headers.
+You can also type your endpoint with `tuple[div, types.Headers]` which allows arbitrary headers, not just HTMX-specific ones.
 
 ## Rendering JavaScript
 
 In some cases, HTMX components require some JavaScript code. For that purpose, there is the `ludic.types.JavaScript` class:
 
 ```python
-from ludic.catalog.buttons import ButtonPrimary
+from ludic.html import button, div, h2, table
 from ludic.types import JavaScript
 
+from your_app.server import app
 
-ButtonPrimary(
-    "Click Here",
-    onclick=JavaScript("alert('test')")
-)
+@app.get("/data")
+def data() -> div:
+    return div(
+        h2("Data"),
+        table(...),
+        button("Click Here", onclick=JavaScript("alert('test')")),
+    )
 ```
