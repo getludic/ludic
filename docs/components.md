@@ -4,9 +4,9 @@ In Ludic, you can create components similar to React components. These component
 
 ## Key Concepts
 
-- **Components**: a component is reusable chunk of code that defines a piece of your user interface. Think of it like a blueprint for an HTML element, but more powerful.
+- **Components**: a component is a reusable chunk of code that defines a piece of your user interface. Think of it like a blueprint for an HTML element, but more powerful.
 - **Elements**: these represent the individual HTML tags (like `<a>`, `<div>`, `<h1>`, etc.) that make up the structure of your page.
-- **Attributes**: These help define properties on your components and elements. They let you modify things like a link's destination, text color, or an element's size.
+- **Attributes**: These help define the properties on your components and elements. They let you modify things like a link's destination, text color, or an element's size.
 - **Hierarchy**: Components can contain other components or elements, creating a tree-like structure.
 - **Types**: A safety net to help you write correct code, preventing errors just like making sure LEGO pieces fit together properly.
 
@@ -60,7 +60,7 @@ The current definition doesn't strictly enforce a single child. This means you c
 
 ## Strict Components
 
-Strict components offer more precise control over the types and structure of their children compared to regular components. Let's illustrate this with a Table component example:
+Strict components offer more precise control over the types and structures of their children compared to regular components. Let's illustrate this with a Table component example:
 
 ```python
 from ludic.attrs import GlobalAttrs
@@ -150,7 +150,7 @@ class PersonAttrs(Attrs, total=False):
     is_active: bool
 ```
 
-In this case all attributes are optional except for the `id` attribute.
+In this case, all attributes are optional except for the `id` attribute.
 
 !!! note "The `Attrs` declaration is an information for type checkers"
 
@@ -182,7 +182,7 @@ The method passes only the attributes registered for the `<td>` element.
 
 ### Pre-defined Attributes
 
-The `ludic.attrs` module contains many attributes definition which you can reuse in your components, hare are the most used ones:
+The `ludic.attrs` module contains many attribute definition that you can reuse in your components, here are the most used ones:
 
 - `HtmlAttrs` - Global HTML attributes available in all elements
     - The `class` and `for` attributes have the aliases `class_` and `for_`
@@ -214,7 +214,7 @@ p("<script>alert('Hello world')</script>").to_html()
 
 ## Using `f-strings`
 
-In Ludic, f-strings offer a bit more readable way to construct component content, especially if you need to do a lot of formatting with `<b>`, `<i>` and other elements for improving typography. Let's modify the previous example using f-strings:
+In Ludic, f-strings offer a bit more readable way to construct component content, especially if you need to do a lot of formatting with `<b>`, `<i>`, and other elements for improving typography. Let's modify the previous example using f-strings:
 
 ```python
 p1 = p(f"click {Link("here", to="https://example.com")}")
@@ -233,7 +233,7 @@ There are two cases it can create hanging objects (memory leaks):
 
 !!! warning "Possible memory leak"
 
-    The implementation of f-strings requires creation of a temporary dict which can result in hanging objects in memory. To avoid memory leaks, there is the `BaseElement.formatter` attribute which is a context manager clearing the temporary dict on exit.
+    The implementation of f-strings requires the creation of a temporary dict which can result in hanging objects in memory. To avoid memory leaks, there is the `BaseElement.formatter` attribute which is a context manager clearing the temporary dict on exit.
 
 **The `BaseElement.formatter` Context Manager**
 
@@ -251,7 +251,7 @@ The Ludic Web Framework (built on Starlette) automatically wraps request handler
 
 **Key Takeaway**
 
-While f-strings are convenient, exercise caution to prevent memory leaks. Use them within the provided safety mechanisms. In contexts like task queues or other web frameworks, you can use similar mechanism of wrapping to achieve memory safety.
+While f-strings are convenient, exercise caution to prevent memory leaks. Use them within the provided safety mechanisms. In contexts like task queues or other web frameworks, you can use a similar mechanism of wrapping to achieve memory safety.
 
 ## Available Methods
 
@@ -259,10 +259,10 @@ All *components* (and *elements* too) inherit the following properties and metho
 
 - `BaseElement`
     - `children` - children of the component
-    - `attrs` - dictionary containing attributes
-    - `to_html()` - converts the component to HTML document
+    - `attrs` - a dictionary containing attributes
+    - `to_html()` - converts the component to an HTML document
     - `to_string()` - converts the component to a string representation of the tree
-    - `attrs_for(...)` - filter attributes to return only those valid for given element or component
+    - `attrs_for(...)` - filter attributes to return only those valid for a given element or component
     - `has_attributes()` - whether the component has any attributes
     - `is_simple()` - whether the component contains one primitive child
     - `render()` (*abstract method*) - render the component
@@ -293,5 +293,5 @@ The `ludic.types` module contains many useful types:
     - example: `Blank(f"Hello {b("world")}").to_html() == 'Hello <b>world</b>'`
 - `Safe` - marker for a safe string which is not escaped
     - example: `a(Safe("This <b>won't</b> be escaped."))`
-- `JavaScript` - marker for javascript, subclasses `Safe`
+- `JavaScript` - a marker for javascript, subclasses `Safe`
 - `GlobalStyles` - type for CSS styles

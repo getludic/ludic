@@ -3,7 +3,7 @@
 The `ludic.catalog` module is meant as a collection of components that could be useful for building Ludic applications.
 
 * Any contributor is welcome to add new components or helpers.
-* It also serves as showcase of possible implementations.
+* It also serves as a showcase of possible implementations.
 
 ## Typography
 
@@ -150,7 +150,7 @@ Pairs(
 
 ## Forms
 
-These components are in an experimental mode. There is the possibility to automatically create form fields from annotations, but it is far from production ready.
+These components are in an experimental mode. There is the possibility to automatically create form fields from annotations, but it is far from production-ready.
 
 Here is the definition:
 
@@ -204,7 +204,7 @@ Which would render as:
 
 !!! warning "Experimental"
 
-    This module is in an experimental state. It is not clear yet how to make generation of form fields from annotations flexible enough.
+    This module is in an experimental state. It is not clear yet how to make the generation of form fields from annotations flexible enough.
 
 Here is what you can do:
 
@@ -222,7 +222,7 @@ fields = create_fields(customer, spec=CustomerAttrs)
 form = Form(*fields)
 ```
 
-The `create_fields` function generates form fields from annotations. It generates only fields which are annotated with the `FieldMeta` dataclass:
+The `create_fields` function generates form fields from annotations. It generates only fields that are annotated with the `FieldMeta` dataclass:
 
 ```python
 @dataclass
@@ -252,7 +252,7 @@ class CustomerAttrs(Attrs):
 
 ## Tables
 
-These components are in an experimental mode. There is the possibility to automatically create tables even containing form fields and actions from annotations, but it is far from production ready.
+These components are in an experimental mode. There is the possibility to automatically create tables even containing form fields and actions from annotations, but it is far from production-ready.
 
 Here is the definition:
 
@@ -296,7 +296,7 @@ Table(
 
 !!! warning "Experimental"
 
-    This module is in an experimental state. It is not clear yet how to make generation of tables from annotations and combine them with forms, button actions and so on. The idea is to make it flexible and extensible.
+    This module is in an experimental state. It is not clear yet how to make the generation of tables from annotations and combine them with forms, button actions, and so on. The idea is to make it flexible and extensible.
 
 Here is what you can do:
 
@@ -315,7 +315,7 @@ rows = create_rows(people, spec=PersonAttrs)
 table = Table(*rows)
 ```
 
-The `create_rows` function expects people and a specification using the `ColumnMeta` annotation. It generates table from that. Here are all the properties of the `ColumnMeta` dataclass:
+The `create_rows` function expects people and a specification using the `ColumnMeta` annotation. It generates a table from that. Here are all the properties of the `ColumnMeta` dataclass:
 
 ```python
 @dataclass

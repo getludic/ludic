@@ -63,10 +63,10 @@ The list of parameters can be found in the [Starlette documentation](https://www
 
 There are three types of endpoints that you can create:
 
-* [Function Based](#function-based)
-* [Component Based](#component-based)
+* [Function-Based](#function-based)
+* [Component-Based](#component-based)
 
-### Function Based
+### Function-Based
 
 These are functions returning Ludic components, a tuple or the [Starlette's Response class](https://www.starlette.io/responses/).
 
@@ -100,13 +100,13 @@ async def register_person(data: FormData) -> Page:
     return await show_person(person.id), 202
 ```
 
-### Component Based
+### Component-Based
 
-While it is possible to use function based handlers everywhere, in case of HTMX based web applications, we want to also create a lot of endpoints rendering only single form element, table, and so on. We don't need to always return the whole HTML document in `<html>` tag. We could use function based handlers for that, however, it is often better to think of endpoints as just another components.
+While it is possible to use function-based handlers everywhere, in the case of HTMX-based web applications, we want to also create a lot of endpoints rendering only sole form elements, tables, and so on. We don't need to always return the whole HTML document in `<html>` tag. We could use function-based handlers for that, however, it is often better to think of endpoints as just another components.
 
-Component based endpoints can only have one generic argument which is the type of attributes. They cannot have children.
+Component-based endpoints can only have one generic argument which is the type of attributes. They cannot have children.
 
-Here is an example where we create two component based endpoints:
+Here is an example where we create two component-based endpoints:
 
 ```python
 from ludic.web import Endpoint
@@ -169,7 +169,7 @@ class ContactForm(Endpoint[ContactAttrs]):
         )
 ```
 
-The benefit of this approach is that you can create components which generate the URL path for other component based endpoints with the `url_for` method. More about that in the next section.
+The benefit of this approach is that you can create components that generate the URL path for other component-based endpoints with the `url_for` method. More about that in the next section.
 
 ### Reverse URL Lookups
 
@@ -180,15 +180,15 @@ There are two possible ways to generate the URL for a particular route handled b
 
 **`Request.url_for(endpoint: Callable[..., Any] | str, ...)`**
 
-This method is available on the `ludic.web.requests.Request` object. It generates and `URLPath` object for given endpoint.
+This method is available on the `ludic.web.requests.Request` object. It generates and `URLPath` object for a given endpoint.
 
 **`Endpoint.url_for(endpoint: type[RoutedProtocol] | str, ...)`**
 
-This method is available on a component based endpoint. It has one small advantage over the `request`'s method -- if the destination component defines the same attributes, the path parameters are automatically extracted so you don't need to pass them via key-word arguments. Here are examples:
+This method is available on a component-based endpoint. It has one small advantage over the `request`'s method -- if the destination component defines the same attributes, the path parameters are automatically extracted so you don't need to pass them via key-word arguments. Here are examples:
 
 - `ContactForm(...).url_for(Contact)` - Even though the `ContactForm` endpoint requires the `id` path parameter, it is automatically taken from `ContactForm(...).attrs` since the type of `ContactForm[ContactAttrs]` and `Contact[ContactAttrs]` are the same.
-- If these attributes types are not equal, you need to specify the URL path parameter explicitly, e.g. `ContactForm(...).url_for(Foo, id=self.attrs["foo_id"])`
-- if the first argument to `url_for` is a the name of the endpoint, you need to always specify the URL path parameters explicitly.
+- If these attribute types are not equal, you need to specify the URL path parameter explicitly, e.g. `ContactForm(...).url_for(Foo, id=self.attrs["foo_id"])`
+- if the first argument to `url_for` is the name of the endpoint, you need to always specify the URL path parameters explicitly.
 
 ### Handler Responses
 
@@ -203,7 +203,7 @@ def index() -> tuple[div, types.Headers]:
     return div("Headers Example"), {"Content-Type": "..."}
 ```
 
-When it comes to handler's return type, you have the following options:
+When it comes to the handler's return type, you have the following options:
 
 - `BaseElement` - any element or component
 - `tuple[BaseElement, int]` - any element or component and a status code
@@ -213,7 +213,7 @@ When it comes to handler's return type, you have the following options:
 
 ### Handler Arguments
 
-Here is a list of arguments that your handlers can optionally define (they need to be correctly type annotated):
+Here is a list of arguments that your handlers can optionally define (they need to be correctly type-annotated):
 
 - `<name>: <type>` - if the endpoint accepts path parameters, they can be specified in the handler's arguments
 - `request: Request` - the Ludic's slightly modified `ludic.web.requests.Request` class based on [Starlette's one](https://www.starlette.io/requests/).
@@ -225,7 +225,7 @@ Here is a list of arguments that your handlers can optionally define (they need 
 
 !!! warning "Experimental"
 
-    This module is in an experimental state. It is not clear yet how to make parse and validate form data.
+    This module is in an experimental state. It is not clear yet how to parse and validate form data.
 
 The `ludic.parsers` module contains helpers for parsing `FormData`. The way it works is that You define `Attrs` class with `Annotated` arguments like here:
 
@@ -284,7 +284,7 @@ async def server_error(request: Request, exc: Exception) -> Page: ...
 
 ## Exceptions
 
-The `ludic.web.exceptions` contains a lot of useful exception that can be raised in your views and caught in you custom error handlers:
+The `ludic.web.exceptions` contains a lot of useful exceptions that can be raised in your views and caught in your custom error handlers:
 
 - `ClientError(HTTPException)` - default status code `400`
 - `BadRequestError(ClientError)` - default status code `400`
@@ -303,8 +303,8 @@ The `ludic.web.exceptions` contains a lot of useful exception that can be raised
 
 ## WebSockets
 
-WebSockets support is not yet fully tested in Ludic. However, Starlette has a good support for WebSockets so it should be possible tu use Ludic as well.
+WebSockets support is not yet fully tested in Ludic. However, Starlette has good support for WebSockets so it should be possible to use Ludic as well.
 
 ## Testing
 
-Testing Ludic Web Apps is basically the same as testing Starlette apps which use a `TestClient` class exposing the same interface as `httpx` library. Read more about testing in the [Starlette documentation](https://www.starlette.io/testclient/).
+Testing Ludic Web Apps is the same as testing Starlette apps which use a `TestClient` class exposing the same interface as `httpx` library. Read more about testing in the [Starlette documentation](https://www.starlette.io/testclient/).

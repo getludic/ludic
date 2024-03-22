@@ -1,8 +1,8 @@
 # Getting Started
 
-To show an example how to get started with writing apps using Ludic Framework, here is a bit of an opinionated article where we create almost ready to run web app.
+To show an example of how to get started with writing apps using Ludic Framework, here is a bit of an opinionated article where we create an almost ready to run web app.
 
-First let's say we create a small app with a file structure somewhat similar to this:
+First, let's say we create a small app with a file structure somewhat similar to this:
 
 ```
 your_app
@@ -18,7 +18,7 @@ your_app
    └── ...
 ```
 
-For bigger applications, this structure can look completely differently. If you are just getting started, this is a good starting point.
+For bigger applications, this structure can look completely different. If you are just getting started, this is a good starting point.
 
 Now we explain what each module represents.
 
@@ -52,7 +52,7 @@ class Page(Component[AnyChildren, NoAttrs]):
 
 Notice the `script` element loading the htmx library.
 
-You probably want to modify this page to include other stuff like fonts, favicon and so on. Now you might create a `Header` and `Body` components and use it like this:
+You probably want to modify this page to include other stuff like fonts, favicon, and so on. Now you might create a `Header` and `Body` components and use it like this:
 
 ```python
 Page(
@@ -156,7 +156,7 @@ You can create any components you like and combine them in the `render()` method
 
 ## `attrs.py`
 
-This module can be used to define attributes for your endpoints. Note that it is probably better to keep regular component's attributes close to them, so this module serves for definition of endpoint's attribute only:
+This module can be used to define attributes for your endpoints. Note that it is probably better to keep regular component's attributes close to them, so this module serves for the definition of the endpoint's attribute only:
 
 ```python
 from typing import NotRequired
@@ -178,4 +178,4 @@ Now you are almost ready to run the up with `uvicorn`:
 uvicorn your_app.server:app
 ```
 
-In the next sections of this documentation, you can learn more about how to write components, endpoints, and what kind of other tools there are.
+In the next sections of this documentation, you can learn more about how to write components, and endpoints, and what kinds of other tools there are.

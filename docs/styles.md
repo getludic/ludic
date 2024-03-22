@@ -75,7 +75,7 @@ class Button(ComponentStrict[str, ButtonAttrs]):
     styles = style.load()
     ```
 
-    The `styles` variable now contains renders the following element:
+    The `styles` variable now renders as a `<style>` element with the content similar to this:
 
     ```html
     <style>
@@ -83,7 +83,7 @@ class Button(ComponentStrict[str, ButtonAttrs]):
     </style>
     ```
 
-    You can also pass `styles.load(cache=True)` in order to cache the styles.
+    You can also pass `styles.load(cache=True)` to cache the styles.
 
 2. **Targeted Loading**: For more control, use `style.from_components(...)` to load styles from specific components:
 

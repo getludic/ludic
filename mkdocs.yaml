@@ -1,5 +1,5 @@
 site_name: "Ludic Framework"
-site_description: Lightweight framework for building HTML pages in pure Python.
+site_description: Lightweight framework for building dynamic HTML pages in pure Python.
 site_url: https://ludic.readthedocs.io/
 repo_url: https://github.com/paveldedik/ludic
 
