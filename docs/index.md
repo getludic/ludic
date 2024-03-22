@@ -31,7 +31,7 @@ Python 3.12+
 ## Installation
 
 ```
-pip install ludic[full]
+pip install "ludic[full]"
 ```
 
 As similar for Starlette, you'll also want to install an [ASGI](https://asgi.readthedocs.io/en/latest/) server:
