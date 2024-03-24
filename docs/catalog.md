@@ -327,3 +327,26 @@ class ColumnMeta:
 ```
 
 The `kind` can be a simple text or a `FieldMeta` instance which generates a form field.
+
+## Lazy Loader
+
+The module allows lazy loading data after the component is rendered in the browser. For this component to work, you need to have HTMX script loaded.
+
+```python
+class LazyLoaderAttrs(GlobalAttrs):
+    load_url: str
+    placeholder: NotRequired[AnyChildren]  # default is "Loading..."
+
+
+class LazyLoader(Component[AnyChildren, LazyLoaderAttrs]):
+    @override
+    def render(self) -> div: ...
+```
+
+Here is how you would use the component:
+
+```python
+LazyLoader(load_url="/content-to-load", placeholder=span(...))
+```
+
+The placeholder will be shown while the data is loading.
