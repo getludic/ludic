@@ -7,7 +7,7 @@ The `ludic.catalog` module is meant as a collection of components that could be 
 
 ## Typography
 
-This module contains the following components:
+The module `ludic.catalog.typography` contains the following components:
 
 * `Link`
 * `Paragraph`
@@ -17,9 +17,10 @@ This module contains the following components:
 Definition:
 
 ```python
+# ludic/catalog/typography.py
+
 class LinkAttrs(Attrs):
     to: str
-
 
 class Link(ComponentStrict[PrimitiveChildren, LinkAttrs]):
     def render(self) -> a: ...
@@ -28,6 +29,8 @@ class Link(ComponentStrict[PrimitiveChildren, LinkAttrs]):
 Usage:
 
 ```python
+from ludic.catalog.typography import Link
+
 Link("github", to="https://github.com")
 ```
 
@@ -36,6 +39,8 @@ Link("github", to="https://github.com")
 Definition:
 
 ```python
+# ludic/catalog/typography.py
+
 class Paragraph(Component[AnyChildren, GlobalAttrs]):
     def render(self) -> p: ...
 ```
@@ -43,12 +48,14 @@ class Paragraph(Component[AnyChildren, GlobalAttrs]):
 Usage:
 
 ```python
+from ludic.catalog.typography import Paragraph
+
 Paragraph(f"Hello, {b("World")}!")
 ```
 
 ## Buttons
 
-This module contains the following components:
+The module `ludic.catalog.buttons` contains the following components:
 
 * `Button` - regular button with the `btn` class
 * `ButtonPrimary` - regular button with the `btn btn-primary` class
@@ -59,22 +66,21 @@ This module contains the following components:
 
 ## Navigation
 
-This module contains the following components:
+The module `ludic.catalog.navigation` contains the following components:
 
 * `NavItem`
 * `Navigation`
 
-These components work together:
+These components have the following definition:
 
 ```python
+# ludic/catalog/navigation.py
 
 class NavItemAttrs(GlobalAttrs):
     to: str
 
-
 class NavItem(Component[PrimitiveChildren, NavItemAttrs]):
     def render(self) -> li: ...
-
 
 class Navigation(Component[NavItem, GlobalAttrs]):
     def render(self) -> ul: ...
@@ -83,6 +89,8 @@ class Navigation(Component[NavItem, GlobalAttrs]):
 Here is the usage:
 
 ```python
+from ludic.catalog.navigation import Navigation, NavItem
+
 Navigation(
     NavItem("Home", to="/"),
     NavItem("About", to="/about"),
@@ -104,26 +112,25 @@ This would render as the following HTML tree:
 
 ## Lists
 
-This module contains the following components:
+The module `ludic.catalog.lists` contains the following components:
 
-- `Pairs`
-- `Key`
-- `Value`
+* `Pairs`
+* `Key`
+* `Value`
 
 Here is the definition:
 
 ```python
+# ludic/catalog/lists.py
+
 class Key(Component[PrimitiveChildren, GlobalAttrs]):
     def render(self) -> dt: ...
-
 
 class Value(Component[PrimitiveChildren, GlobalAttrs]):
     def render(self) -> dd: ...
 
-
 class PairsAttrs(GlobalAttrs, total=False):
     items: Iterable[tuple[str, PrimitiveChildren]]
-
 
 class Pairs(Component[Key | Value, PairsAttrs]):
     def render(self) -> dl: ...
@@ -132,6 +139,8 @@ class Pairs(Component[Key | Value, PairsAttrs]):
 There are two possible ways to instantiate these components:
 
 ```python
+from ludic.catalog.lists import Pairs, Key, Value
+
 Pairs(
     Key("Name"),
     Value("John"),
@@ -150,24 +159,23 @@ Pairs(
 
 ## Forms
 
-These components are in an experimental mode. There is the possibility to automatically create form fields from annotations, but it is far from production-ready.
+These components located in `ludic.catalog.forms` are in an experimental mode. There is the possibility to automatically create form fields from annotations, but it is far from production-ready.
 
 Here is the definition:
 
 ```python
+# ludic/catalog/forms.py
+
 class FieldAttrs(Attrs, total=False):
     label: str
     class_div: str
 
-
 class InputFieldAttrs(FieldAttrs, InputAttrs): ...
 class TextAreaFieldAttrs(FieldAttrs, TextAreaAttrs): ...
-
 
 class FormField(Component[TChildren, TAttrs]): ...
 class InputField(FormField[NoChildren, InputFieldAttrs]): ...
 class TextAreaField(FormField[PrimitiveChildren, TextAreaFieldAttrs]): ...
-
 
 class Form(Component[ComplexChildren, FormAttrs]):
     def render(self) -> form: ...
@@ -176,8 +184,11 @@ class Form(Component[ComplexChildren, FormAttrs]):
 Here is how you would use these components:
 
 ```python
+from ludic.catalog.forms import Form, InputField, TextAreaField
+from ludic.catalog.buttons import Button
+
 Form(
-    InputField("John", label="Name", type="input", name="person_name"),
+    InputField(value="John", label="Name", type="input", name="person_name"),
     TextAreaField("...", label="About you", name="person_about"),
     Button("Update", type="submit"),
     hx_get="/people/1",
@@ -209,6 +220,10 @@ Which would render as:
 Here is what you can do:
 
 ```python
+from typing import Annotated
+from ludic.catalog.forms import Form, FieldMeta, create_fields
+from ludic.types import Attrs
+
 class CustomerAttrs(Attrs):
     id: str
     name: Annotated[
@@ -252,26 +267,24 @@ class CustomerAttrs(Attrs):
 
 ## Tables
 
-These components are in an experimental mode. There is the possibility to automatically create tables even containing form fields and actions from annotations, but it is far from production-ready.
+These components located in `ludic.catalog.tables` are in an experimental mode. There is the possibility to automatically create tables even containing form fields and actions from annotations, but it is far from production-ready.
 
 Here is the definition:
 
 ```python
+# ludic/catalog/tables.py
+
 class TableRow(Component[AnyChildren, GlobalAttrs]): ...
     def render(self) -> tr: ...
-
 
 class TableHead(Component[AnyChildren, GlobalAttrs]):
     def render(self) -> tr: ...
 
-
 THead = TypeVar("THead", bound=BaseElement, default=TableHead)
 TRow = TypeVar("TRow", bound=BaseElement, default=TableRow)
 
-
 class TableType(ComponentStrict[THead, *tuple[TRow, ...], GlobalAttrs]): ...
     def render(self) -> table: ...
-
 
 class Table(TableType[TableHead, TableRow]): ...
 ```
@@ -279,6 +292,10 @@ class Table(TableType[TableHead, TableRow]): ...
 This allows the following instantiations:
 
 ```python
+from ludic.catalog.tables import Table, TableHead, TableRow, TableType
+
+from your_app.components import PersonHead, PersonRow
+
 TableType[PersonHead, PersonRow](
     PersonHead("Name", "Age"),
     PersonRow("John", 42),
@@ -301,6 +318,10 @@ Table(
 Here is what you can do:
 
 ```python
+from typing import Annotated
+from ludic.catalog.tables import Table, create_rows
+from ludic.types import Attrs
+
 class PersonAttrs(Attrs):
     id: Annotated[int, ColumnMeta(identifier=True)]
     name: Annotated[str, ColumnMeta(label="Full Name")]
@@ -330,13 +351,18 @@ The `kind` can be a simple text or a `FieldMeta` instance which generates a form
 
 ## Lazy Loader
 
-The module allows lazy loading data after the component is rendered in the browser. For this component to work, you need to have HTMX script loaded.
+The module `ludic.catalog.loaders` contains the following component:
+
+* `LazyLoader`
+
+This component allows lazy loading data after it is rendered in the browser. For this component to work, you need to have HTMX script loaded.
 
 ```python
+# ludic/catalog/loaders.py
+
 class LazyLoaderAttrs(GlobalAttrs):
     load_url: str
     placeholder: NotRequired[AnyChildren]  # default is "Loading..."
-
 
 class LazyLoader(Component[AnyChildren, LazyLoaderAttrs]):
     @override
@@ -346,6 +372,9 @@ class LazyLoader(Component[AnyChildren, LazyLoaderAttrs]):
 Here is how you would use the component:
 
 ```python
+from ludic.catalog.loaders import LazyLoader
+from ludic.html import span
+
 LazyLoader(load_url="/content-to-load", placeholder=span(...))
 ```
 

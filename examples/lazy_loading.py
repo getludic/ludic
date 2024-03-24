@@ -1,7 +1,7 @@
 import asyncio
 
 from examples import Body, Header, Loading, Page, app
-from ludic.catalog.loading import LazyLoader
+from ludic.catalog.loaders import LazyLoader
 from ludic.html import div, svg
 from ludic.types import Safe
 from ludic.web import Request

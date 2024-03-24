@@ -22,7 +22,7 @@ This framework allows HTML generation in Python while utilizing Python's typing 
 **Key Ideas:**
 
 - **Type-Guided HTML**: Catch potential HTML structural errors at development time thanks to type hints. The framework enforces stricter rules than standard HTML, promoting well-structured and maintainable code.
-- **Composable Components**:  Define reusable HTML components in pure Python. This aligns with modern web development practices, emphasizing modularity.
+- **Composable Components**: Define reusable, dynamic HTML components in pure Python. This aligns with modern web development practices, emphasizing modularity.
 
 ### Type-Guided HTML
 
@@ -52,7 +52,7 @@ Table(
 )
 ```
 
-This structure can be type-checked thanks to Python's rich type system.
+This structure can be type-checked thanks to Python's rich type system. Additionally, this `Table` component could have **dynamic properties** like sorting or even modification of data on the server.
 
 ## Quick Example
 
