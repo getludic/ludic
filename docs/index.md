@@ -7,9 +7,48 @@ Ludic is a lightweight framework for building HTML pages with a component approa
 ## Features
 
 - Seamless **&lt;/&gt; htmx** integration for rapid web development in **pure Python**
-- **React**-like component approach with standard Python type-hints
+- **Type-Guided** HTML with **Composable Components** utilizing Python's typing system
 - Uses the power of **Starlette** and **Async** for high-performance web development
 - Build HTML with the ease and power of Python **f-strings**
+
+## Ideals
+
+This framework allows HTML generation in Python while utilizing Python's typing system. Our goal is to enable the creation of dynamic web applications with reusable components, all while offering a greater level of type safety than raw HTML.
+
+**Key Ideas:**
+
+- **Type-Guided HTML**: Catch potential HTML structural errors at development time thanks to type hints. The framework enforces stricter rules than standard HTML, promoting well-structured and maintainable code.
+- **Composable Components**:  Define reusable HTML components in pure Python. This aligns with modern web development practices, emphasizing modularity.
+
+### Type-Guided HTML
+
+Here is an example of how Python's type system can be leveraged to enforce HTML structure:
+
+```python
+br("Hello, World!")        # type error (<br> can't have children)
+br()                       # ok
+
+html(body(...))            # type error (first child must be a <head>)
+html(head(...), body(...)) # ok
+
+div("Test", href="test")   # type error (unknown attribute)
+a("Test", href="...")      # ok
+```
+
+### Composable Components
+
+Instead of using only basic HTML elements, it is possible to create modular components with the support of Python's type system. Let's take a look at an example:
+
+```python
+Table(
+    TableHead("Id", "Name"),
+    TableRow("1", "John"),
+    TableRow("2", "Jane"),
+    TableRow("3", "Bob"),
+)
+```
+
+This structure can be type-checked thanks to Python's rich type system.
 
 ## Example
 
@@ -39,3 +78,7 @@ As similar for Starlette, you'll also want to install an [ASGI](https://asgi.rea
 ```
 pip install uvicorn
 ```
+
+## Contributing
+
+Any contributions to the framework are warmly welcome! Your help will make it a better resource for the community. If you're ready to contribute, read the [contribution guide on GitHub](https://github.com/paveldedik/ludic/tree/master/CONTRIBUTING.md).

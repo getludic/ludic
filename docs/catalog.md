@@ -1,6 +1,6 @@
 # Component Catalog
 
-The `ludic.catalog` module is meant as a collection of components that could be useful for building Ludic applications.
+The `ludic.catalog` module is meant as a collection of components that could be useful for building applications with the Ludic framework.
 
 * Any contributor is welcome to add new components or helpers.
 * It also serves as a showcase of possible implementations.
