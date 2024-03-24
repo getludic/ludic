@@ -9,7 +9,7 @@ Ludic is a lightweight framework for building HTML pages with a component approa
 ## Features
 
 - Seamless **&lt;/&gt; htmx** integration for rapid web development in **pure Python**
-- **Type-Guided** HTML with **Composable Components** utilizing Python's typing system
+- **Type-Guided components** utilizing Python's typing system
 - Uses the power of **Starlette** and **Async** for high-performance web development
 - Build HTML with the ease and power of Python **f-strings**
 
@@ -68,7 +68,7 @@ Similar to Starlette, you'll also want to install an [ASGI](https://asgi.readthe
 pip install uvicorn
 ```
 
-## Example
+## Full Example
 
 **components.py**:
 

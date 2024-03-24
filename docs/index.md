@@ -7,7 +7,7 @@ Ludic is a lightweight framework for building HTML pages with a component approa
 ## Features
 
 - Seamless **&lt;/&gt; htmx** integration for rapid web development in **pure Python**
-- **Type-Guided** HTML with **Composable Components** utilizing Python's typing system
+- **Type-Guided components** utilizing Python's typing system
 - Uses the power of **Starlette** and **Async** for high-performance web development
 - Build HTML with the ease and power of Python **f-strings**
 
@@ -50,7 +50,7 @@ Table(
 
 This structure can be type-checked thanks to Python's rich type system.
 
-## Example
+## Quick Example
 
 ```python
 from ludic.html import b, span
