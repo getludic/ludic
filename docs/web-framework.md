@@ -225,9 +225,9 @@ Here is a list of arguments that your handlers can optionally define (they need 
 
 !!! warning "Experimental"
 
-    This module is in an experimental state. It is not clear yet how to parse and validate form data.
+    This module is in an experimental state. The API may change in the future.
 
-The `ludic.parsers` module contains helpers for parsing `FormData`. The way it works is that You define `Attrs` class with `Annotated` arguments like here:
+The `ludic.parsers` module contains helpers for parsing `FormData`. The way it works is that you define `Attrs` class with `Annotated` arguments like here:
 
 ```python
 class PersonAttrs(Attrs):
@@ -249,7 +249,7 @@ async def update_person(cls, id: str, data: Parser[PersonAttrs]) -> div:
     return div(...)  # return updated user
 ```
 
-The `Parser.validate()` method raises `ludic.parsers.ValidationError` if the request's form data are not valid. If unhandled, this results in `403` status code.
+The `Parser.validate()` uses [typeguard](https://typeguard.readthedocs.io/en/latest/) to validate the form data. If the validation fails, the method raises `ludic.parsers.ValidationError` if the request's form data are not valid. If unhandled, this results in `403` status code.
 
 ## Error Handlers
 
