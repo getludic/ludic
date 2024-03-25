@@ -32,7 +32,7 @@ async def index() -> Page:
 
 @app.endpoint("/people/{id}")
 class PersonRow(Endpoint[PersonAttrs]):
-    onclick_script: JavaScript = JavaScript(
+    on_click_script: JavaScript = JavaScript(
         """
         let editing = document.querySelector('.editing')
 
@@ -74,7 +74,7 @@ class PersonRow(Endpoint[PersonAttrs]):
                 "Edit",
                 hx_get=self.url_for(PersonForm),
                 hx_trigger="edit",
-                onclick=self.onclick_script,
+                on_click=self.on_click_script,
             ),
         )
 
