@@ -9,7 +9,8 @@ from starlette.middleware import Middleware
 from starlette.requests import Request
 from starlette.responses import Response
 from starlette.routing import BaseRoute
-from starlette.types import ExceptionHandler, Lifespan
+from starlette.types import Lifespan
+from starlette.websockets import WebSocket
 
 from ludic.types import BaseElement
 
@@ -47,15 +48,16 @@ class LudicApp(Starlette):
         debug: bool = False,
         routes: Sequence[BaseRoute] | None = None,
         middleware: Sequence[Middleware] | None = None,
-        exception_handlers: Mapping[Any, ExceptionHandler] | None = None,
+        exception_handlers: Mapping[Any, TCallable] | None = None,
         on_startup: Sequence[Callable[[], Any]] | None = None,
         on_shutdown: Sequence[Callable[[], Any]] | None = None,
         lifespan: Lifespan[AppType] | None = None,
     ) -> None:
-        exception_handlers = exception_handlers or {}
-        super().__init__(
-            debug, middleware=middleware, exception_handlers=exception_handlers
-        )
+        super().__init__(debug, middleware=middleware)
+
+        for key, value in (exception_handlers or {}).items():
+            self.add_exception_handler(key, value)
+
         self.router = Router(
             routes, on_startup=on_startup, on_shutdown=on_shutdown, lifespan=lifespan
         )
@@ -158,6 +160,54 @@ class LudicApp(Starlette):
         """
         return self.router.url_path_for(name, **path_params)
 
+    def add_exception_handler(
+        self,
+        exc_class_or_status_code: int | type[Exception],
+        handler: TCallable,
+    ) -> None:
+        """Add an exception handler to the application.
+
+        Example:
+
+            async def not_found(request: Request, exc: HTTPException):
+                return Page(
+                    Header("Page Could Not Be Found"),
+                    Body(f"Here is the reason: {exc.detail}")
+                )
+
+            app.add_exception_handler(404, not_found)
+
+        Args:
+            exc_class_or_status_code: The exception class or status code.
+            handler: The exception handler function.
+        """
+
+        @wraps(handler)
+        async def wrapped_handler(
+            request: Request | WebSocket, exc: Exception
+        ) -> Response:
+            parameters = inspect.signature(handler).parameters
+            handler_kw: dict[str, Any] = {}
+            is_async = is_async_callable(handler)
+
+            for name, param in parameters.items():
+                if issubclass(param.annotation, Exception):
+                    handler_kw[name] = exc
+                elif issubclass(param.annotation, Request):
+                    handler_kw[name] = request
+
+            if is_async:
+                with BaseElement.formatter:
+                    response = await handler(**handler_kw)
+            else:
+                response = await run_in_threadpool_safe(handler, **handler_kw)
+
+            if isinstance(response, BaseElement):
+                return LudicResponse(response, getattr(exc, "status_code", 500))
+            return cast(Response, response)
+
+        self.exception_handlers[exc_class_or_status_code] = wrapped_handler
+
     def exception_handler(
         self, exc_class_or_status_code: int | type[Exception]
     ) -> Callable[[TCallable], TCallable]:
@@ -174,29 +224,7 @@ class LudicApp(Starlette):
         """
 
         def decorator(handler: TCallable) -> TCallable:
-            @wraps(handler)
-            async def wrapper(request: Request, exc: Exception) -> Response:
-                parameters = inspect.signature(handler).parameters
-                handler_kw: dict[str, Any] = {}
-                is_async = is_async_callable(handler)
-
-                for name, param in parameters.items():
-                    if issubclass(param.annotation, Exception):
-                        handler_kw[name] = exc
-                    elif issubclass(param.annotation, Request):
-                        handler_kw[name] = request
-
-                if is_async:
-                    with BaseElement.formatter:
-                        response = await handler(**handler_kw)
-                else:
-                    response = await run_in_threadpool_safe(handler, **handler_kw)
-
-                if isinstance(response, BaseElement):
-                    return LudicResponse(response, getattr(exc, "status_code", 500))
-                return cast(Response, response)
-
-            self.add_exception_handler(exc_class_or_status_code, wrapper)
+            self.add_exception_handler(exc_class_or_status_code, handler)
             return handler
 
         return decorator
