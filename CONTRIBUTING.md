@@ -1,6 +1,6 @@
 ## Contributing
 
-Any contributions to the framework are warmly welcome! Your help will make it a better resource for the community. If you're ready to contribute, here's how to get started:
+Any contributions to the framework are warmly welcome! Your help will make it a better resource for the community. If you're ready to contribute, here's how to get started.
 
 ### Set Up Pre-Commit Hooks
 

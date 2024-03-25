@@ -15,6 +15,7 @@ from starlette.responses import (
     Response,
     StreamingResponse,
 )
+from starlette.websockets import WebSocket
 
 from ludic.types import BaseElement
 from ludic.web import datastructures as ds
@@ -107,7 +108,7 @@ async def prepare_response(
 
 async def extract_from_request(
     handler: Callable[..., Any],
-    request: Request,
+    request: Request | WebSocket,
 ) -> dict[str, Any]:
     """Extracts parameters for given handler from the request.
 
@@ -122,7 +123,10 @@ async def extract_from_request(
         handler_kwargs.update(request.path_params)
 
     for name, param in parameters.items():
-        if (origin := get_origin(param.annotation)) is not None and issubclass(
+        if isinstance(request, WebSocket):
+            if issubclass(param.annotation, WebSocket):
+                handler_kwargs[name] = request
+        elif (origin := get_origin(param.annotation)) is not None and issubclass(
             origin, BaseParser
         ):
             async with request.form() as form:
@@ -130,10 +134,10 @@ async def extract_from_request(
         elif issubclass(param.annotation, FormData):
             async with request.form() as form:
                 handler_kwargs[name] = form
-        elif issubclass(param.annotation, QueryParams):
-            handler_kwargs[name] = request.query_params
         elif issubclass(param.annotation, Request):
             handler_kwargs[name] = request
+        elif issubclass(param.annotation, QueryParams):
+            handler_kwargs[name] = request.query_params
         elif issubclass(param.annotation, Headers):
             handler_kwargs[name] = request.headers
 
