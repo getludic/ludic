@@ -93,78 +93,78 @@ class HtmxAttrs(Attrs, total=False):
 class WindowEventAttrs(Attrs, total=False):
     """Event Attributes for HTML elements."""
 
-    onafterprint: str
-    onbeforeprint: str
-    onbeforeunload: str
-    onerror: str
-    onhashchange: str
-    onload: str
-    onmessage: str
-    onoffline: str
-    ononline: str
-    onpagehide: str
-    onpageshow: str
-    onpopstate: str
-    onresize: str
-    onstorage: str
-    onunhandledrejection: str
-    onunload: str
+    on_afterprint: Annotated[str, Alias("onafterprint")]
+    on_beforeprint: Annotated[str, Alias("onbeforeprint")]
+    on_beforeunload: Annotated[str, Alias("onbeforeunload")]
+    on_error: Annotated[str, Alias("onerror")]
+    on_hashchange: Annotated[str, Alias("onhashchange")]
+    on_load: Annotated[str, Alias("onload")]
+    on_message: Annotated[str, Alias("onmessage")]
+    on_offline: Annotated[str, Alias("onoffline")]
+    on_online: Annotated[str, Alias("ononline")]
+    on_pagehide: Annotated[str, Alias("onpagehide")]
+    on_pageshow: Annotated[str, Alias("onpageshow")]
+    on_popstate: Annotated[str, Alias("onpopstate")]
+    on_resize: Annotated[str, Alias("onresize")]
+    on_storage: Annotated[str, Alias("onstorage")]
+    on_unhandledrejection: Annotated[str, Alias("onunhandledrejection")]
+    on_unload: Annotated[str, Alias("onunload")]
 
 
 class FormEventAttrs(Attrs, total=False):
     """Event Attributes for HTML Form elements."""
 
-    onblur: str
-    onchange: str
-    oncontextmenu: str
-    onfocus: str
-    oninput: str
-    oninvalid: str
-    onreset: str
-    onsearch: str
-    onselect: str
-    onsubmit: str
+    on_blur: Annotated[str, Alias("onblur")]
+    on_change: Annotated[str, Alias("onchange")]
+    on_contextmenu: Annotated[str, Alias("oncontextmenu")]
+    on_focus: Annotated[str, Alias("onfocus")]
+    on_input: Annotated[str, Alias("oninput")]
+    on_invalid: Annotated[str, Alias("oninvalid")]
+    on_reset: Annotated[str, Alias("onreset")]
+    on_search: Annotated[str, Alias("onsearch")]
+    on_select: Annotated[str, Alias("onselect")]
+    on_submit: Annotated[str, Alias("onsubmit")]
 
 
 class KeyboardEventAttrs(Attrs, total=False):
     """Event Attributes for Keyboard events."""
 
-    onkeydown: str
-    onkeypress: str
-    onkeyup: str
+    on_keydown: Annotated[str, Alias("onkeydown")]
+    on_keypress: Annotated[str, Alias("onkeypress")]
+    on_keyup: Annotated[str, Alias("onkeyup")]
 
 
 class MouseEventAttrs(Attrs, total=False):
     """Event Attributes for Mouse events."""
 
-    onclick: str
-    ondblclick: str
-    onmousedown: str
-    onmousemove: str
-    onmouseout: str
-    onmouseover: str
-    onmouseup: str
-    onwheel: str
+    on_click: Annotated[str, Alias("onclick")]
+    on_dblclick: Annotated[str, Alias("ondblclick")]
+    on_mousedown: Annotated[str, Alias("onmousedown")]
+    on_mousemove: Annotated[str, Alias("onmousemove")]
+    on_mouseout: Annotated[str, Alias("onmouseout")]
+    on_mouseover: Annotated[str, Alias("onmouseover")]
+    on_mouseup: Annotated[str, Alias("onmouseup")]
+    on_wheel: Annotated[str, Alias("onwheel")]
 
 
 class DragEventAttrs(Attrs, total=False):
     """Event Attributes for Drag events."""
 
-    ondrag: str
-    ondragend: str
-    ondragenter: str
-    ondragleave: str
-    ondragover: str
-    ondragstart: str
-    ondrop: str
+    on_drag: Annotated[str, Alias("ondrag")]
+    on_dragend: Annotated[str, Alias("ondragend")]
+    on_dragenter: Annotated[str, Alias("ondragenter")]
+    on_dragleave: Annotated[str, Alias("ondragleave")]
+    on_dragover: Annotated[str, Alias("ondragover")]
+    on_dragstart: Annotated[str, Alias("ondragstart")]
+    on_drop: Annotated[str, Alias("ondrop")]
 
 
 class ClipboardEventAttrs(Attrs, total=False):
     """Event Attributes for Clipboard events."""
 
-    oncopy: str
-    oncut: str
-    onpaste: str
+    on_copy: Annotated[str, Alias("oncopy")]
+    on_cut: Annotated[str, Alias("oncut")]
+    on_paste: Annotated[str, Alias("onpaste")]
 
 
 class EventAttrs(
