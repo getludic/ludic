@@ -144,12 +144,21 @@ class Page(Component[AnyChildren, NoAttrs]):
             "border": "1px solid #ddd",
             "border-radius": "4px",
             "cursor": "pointer",
+            "font-size": "1em",
             "transition": "background-color 0.3s ease",
+        },
+        "button.btn:hover": {
+            "background-color": "#bbb",
+            "border-color": "#bbb",
         },
         "button.btn-primary": {
             "background-color": "#2196f3",
             "border-color": "#2196f3",
             "color": "#fff",
+        },
+        "button.btn-primary:hover": {
+            "background-color": "#0961a9",
+            "border-color": "#0961a9",
         },
         "dl": {
             "margin-top": "20px",
@@ -224,7 +233,6 @@ class Description(ComponentStrict[str, DescriptionAttrs]):
                 "padding": "15px",
             },
             "blockquote p": {
-                "font-style": "italic",
                 "font-size": "1.1em",
                 "margin-bottom": "10px",
             },

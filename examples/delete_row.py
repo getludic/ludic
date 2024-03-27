@@ -1,6 +1,6 @@
 from typing import Self, override
 
-from examples import Body, Header, Page, app, init_db
+from examples import Body, Description, Header, Page, app, init_db
 from ludic.catalog.buttons import ButtonDanger
 from ludic.catalog.tables import TableHead, TableRow
 from ludic.html import table, tbody, thead
@@ -26,7 +26,14 @@ class PeopleAttrs(Attrs):
 def index() -> Page:
     return Page(
         Header("Delete Row"),
-        Body(PeopleTable.get()),
+        Body(
+            Description(
+                "This example shows how to implement a delete button that removes "
+                "a table row upon completion.",
+                source_url="https://htmx.org/examples/delete-row/",
+            ),
+            PeopleTable.get(),
+        ),
     )
 
 

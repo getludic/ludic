@@ -1,6 +1,6 @@
 from typing import Annotated, Self, override
 
-from examples import Body, Header, Page, app, init_db
+from examples import Body, Description, Header, Page, app, init_db
 from ludic.catalog.buttons import ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form
 from ludic.catalog.tables import ColumnMeta, Table, create_rows
@@ -50,7 +50,14 @@ class Toast(span):
 async def index() -> Page:
     return Page(
         Header("Bulk Update"),
-        Body(await PeopleTable.get()),
+        Body(
+            Description(
+                "This demo shows how to implement a common pattern where rows are "
+                "selected and then bulk updated.",
+                source_url="https://htmx.org/examples/bulk-update/",
+            ),
+            await PeopleTable.get(),
+        ),
     )
 
 
