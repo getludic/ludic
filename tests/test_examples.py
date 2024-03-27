@@ -100,3 +100,14 @@ def test_lazy_loading() -> None:
         assert b"Content Loaded" in response.content
 
     app.routes.clear()
+
+
+def test_infinite_scroll() -> None:
+    import examples.infinite_scroll as _  # noqa
+
+    with TestClient(app) as client:
+        assert client.get("/").status_code == 200
+        assert client.get("/contacts/").status_code == 200
+        assert client.get("/contacts/?page=2").status_code == 200
+
+    app.routes.clear()

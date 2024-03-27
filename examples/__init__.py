@@ -3,17 +3,21 @@ from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass
 from typing import Any, override
 
-from ludic.attrs import NoAttrs
+from ludic.attrs import Attrs, NoAttrs
 from ludic.catalog.typography import Paragraph
 from ludic.html import (
+    a,
+    blockquote,
     body,
     div,
+    footer,
     h1,
     head,
     header,
     html,
     main,
     meta,
+    p,
     script,
     style,
     title,
@@ -202,6 +206,52 @@ class Body(Component[AnyChildren, NoAttrs]):
     @override
     def render(self) -> div:
         return div(*self.children)
+
+
+class DescriptionAttrs(Attrs):
+    source_url: str
+
+
+class Description(ComponentStrict[str, DescriptionAttrs]):
+    styles = {
+        ".description": {
+            "margin-bottom": "40px",  # type: ignore
+            "blockquote": {
+                "background-color": "#f9f9f9",
+                "border-left": "8px solid #f1f1f1",
+                "margin": "0",
+                "margin-bottom": "20px",
+                "padding": "15px",
+            },
+            "blockquote p": {
+                "font-style": "italic",
+                "font-size": "1.1em",
+                "margin-bottom": "10px",
+            },
+            "footer": {
+                "font-size": "1.25em",
+                "margin-top": "10px",
+                "color": "#666",
+            },
+            "footer a": {
+                "text-decoration": "none",
+                "color": "#333",
+            },
+            "footer a:hover": {
+                "text-decoration": "underline",
+            },
+        }
+    }
+
+    @override
+    def render(self) -> div:
+        return div(
+            blockquote(*map(p, self.children[0].split("\n"))),
+            footer(
+                "Source: ", a(self.attrs["source_url"], href=self.attrs["source_url"])
+            ),
+            class_="description",
+        )
 
 
 class Loading(Component[AnyChildren, NoAttrs]):
