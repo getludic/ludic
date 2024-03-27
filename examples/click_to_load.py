@@ -1,6 +1,6 @@
 from typing import Self, override
 
-from examples import Body, Header, Page, app
+from examples import Body, Description, Header, Page, app
 from ludic.attrs import ButtonAttrs
 from ludic.catalog.buttons import ButtonPrimary
 from ludic.catalog.tables import Table, TableHead, TableRow
@@ -64,7 +64,14 @@ async def index() -> Page:
     slice = await ContactsSlice.get(QueryParams(page=1))
     return Page(
         Header("Click To Edit"),
-        Body(ContactsTable(*slice.render().children)),
+        Body(
+            Description(
+                "This example shows how to implement click-to-load the next page in "
+                "a table of data.",
+                source_url="https://htmx.org/examples/click-to-load/",
+            ),
+            ContactsTable(*slice.render().children),
+        ),
     )
 
 

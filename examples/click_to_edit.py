@@ -1,6 +1,6 @@
 from typing import Annotated, NotRequired, Self, override
 
-from examples import Body, Header, Page, app, init_db
+from examples import Body, Description, Header, Page, app, init_db
 from ludic.catalog.buttons import ButtonDanger, ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form, create_fields
 from ludic.catalog.lists import Pairs
@@ -32,7 +32,14 @@ class ContactAttrs(Attrs):
 async def index() -> Page:
     return Page(
         Header("Click To Edit"),
-        Body(*[Contact(**contact.dict()) for contact in db.contacts.values()]),
+        Body(
+            Description(
+                "The click to edit pattern provides a way to offer inline editing "
+                "of all or part of a record without a page refresh.",
+                source_url="https://htmx.org/examples/click-to-edit/",
+            ),
+            *[Contact(**contact.dict()) for contact in db.contacts.values()],
+        ),
     )
 
 

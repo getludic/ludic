@@ -1,6 +1,6 @@
 from typing import Annotated, NotRequired, Self, override
 
-from examples import Body, Header, Page, app, init_db
+from examples import Body, Description, Header, Page, app, init_db
 from ludic.catalog.buttons import ButtonPrimary, ButtonSecondary
 from ludic.catalog.tables import ColumnMeta, TableHead, TableRow
 from ludic.html import div, input, table, tbody, thead
@@ -26,7 +26,13 @@ class PeopleAttrs(Attrs):
 async def index() -> Page:
     return Page(
         Header("Edit Row"),
-        Body(await PeopleTable.get()),
+        Body(
+            Description(
+                "This example shows how to implement editable rows.",
+                source_url="https://htmx.org/examples/edit-row/",
+            ),
+            await PeopleTable.get(),
+        ),
     )
 
 
