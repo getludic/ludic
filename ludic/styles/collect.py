@@ -1,11 +1,13 @@
-from collections.abc import Mapping
-from typing import Any
+from collections.abc import Mapping, MutableMapping
+from typing import TYPE_CHECKING, Any
 
-from ludic.base import ELEMENT_REGISTRY
-from ludic.css import CSSProperties
-from ludic.types import BaseElement, GlobalStyles
+from .themes import Theme, get_default_theme
+from .types import CSSProperties, GlobalStyles
 
-GLOBAL_STYLES_CACHE: GlobalStyles = {}
+if TYPE_CHECKING:
+    from ludic.types import BaseElement
+
+GLOBAL_STYLES_CACHE: MutableMapping[str, GlobalStyles] = {}
 
 
 def format_styles(styles: GlobalStyles, separator: str = "\n") -> str:
@@ -38,7 +40,9 @@ def format_styles(styles: GlobalStyles, separator: str = "\n") -> str:
     return separator.join(result)
 
 
-def collect_from_components(*components: type[BaseElement]) -> GlobalStyles:
+def from_components(
+    *components: type["BaseElement"], theme: Theme | None = None
+) -> GlobalStyles:
     """Global styles collector from given components.
 
     Example usage:
@@ -46,7 +50,7 @@ def collect_from_components(*components: type[BaseElement]) -> GlobalStyles:
         class Page(Component[AnyChildren, NoAttrs]):
 
             @override
-            def render(self) -> BaseElement:
+            def render(self) -> html:
                 return html(
                     head(
                         title("An example Example"),
@@ -60,18 +64,25 @@ def collect_from_components(*components: type[BaseElement]) -> GlobalStyles:
     This would render an HTML page containing the ``<style>`` element
     with the styles the given components.
     """
-    styles: dict[str, CSSProperties | GlobalStyles] = {}
+    all_styles: dict[str, CSSProperties | GlobalStyles] = {}
+    theme = theme or get_default_theme()
+
     for component in components:
-        if not component.styles:
+        styles = getattr(component, "styles", {})
+
+        if not isinstance(styles, Mapping):
             continue
+        elif hasattr(styles, "theme"):
+            styles.theme = theme
 
-        for key, value in component.styles.items():
+        for key, value in styles.items():
             if isinstance(value, Mapping):
-                styles[key] = value
-    return styles
+                all_styles[key] = value
+
+    return all_styles
 
 
-def collect_from_loaded(cache: bool = False) -> GlobalStyles:
+def from_loaded(cache: bool = False, theme: Theme | None = None) -> GlobalStyles:
     """Global styles collector from loaded components.
 
     Args:
@@ -80,18 +91,16 @@ def collect_from_loaded(cache: bool = False) -> GlobalStyles:
     Returns:
         GlobalStyles: Collected styles from loaded components.
     """
+    from ludic.base import ELEMENT_REGISTRY
+
     global GLOBAL_STYLES_CACHE
+    theme = theme or get_default_theme()
 
-    if cache and GLOBAL_STYLES_CACHE:
-        return GLOBAL_STYLES_CACHE
+    if cache and GLOBAL_STYLES_CACHE.get(theme.name):
+        return GLOBAL_STYLES_CACHE[theme.name]
 
-    loaded = (
-        element
-        for elements in ELEMENT_REGISTRY.values()
-        for element in elements
-        if element.styles
-    )
-    result = collect_from_components(*loaded)
+    loaded = (element for elements in ELEMENT_REGISTRY.values() for element in elements)
+    result = from_components(*loaded, theme=theme)
     if cache:
-        GLOBAL_STYLES_CACHE = result
+        GLOBAL_STYLES_CACHE[theme.name] = result
     return result

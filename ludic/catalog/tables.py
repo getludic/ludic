@@ -7,7 +7,7 @@ from typing import Any, Literal, cast, get_type_hints, override
 from typing_extensions import TypeVar
 
 from ludic.attrs import GlobalAttrs
-from ludic.html import table, tbody, td, th, thead, tr
+from ludic.html import style, table, tbody, td, th, thead, tr
 from ludic.types import (
     AnyChildren,
     BaseElement,
@@ -99,27 +99,15 @@ THead = TypeVar("THead", bound=BaseElement, default=TableHead)
 TRow = TypeVar("TRow", bound=BaseElement, default=TableRow)
 
 
-class TableType(ComponentStrict[THead, *tuple[TRow, ...], GlobalAttrs]):
+class TableAttrs(GlobalAttrs):
+    head_attrs: GlobalAttrs
+    body_attrs: GlobalAttrs
+
+
+class Table(ComponentStrict[THead, *tuple[TRow, ...], TableAttrs]):
     """A component rendering as the HTML ``table`` element.
 
-    The component allows specifying the table head and rows types:
-
-        TableType[PersonHead, PersonRow](
-            PersonHead("Name", "Age"),
-            PersonRow("John", 42),
-            PersonRow("Jane", 23),
-        )
-    """
-
-    @override
-    def render(self) -> table:
-        return table(thead(self.children[0]), tbody(*self.children[1:]), **self.attrs)
-
-
-class Table(TableType[TableHead, TableRow]):
-    """A component rendering as the HTML ``table`` element.
-
-    The component only allows :class:`TableHead` and :class:`TableRow` types.
+    The component allows :class:`TableHead` and :class:`TableRow` types by default.
 
     Example:
 
@@ -128,11 +116,44 @@ class Table(TableType[TableHead, TableRow]):
             TableRow("John", 42),
             TableRow("Jane", 23),
         )
+
+    You can also specify different types of header and body:
+
+        Table[PersonHead, PersonRow](
+            PersonHead("Name", "Age"),
+            PersonRow("John", 42),
+        )
     """
+
+    classes = ["table"]
+    styles = style.use(
+        lambda theme: {
+            "table.table": {
+                "width": "100%",  # type: ignore
+                "border-collapse": "collapse",  # type: ignore
+                "th": {
+                    "border": f"1px solid {theme.colors.light.darken(0.2)}",
+                    "padding": "12px",
+                },
+                "td": {
+                    "border": f"1px solid {theme.colors.light.darken(0.2)}",
+                    "padding": "12px",
+                },
+                "thead": {
+                    "background-color": theme.colors.light,
+                },
+                "button.btn": {
+                    "margin": "0 5px",
+                },
+            }
+        }
+    )
 
     @property
     def header(self) -> tuple[PrimitiveChildren, ...]:
-        return self.children[0].header
+        if isinstance(self.children[0], TableHead):
+            return self.children[0].header
+        return ()
 
     def getlist(self, key: str) -> list[PrimitiveChildren | None]:
         result: list[PrimitiveChildren | None] = []
@@ -147,6 +168,14 @@ class Table(TableType[TableHead, TableRow]):
                     result.append(value)
 
         return result
+
+    @override
+    def render(self) -> table:
+        return table(
+            thead(self.children[0], **self.attrs.get("head_attrs", {})),
+            tbody(*self.children[1:], **self.attrs.get("body_attrs", {})),
+            **self.attrs_for(table),
+        )
 
 
 def create_rows(

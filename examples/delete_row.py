@@ -1,10 +1,10 @@
 from typing import Self, override
 
-from examples import Body, Description, Header, Page, app, init_db
+from examples import Body, Header, Page, app, init_db
+from ludic.attrs import Attrs, HtmxAttrs
 from ludic.catalog.buttons import ButtonDanger
-from ludic.catalog.tables import TableHead, TableRow
-from ludic.html import table, tbody, thead
-from ludic.types import Attrs
+from ludic.catalog.quotes import Quote
+from ludic.catalog.tables import Table, TableHead, TableRow
 from ludic.web.endpoints import Endpoint
 from ludic.web.exceptions import NotFoundError
 
@@ -27,7 +27,7 @@ def index() -> Page:
     return Page(
         Header("Delete Row"),
         Body(
-            Description(
+            Quote(
                 "This example shows how to implement a delete button that removes "
                 "a table row upon completion.",
                 source_url="https://htmx.org/examples/delete-row/",
@@ -62,7 +62,7 @@ class PeopleTable(Endpoint[PeopleAttrs]):
         "tr.htmx-swapping td": {
             "opacity": "0",
             "transition": "opacity 1s ease-out",
-        },
+        }
     }
 
     @classmethod
@@ -70,11 +70,11 @@ class PeopleTable(Endpoint[PeopleAttrs]):
         return cls(people=[person.dict() for person in db.people.values()])
 
     @override
-    def render(self) -> table:
-        return table(
-            thead(TableHead("Name", "Email", "Active", "")),
-            tbody(
-                *(PersonRow(**person) for person in self.attrs["people"]),
+    def render(self) -> Table[TableHead, PersonRow]:
+        return Table[TableHead, PersonRow](
+            TableHead("Name", "Email", "Active", ""),
+            *(PersonRow(**person) for person in self.attrs["people"]),
+            body_attrs=HtmxAttrs(
                 hx_confirm="Are you sure?",
                 hx_target="closest tr",
                 hx_swap="outerHTML swap:1s",

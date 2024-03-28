@@ -110,9 +110,9 @@ This would render as the following HTML tree:
 </ul>
 ```
 
-## Lists
+## Items
 
-The module `ludic.catalog.lists` contains the following components:
+The module `ludic.catalog.items` contains the following components:
 
 * `Pairs`
 * `Key`
@@ -121,7 +121,7 @@ The module `ludic.catalog.lists` contains the following components:
 Here is the definition:
 
 ```python
-# ludic/catalog/lists.py
+# ludic/catalog/items.py
 
 class Key(Component[PrimitiveChildren, GlobalAttrs]):
     def render(self) -> dt: ...
@@ -139,7 +139,7 @@ class Pairs(Component[Key | Value, PairsAttrs]):
 There are two possible ways to instantiate these components:
 
 ```python
-from ludic.catalog.lists import Pairs, Key, Value
+from ludic.catalog.items import Pairs, Key, Value
 
 Pairs(
     Key("Name"),
@@ -283,29 +283,33 @@ class TableHead(Component[AnyChildren, GlobalAttrs]):
 THead = TypeVar("THead", bound=BaseElement, default=TableHead)
 TRow = TypeVar("TRow", bound=BaseElement, default=TableRow)
 
-class TableType(ComponentStrict[THead, *tuple[TRow, ...], GlobalAttrs]): ...
+class Table(ComponentStrict[THead, *tuple[TRow, ...], GlobalAttrs]): ...
     def render(self) -> table: ...
-
-class Table(TableType[TableHead, TableRow]): ...
 ```
 
 This allows the following instantiations:
 
 ```python
-from ludic.catalog.tables import Table, TableHead, TableRow, TableType
-
-from your_app.components import PersonHead, PersonRow
-
-TableType[PersonHead, PersonRow](
-    PersonHead("Name", "Age"),
-    PersonRow("John", 42),
-    PersonRow("Jane", 23),
-)
+from ludic.catalog.tables import Table, TableHead, TableRow
 
 Table(
     TableHead("Name", "Age"),
     TableRow("John", 42),
     TableRow("Jane", 23),
+)
+```
+
+You can also specify different types of header and body:
+
+```python
+from ludic.catalog.tables import Table
+
+from your_app.components import PersonHead, PersonRow
+
+Table[PersonHead, PersonRow](
+    PersonHead("Name", "Age"),
+    PersonRow("John", 42),
+    PersonRow("Jane", 23),
 )
 ```
 

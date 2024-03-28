@@ -108,7 +108,7 @@ def test_styles_with_at_rule() -> None:
 
 def test_styles_collection() -> None:
     assert style.from_components(A, B).to_html() == (
-        "<style>\n"
+        '<style type="text/css">\n'
         "a { color: red; }\n"
         ".content { background: #ffe; padding: 10px; }\n"
         ".content > p { color: blue; font-size: 20px; }\n"

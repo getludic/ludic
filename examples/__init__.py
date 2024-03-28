@@ -3,21 +3,17 @@ from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass
 from typing import Any, override
 
-from ludic.attrs import Attrs, NoAttrs
+from ludic.attrs import NoAttrs
 from ludic.catalog.typography import Paragraph
 from ludic.html import (
-    a,
-    blockquote,
     body,
     div,
-    footer,
     h1,
     head,
     header,
     html,
     main,
     meta,
-    p,
     script,
     style,
     title,
@@ -114,77 +110,6 @@ class Page(Component[AnyChildren, NoAttrs]):
             "max-width": "800px",
             "padding": "20px",
         },
-        "header": {
-            "text-align": "center",
-        },
-        "h1": {
-            "font-size": "3.5em",
-            "line-height": "1.2",
-            "margin-bottom": "35px",
-        },
-        "table": {
-            "width": "100%",
-            "border-collapse": "collapse",
-        },
-        "th": {
-            "border": "1px solid #ddd",
-            "padding": "12px",
-        },
-        "td": {
-            "border": "1px solid #ddd",
-            "padding": "12px",
-        },
-        "thead": {
-            "background-color": "#f5f5f5",
-        },
-        "button.btn": {
-            "margin": "10px 5px",
-            "padding": "10px 20px",
-            "background-color": "#f5f5f5",
-            "border": "1px solid #ddd",
-            "border-radius": "4px",
-            "cursor": "pointer",
-            "font-size": "1em",
-            "transition": "background-color 0.3s ease",
-        },
-        "button.btn:hover": {
-            "background-color": "#bbb",
-            "border-color": "#bbb",
-        },
-        "button.btn-primary": {
-            "background-color": "#2196f3",
-            "border-color": "#2196f3",
-            "color": "#fff",
-        },
-        "button.btn-primary:hover": {
-            "background-color": "#0961a9",
-            "border-color": "#0961a9",
-        },
-        "dl": {
-            "margin-top": "20px",
-            "margin-bottom": "20px",
-        },
-        "dt": {
-            "font-weight": "bold",
-            "margin-bottom": "5px",
-        },
-        "dd": {
-            "margin-left": "20px",
-            "margin-bottom": "10px",
-        },
-        "label": {
-            "display": "block",
-            "margin-top": "10px",
-            "margin-bottom": "10px",
-            "font-weight": "bold",
-        },
-        "input": {
-            "width": "100%",
-            "padding": "10px",
-            "border": "1px solid #ddd",
-            "border-radius": "4px",
-            "box-sizing": "border-box",
-        },
     }
 
     @override
@@ -204,6 +129,20 @@ class Page(Component[AnyChildren, NoAttrs]):
 
 
 class Header(ComponentStrict[PrimitiveChildren, NoAttrs]):
+    styles = style.use(
+        lambda theme: {
+            "header": {
+                "text-align": "center",
+            },
+            "header h1": {
+                "font-size": "3.5em",
+                "line-height": "1.2",
+                "margin-bottom": "35px",
+                "font-family": theme.fonts.families.headers,
+            },
+        }
+    )
+
     @override
     def render(self) -> header:
         return header(
@@ -215,121 +154,6 @@ class Body(Component[AnyChildren, NoAttrs]):
     @override
     def render(self) -> div:
         return div(*self.children)
-
-
-class DescriptionAttrs(Attrs):
-    source_url: str
-
-
-class Description(ComponentStrict[str, DescriptionAttrs]):
-    styles = {
-        ".description": {
-            "margin-bottom": "40px",  # type: ignore
-            "blockquote": {
-                "background-color": "#f9f9f9",
-                "border-left": "8px solid #f1f1f1",
-                "margin": "0",
-                "margin-bottom": "20px",
-                "padding": "15px",
-            },
-            "blockquote p": {
-                "font-size": "1.1em",
-                "margin-bottom": "10px",
-            },
-            "footer": {
-                "font-size": "1.25em",
-                "margin-top": "10px",
-                "color": "#666",
-            },
-            "footer a": {
-                "text-decoration": "none",
-                "color": "#333",
-            },
-            "footer a:hover": {
-                "text-decoration": "underline",
-            },
-        }
-    }
-
-    @override
-    def render(self) -> div:
-        return div(
-            blockquote(*map(p, self.children[0].split("\n"))),
-            footer(
-                "Source: ", a(self.attrs["source_url"], href=self.attrs["source_url"])
-            ),
-            class_="description",
-        )
-
-
-class Loading(Component[AnyChildren, NoAttrs]):
-    styles = {
-        ".loader": {
-            "text-align": "center",
-        },
-        ".lds-ellipsis": {
-            "display": "inline-block",
-            "position": "relative",
-            "width": "80px",
-            "height": "80px",
-        },
-        ".lds-ellipsis div": {
-            "position": "absolute",
-            "top": "33px",
-            "width": "13px",
-            "height": "13px",
-            "border-radius": "50%",
-            "background": "#555",
-            "animation-timing-function": "cubic-bezier(0, 1, 1, 0)",
-        },
-        ".lds-ellipsis div:nth-child(1)": {
-            "left": "8px",
-            "animation": "lds-ellipsis1 0.6s infinite",
-        },
-        ".lds-ellipsis div:nth-child(2)": {
-            "left": "8px",
-            "animation": "lds-ellipsis2 0.6s infinite",
-        },
-        ".lds-ellipsis div:nth-child(3)": {
-            "left": "32px",
-            "animation": "lds-ellipsis2 0.6s infinite",
-        },
-        ".lds-ellipsis div:nth-child(4)": {
-            "left": "56px",
-            "animation": "lds-ellipsis3 0.6s infinite",
-        },
-        "@keyframes lds-ellipsis1": {
-            "0%": {
-                "transform": "scale(0)",
-            },
-            "100%": {
-                "transform": "scale(1)",
-            },
-        },
-        "@keyframes lds-ellipsis3": {
-            "0%": {
-                "transform": "scale(1)",
-            },
-            "100%": {
-                "transform": "scale(0)",
-            },
-        },
-        "@keyframes lds-ellipsis2": {
-            "0%": {
-                "transform": "translate(0, 0)",
-            },
-            "100%": {
-                "transform": "translate(24px, 0)",
-            },
-        },
-    }
-
-    @override
-    def render(self) -> div:
-        return div(
-            div(div(""), div(""), div(""), div(""), class_="lds-ellipsis"),
-            class_="loader",
-        )
 
 
 @asynccontextmanager

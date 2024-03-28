@@ -1,3 +1,4 @@
+from collections.abc import Callable, Iterator
 from typing import Self, Unpack, override
 
 from .attrs import (
@@ -50,11 +51,18 @@ from .attrs import (
     TrackAttrs,
     VideoAttrs,
 )
-from .styles import collect_from_components, collect_from_loaded, format_styles
+from .styles import (
+    Theme,
+    format_styles,
+    from_components,
+    from_loaded,
+    get_default_theme,
+)
 from .types import (
     AnyChildren,
     BaseElement,
     ComplexChildren,
+    CSSProperties,
     Element,
     ElementStrict,
     GlobalStyles,
@@ -295,23 +303,57 @@ class link(Element[PrimitiveChildren, HeadLinkAttrs]):
     html_name = "link"
 
 
-class style(BaseElement):
+class style(BaseElement, GlobalStyles):
     html_name = "style"
 
-    children: tuple[GlobalStyles | str]
+    children: tuple[GlobalStyles | Callable[[Theme], GlobalStyles] | str]
     attrs: StyleAttrs
 
-    def __init__(self, styles: GlobalStyles | str, **attrs: Unpack[StyleAttrs]) -> None:
+    def __init__(
+        self,
+        styles: GlobalStyles | Callable[[Theme], GlobalStyles] | str,
+        theme: Theme | None = None,
+        **attrs: Unpack[StyleAttrs],
+    ) -> None:
         self.children = (styles,)
         self.attrs = attrs
+        self.theme = theme or get_default_theme()
 
     @classmethod
-    def from_components(cls, *components: type[BaseElement]) -> Self:
-        return cls(collect_from_components(*components))
+    def use(cls, styles: GlobalStyles | Callable[[Theme], GlobalStyles]) -> Self:
+        return cls(styles)
 
     @classmethod
-    def load(cls, cache: bool = False) -> Self:
-        return cls(collect_from_loaded(cache=cache))
+    def from_components(
+        cls, *components: type[BaseElement], theme: Theme | None = None
+    ) -> Self:
+        return cls(from_components(*components, theme=theme), type="text/css")
+
+    @classmethod
+    def load(cls, cache: bool = False, theme: Theme | None = None) -> Self:
+        return cls(from_loaded(cache=cache, theme=theme), type="text/css")
+
+    def __getitem__(self, key: str) -> CSSProperties | GlobalStyles:
+        return self.styles[key]
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self.styles.keys())
+
+    def __len__(self) -> int:
+        return len(self.styles)
+
+    @property
+    def styles(self) -> GlobalStyles:
+        if isinstance(self.children[0], str):
+            return {}
+        elif callable(self.children[0]):
+            return self.children[0](self.theme)
+        else:
+            return self.children[0]
+
+    @styles.setter
+    def styles(self, value: GlobalStyles) -> None:
+        self.children = (value,)
 
     def to_html(self) -> str:
         dom: BaseElement = self
@@ -322,13 +364,16 @@ class style(BaseElement):
         if formatted_attrs := dom._format_attributes():
             attributes = f" {formatted_attrs}"
 
-        css_styles = self.children[0]
-        if not isinstance(css_styles, str):
-            css_styles = format_styles(dom.children[0])
+        if isinstance(dom.children[0], str):
+            css_styles = self.children[0]
+        else:
+            css_styles = format_styles(self.styles)
 
         return (
-            f"<{dom.html_name}{attributes}>\n" f"{css_styles}\n" f"</{dom.html_name}>"
-        )
+            f"<{dom.html_name}{attributes}>\n"
+            f"{css_styles}\n"
+            f"</{dom.html_name}>"
+        )  # fmt: off
 
     @override
     def render(self) -> BaseElement:

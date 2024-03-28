@@ -1,8 +1,9 @@
 import asyncio
 
-from examples import Body, Description, Header, Loading, Page, app
+from examples import Body, Header, Page, app
 from ludic.catalog.loaders import LazyLoader
-from ludic.html import svg
+from ludic.catalog.quotes import Quote
+from ludic.html import div, svg
 from ludic.types import Safe
 from ludic.web import Request
 
@@ -12,14 +13,14 @@ async def homepage(request: Request) -> Page:
     return Page(
         Header("Lazy Loading"),
         Body(
-            Description(
+            Quote(
                 "This example shows how to lazily load an element on a page.",
                 source_url="https://htmx.org/examples/lazy-load/",
             ),
-            LazyLoader(
-                load_url=request.url_for(load_svg, seconds=3), placeholder=Loading()
+            div(
+                LazyLoader(load_url=request.url_for(load_svg, seconds=3)),
+                style={"text-align": "center"},
             ),
-            style={"text-align": "center"},
         ),
     )
 

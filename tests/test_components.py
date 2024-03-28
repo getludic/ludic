@@ -1,3 +1,4 @@
+from ludic.catalog.items import Key, Pairs, Value
 from ludic.catalog.navigation import Navigation, NavItem
 from ludic.catalog.typography import Link, Paragraph
 from ludic.html import b
@@ -35,8 +36,25 @@ def test_navigation() -> None:
         id="nav",
     )
     assert navigation.to_html() == (
-        '<ul class="navigation" id="nav">'
+        '<ul id="nav" class="navigation">'
             '<li id="home"><a href="/">Home</a></li>'
             '<li id="about"><a href="/about">About</a></li>'
         "</ul>"
+    )  # fmt: skip
+
+
+def test_pairs() -> None:
+    pairs = Pairs(
+        Key("Name"),
+        Value("John"),
+        Key("Age"),
+        Value(42),
+    )
+    assert pairs.to_html() == (
+        '<dl class="pairs">'
+            '<dt class="key">Name</dt>'
+            '<dd class="value">John</dd>'
+            '<dt class="key">Age</dt>'
+            '<dd class="value">42</dd>'
+        "</dl>"
     )  # fmt: skip

@@ -28,7 +28,7 @@ class Link(ComponentStrict[PrimitiveChildren, LinkAttrs]):
 
     @override
     def render(self) -> a:
-        return a(self.children[0], href=self.attrs["to"], **self.attrs_for(a))
+        return a(self.children[0], href=self.attrs["to"])
 
 
 class Paragraph(Component[AnyChildren, GlobalAttrs]):

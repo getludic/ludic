@@ -1,10 +1,13 @@
 from typing import Annotated, NotRequired, Self, override
 
-from examples import Body, Description, Header, Page, app, init_db
+from examples import Body, Header, Page, app, init_db
+from ludic.attrs import Attrs, HtmxAttrs
 from ludic.catalog.buttons import ButtonPrimary, ButtonSecondary
-from ludic.catalog.tables import ColumnMeta, TableHead, TableRow
-from ludic.html import div, input, table, tbody, thead
-from ludic.types import Attrs, JavaScript
+from ludic.catalog.forms import InputField
+from ludic.catalog.quotes import Quote
+from ludic.catalog.tables import ColumnMeta, Table, TableHead, TableRow
+from ludic.html import div
+from ludic.types import JavaScript
 from ludic.web.endpoints import Endpoint
 from ludic.web.exceptions import NotFoundError
 from ludic.web.parsers import Parser
@@ -27,7 +30,7 @@ async def index() -> Page:
     return Page(
         Header("Edit Row"),
         Body(
-            Description(
+            Quote(
                 "This example shows how to implement editable rows.",
                 source_url="https://htmx.org/examples/edit-row/",
             ),
@@ -99,8 +102,8 @@ class PersonForm(Endpoint[PersonAttrs]):
     @override
     def render(self) -> TableRow:
         return TableRow(
-            input(name="name", value=self.attrs["name"]),
-            input(name="email", value=self.attrs["email"]),
+            InputField(name="name", value=self.attrs["name"]),
+            InputField(name="email", value=self.attrs["email"]),
             div(
                 ButtonSecondary("Cancel", hx_get=self.url_for(PersonRow)),
                 ButtonPrimary(
@@ -120,13 +123,10 @@ class PeopleTable(Endpoint[PeopleAttrs]):
         return cls(people=[person.dict() for person in db.people.values()])
 
     @override
-    def render(self) -> table:
-        return table(
-            thead(TableHead("Name", "Email", "Action")),
-            tbody(
-                *(PersonRow(**person) for person in self.attrs["people"]),
-                hx_target="closest tr",
-                hx_swap="outerHTML",
-            ),
+    def render(self) -> Table[TableHead, PersonRow]:
+        return Table[TableHead, PersonRow](
+            TableHead("Name", "Email", "Action"),
+            *(PersonRow(**person) for person in self.attrs["people"]),
+            body_attrs=HtmxAttrs(hx_target="closest tr", hx_swap="outerHTML"),
             style={"text-align": "center"},
         )

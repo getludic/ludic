@@ -21,6 +21,12 @@ def get_element_generic_args(cls_or_obj: Any) -> tuple[type, ...] | None:
     """
     from ludic.base import BaseElement
 
+    if hints := getattr(cls_or_obj, "__annotations__", None):
+        children = hints.get("children")
+        attrs = hints.get("attrs")
+        if attrs and children:
+            return (children, attrs)
+
     for base in getattr(cls_or_obj, "__orig_bases__", []):
         if issubclass(get_origin(base), BaseElement):
             return get_args(base)

@@ -1,8 +1,8 @@
 from typing import override
 
 from ludic.attrs import GlobalAttrs
-from ludic.base import Component, PrimitiveChildren
 from ludic.html import li, ul
+from ludic.types import Component, PrimitiveChildren
 
 from .typography import Link
 
@@ -35,6 +35,8 @@ class Navigation(Component[NavItem, GlobalAttrs]):
         )
     """
 
+    classes = ["navigation"]
+
     @override
     def render(self) -> ul:
-        return ul(*self.children, class_="navigation", **self.attrs_for(ul))
+        return ul(*self.children, **self.attrs_for(ul))

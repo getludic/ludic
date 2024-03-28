@@ -2,7 +2,7 @@ from typing import Annotated, Literal
 
 from .base import Attrs as Attrs
 from .base import NoAttrs as NoAttrs
-from .css import CSSProperties
+from .styles import CSSProperties
 
 
 class Alias(str):

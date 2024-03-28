@@ -1,6 +1,7 @@
 from typing import Self, override
 
-from examples import Body, Description, Header, Page, app
+from examples import Body, Header, Page, app
+from ludic.catalog.quotes import Quote
 from ludic.catalog.tables import Table, TableHead, TableRow
 from ludic.types import Attrs, Blank, Component
 from ludic.web import Endpoint
@@ -45,7 +46,7 @@ async def index() -> Page:
     return Page(
         Header("Infinite Scroll"),
         Body(
-            Description(
+            Quote(
                 "The infinite scroll pattern provides a way to load content dynamically"
                 "on user scrolling action.",
                 source_url="https://htmx.org/examples/infinite-scroll/",
