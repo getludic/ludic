@@ -1,4 +1,3 @@
-from ludic.css import CSSProperties
 from ludic.html import (
     a,
     b,
@@ -16,6 +15,7 @@ from ludic.html import (
     thead,
     tr,
 )
+from ludic.styles import CSSProperties
 
 
 def test_empty_element() -> None:

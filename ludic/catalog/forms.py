@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Any, Literal, get_type_hints, override
 
 from ludic.attrs import Attrs, FormAttrs, InputAttrs, TextAreaAttrs
-from ludic.html import div, form, input, label, textarea
+from ludic.html import div, form, input, label, style, textarea
 from ludic.types import (
     BaseElement,
     ComplexChildren,
@@ -80,7 +80,6 @@ class FieldAttrs(Attrs, total=False):
     """Shared attributes between custom form fields."""
 
     label: str
-    class_div: str
 
 
 class InputFieldAttrs(FieldAttrs, InputAttrs):
@@ -99,6 +98,29 @@ class TextAreaFieldAttrs(FieldAttrs, TextAreaAttrs):
 
 class FormField(Component[TChildren, TAttrs]):
     """Base class for form fields."""
+
+    classes = ["form-field"]
+    styles = style.use(
+        lambda theme: {
+            ".form-field": {
+                "label": {
+                    "display": "block",
+                    "margin-top": "12px",
+                    "margin-bottom": "8px",
+                    "font-weight": "bold",
+                },
+                "input": {
+                    "width": "100%",
+                    "padding": "10px",
+                    "margin": "5px 0",
+                    "border": f"1px solid {theme.colors.light.darken(0.2)}",
+                    "border-radius": "4px",
+                    "box-sizing": "border-box",
+                    "font-size": "1em",
+                },
+            }
+        }
+    )
 
     def create_label(self, text: PrimitiveChildren, for_: str = "") -> label:
         if for_:
@@ -121,7 +143,7 @@ class InputField(FormField[NoChildren, InputFieldAttrs]):
             elements.append(self.create_label(text=text, for_=attrs.get("id", "")))
         elements.append(input(**attrs))
 
-        return div(*elements, class_=self.attrs.get("class_div", "form-group"))
+        return div(*elements)
 
 
 class TextAreaField(FormField[PrimitiveChildren, TextAreaFieldAttrs]):
@@ -138,11 +160,13 @@ class TextAreaField(FormField[PrimitiveChildren, TextAreaFieldAttrs]):
             elements.append(self.create_label(text=text, for_=attrs.get("id", "")))
         elements.append(textarea(self.children[0], **attrs))
 
-        return div(*elements, class_=self.attrs.get("class_div", "form-group"))
+        return div(*elements)
 
 
 class Form(Component[ComplexChildren, FormAttrs]):
     """A component helper for creating HTML forms."""
+
+    classes = ["form"]
 
     @override
     def render(self) -> form:

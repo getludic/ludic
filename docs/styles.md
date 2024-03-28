@@ -1,9 +1,10 @@
 # CSS Styling Options
 
-There are two primary ways to apply CSS properties to components within your application:
+There are three primary ways to apply CSS properties to components within your application:
 
 1. The `style` HTML Attribute
-3. The `styles` Class Property
+2. The `styles` Class Property
+3. The `style` HTML Element
 
 ## The `style` HTML Attribute
 
@@ -79,7 +80,7 @@ class Button(ComponentStrict[str, ButtonAttrs]):
 
     ```html
     <style>
-    button.btn { background-color: #fab; font-size: 16px; }
+      button.btn { background-color: #fab; font-size: 16px; }
     </style>
     ```
 

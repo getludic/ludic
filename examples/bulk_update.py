@@ -1,10 +1,11 @@
 from typing import Annotated, Self, override
 
-from examples import Body, Description, Header, Page, app, init_db
+from examples import Body, Header, Page, app, init_db
 from ludic.catalog.buttons import ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form
+from ludic.catalog.quotes import Quote
 from ludic.catalog.tables import ColumnMeta, Table, create_rows
-from ludic.html import span
+from ludic.html import span, style
 from ludic.types import Attrs
 from ludic.web.endpoints import Endpoint
 from ludic.web.parsers import ListParser
@@ -29,17 +30,19 @@ class PeopleAttrs(Attrs):
 class Toast(span):
     id: str = "toast"
     target: str = f"#{id}"
-    styles = {
-        target: {
-            "background": "#E1F0DA",
-            "margin": "10px 20px",
-            "opacity": "0",
-            "transition": "opacity 3s ease-out",
-        },
-        f"{target}.htmx-settling": {
-            "opacity": "100",
-        },
-    }
+    styles = style.use(
+        lambda theme: {
+            Toast.target: {
+                "background": theme.colors.success,
+                "margin": "10px 20px",
+                "opacity": "0",
+                "transition": "opacity 3s ease-out",
+            },
+            f"{Toast.target}.htmx-settling": {
+                "opacity": "100",
+            },
+        }
+    )
 
     @override
     def render(self) -> span:
@@ -51,7 +54,7 @@ async def index() -> Page:
     return Page(
         Header("Bulk Update"),
         Body(
-            Description(
+            Quote(
                 "This demo shows how to implement a common pattern where rows are "
                 "selected and then bulk updated.",
                 source_url="https://htmx.org/examples/bulk-update/",

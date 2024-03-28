@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from collections.abc import Callable, Iterator, Mapping, MutableMapping, Sequence
 from typing import (
     Any,
@@ -13,28 +13,11 @@ from typing import (
 
 from typing_extensions import TypeVar, TypeVarTuple
 
-from .css import CSSProperties
 from .format import FormatContext, format_attrs, format_element
+from .styles import GlobalStyles, Theme, get_default_theme
 from .utils import get_element_attrs_annotations
 
 ELEMENT_REGISTRY: MutableMapping[str, list[type["BaseElement"]]] = {}
-
-# FIXME: Currently, it is impossible to properly type nested CSS properties
-# defined similar as in SCSS, it will be possible when the following PEP is
-# implemented and supported by type checkers: https://peps.python.org/pep-0728/
-GlobalStyles = Mapping[str, "CSSProperties | GlobalStyles"]
-"""CSS styles for elements or components which are defined by setting the ``styles``
-class property.
-
-Example usage:
-
-    class Page(Component[AnyChildren, NoAttrs]):
-        styles = {
-            "body": {
-                "background-color": "red",
-            },
-        }
-"""
 
 
 class Safe(str):
@@ -92,12 +75,15 @@ class BaseElement(metaclass=ABCMeta):
     html_name: ClassVar[str | None] = None
 
     always_pair: ClassVar[bool] = False
-    styles: ClassVar[GlobalStyles] = {}
-
     formatter: ClassVar[FormatContext] = FormatContext("element_formatter")
+
+    classes: ClassVar[Sequence[str]] = []
+    styles: ClassVar["GlobalStyles"] = {}
 
     children: Sequence[Any]
     attrs: Mapping[str, Any]
+
+    _theme: Theme | None = None
 
     def __init_subclass__(cls) -> None:
         ELEMENT_REGISTRY.setdefault(cls.__name__, [])
@@ -125,19 +111,37 @@ class BaseElement(metaclass=ABCMeta):
             and self.attrs == other.attrs
         )
 
-    def _format_attributes(self, is_html: bool = False) -> str:
+    def _format_attributes(
+        self, classes: list[str] | None = None, is_html: bool = False
+    ) -> str:
         attrs: dict[str, Any]
         if is_html:
-            attrs = format_attrs(type(self), dict(self.attrs), True)
+            attrs = format_attrs(type(self), dict(self.attrs), is_html=True)
         else:
             attrs = self.aliased_attrs
+
+        if classes:
+            if "class" in attrs:
+                attrs["class"] += " " + " ".join(classes)
+            else:
+                attrs["class"] = " ".join(classes)
+
         return " ".join(f'{key}="{value}"' for key, value in attrs.items())
 
     def _format_children(
         self,
         format_fun: Callable[[Any], str] = format_element,
     ) -> str:
-        return "".join(format_fun(child) for child in self.children)
+        formatted = []
+        for child in self.children:
+            if (
+                isinstance(child, BaseElement)
+                and child._theme is None
+                and self._theme is not None
+            ):
+                child.theme = self.theme
+            formatted.append(format_fun(child))
+        return "".join(formatted)
 
     @property
     def aliased_attrs(self) -> dict[str, Any]:
@@ -146,10 +150,21 @@ class BaseElement(metaclass=ABCMeta):
 
     @property
     def text(self) -> str:
+        """Get the text content of the element."""
         return "".join(
             child.text if isinstance(child, BaseElement) else str(child)
             for child in self.children
         )
+
+    @property
+    def theme(self) -> Theme:
+        """Get the theme of the element."""
+        return self._theme or get_default_theme()
+
+    @theme.setter
+    def theme(self, value: Theme) -> None:
+        """Set the theme of the element."""
+        self._theme = value
 
     def is_simple(self) -> bool:
         """Check if the element is simple (i.e. contains only one primitive type)."""
@@ -196,16 +211,20 @@ class BaseElement(metaclass=ABCMeta):
     def to_html(self) -> str:
         """Convert an element tree to an HTML string."""
         dom = self
+        classes = list(dom.classes)
+
         while dom != (rendered_dom := dom.render()):
+            rendered_dom._theme = dom._theme
             dom = rendered_dom
+            classes += dom.classes
 
         element_tag = f"{dom.html_header}\n" if dom.html_header else ""
 
         hidden = dom.html_name == "__hidden__"
         element_tag = "" if hidden else f"<{dom.html_name}"
 
-        if dom.has_attributes():
-            attributes_str = dom._format_attributes(is_html=True)
+        if not hidden and (dom.has_attributes() or classes):
+            attributes_str = dom._format_attributes(classes, is_html=True)
             element_tag += f" {attributes_str}"
 
         if dom.children or dom.always_pair:
@@ -226,6 +245,7 @@ class BaseElement(metaclass=ABCMeta):
 
         Args:
             cls (type[BaseElement]): The element to get the attributes of.
+
         """
         return {
             key: value
@@ -308,86 +328,3 @@ class ElementStrict(Generic[*TChildrenArgs, TAttrs], BaseElement):
     ) -> None:
         self.attrs = cast(TAttrs, attrs)
         self.children = tuple(self.formatter.extract(*children))
-
-
-class Blank(Element[TChildren, NoAttrs]):
-    """Element representing no element at all, just children.
-
-    The purpose of this element is to be able to return only children
-    when rendering a component.
-    """
-
-    html_name = "__hidden__"
-
-    def __init__(self, *children: TChildren) -> None:
-        super().__init__(*self.formatter.extract(*children))
-
-
-class Component(Element[TChildren, TAttrs], metaclass=ABCMeta):
-    """Base class for components.
-
-    A component subclasses an :class:`Element` and represents any element
-    that can be rendered in Ludic.
-
-    Example usage:
-
-        class PersonAttrs(Attributes):
-            age: NotRequired[int]
-
-        class Person(Component[PersonAttrs]):
-            @override
-            def render(self) -> dl:
-                return dl(
-                    dt("Name"),
-                    dd(self.attrs["name"]),
-                    dt("Age"),
-                    dd(self.attrs.get("age", "N/A")),
-                )
-
-    Now the component can be used in any other component or element:
-
-        >>> div(Person(name="John Doe", age=30), id="person-detail")
-
-    """
-
-    @abstractmethod
-    def render(self) -> BaseElement:
-        """Render the component as an instance of :class:`BaseElement`."""
-
-
-class ComponentStrict(ElementStrict[*TChildrenArgs, TAttrs], metaclass=ABCMeta):
-    """Base class for strict components.
-
-    A component subclasses an :class:`ElementStrict` and represents any
-    element that can be rendered in Ludic. The difference between
-    :class:`Component` and :class:`ComponentStrict` is that the latter
-    expects concrete types of children. It allows specification
-    of each child's type.
-
-    Example usage:
-
-        class PersonAttrs(Attributes):
-            age: NotRequired[int]
-
-        class Person(ComponentStrict[str, str, PersonAttrs]):
-            @override
-            def render(self) -> dl:
-                return dl(
-                    dt("Name"),
-                    dd(" ".join(self.children),
-                    dt("Age"),
-                    dd(self.attrs.get("age", "N/A")),
-                )
-
-    Valid usage would look like this:
-
-        >>> div(Person("John", "Doe", age=30), id="person-detail")
-
-    In this case, we specified that Person expects two string children.
-    First child is the first name, and the second is the second name.
-    We also specify age as an optional key-word argument.
-    """
-
-    @abstractmethod
-    def render(self) -> BaseElement:
-        """Render the component as an instance of :class:`BaseElement`."""

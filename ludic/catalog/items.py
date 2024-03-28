@@ -2,15 +2,22 @@ from collections.abc import Iterable
 from typing import override
 
 from ludic.attrs import GlobalAttrs
-from ludic.base import Component
 from ludic.html import dd, dl, dt
-from ludic.types import PrimitiveChildren
+from ludic.types import Component, PrimitiveChildren
 
 from .utils import attr_to_camel
 
 
 class Key(Component[PrimitiveChildren, GlobalAttrs]):
     """Simple component rendering as the HTML ``dt`` element."""
+
+    classes = ["key"]
+    styles = {
+        "dt.key": {
+            "font-weight": "bold",
+            "margin-bottom": "10px",
+        },
+    }
 
     @override
     def render(self) -> dt:
@@ -19,6 +26,14 @@ class Key(Component[PrimitiveChildren, GlobalAttrs]):
 
 class Value(Component[PrimitiveChildren, GlobalAttrs]):
     """Simple component rendering as the HTML ``dd`` element."""
+
+    classes = ["value"]
+    styles = {
+        "dd.value": {
+            "margin-left": "0",
+            "margin-bottom": "20px",
+        },
+    }
 
     @override
     def render(self) -> dd:
@@ -56,10 +71,20 @@ class Pairs(Component[Key | Value, PairsAttrs]):
         )
     """
 
+    classes = ["pairs"]
+    styles = {
+        "dl.pairs": {
+            "margin-top": "20px",
+            "margin-bottom": "20px",
+        },
+    }
+
     @override
     def render(self) -> dl:
         from_items: list[Key | Value] = []
+
         for key, value in self.attrs.get("items", ()):
             from_items.append(Key(attr_to_camel(key)))
             from_items.append(Value(value))
+
         return dl(*from_items, *self.children, **self.attrs_for(dl))

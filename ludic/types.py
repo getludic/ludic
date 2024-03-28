@@ -5,13 +5,9 @@ from .base import (
     AnyChildren,
     Attrs,
     BaseElement,
-    Blank,
     ComplexChildren,
-    Component,
-    ComponentStrict,
     Element,
     ElementStrict,
-    GlobalStyles,
     JavaScript,
     NoAttrs,
     NoChildren,
@@ -21,6 +17,8 @@ from .base import (
     TChildren,
     TChildrenArgs,
 )
+from .components import Blank, Component, ComponentStrict
+from .styles import CSSProperties, GlobalStyles, Theme
 
 JSONType = (
     Mapping[str, "JSONType"] | Iterable["JSONType"] | str | int | float | bool | None
@@ -51,6 +49,7 @@ __all__ = (
     "ComplexChildren",
     "Component",
     "ComponentStrict",
+    "CSSProperties",
     "Element",
     "ElementStrict",
     "GlobalStyles",
@@ -64,5 +63,6 @@ __all__ = (
     "TAttrs",
     "TChildren",
     "TChildrenArgs",
+    "Theme",
     "Blank",
 )

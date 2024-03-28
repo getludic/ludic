@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from typing import Literal, TypedDict
 
 CSSProperties = TypedDict(
@@ -606,3 +607,20 @@ CSSProperties = TypedDict(
     },
     total=False,
 )
+
+# FIXME: Currently, it is impossible to properly type nested CSS properties
+# defined similar as in SCSS, it will be possible when the following PEP is
+# implemented and supported by type checkers: https://peps.python.org/pep-0728/
+GlobalStyles = Mapping[str, "CSSProperties | GlobalStyles"]
+"""CSS styles for elements or components which are defined by setting the ``styles``
+class property.
+
+Example usage:
+
+    class Page(Component[AnyChildren, NoAttrs]):
+        styles = {
+            "body": {
+                "background-color": "red",
+            },
+        }
+"""

@@ -85,12 +85,14 @@ class LinkAttrs(Attrs):
     to: str
 
 class Link(Component[str, LinkAttrs]):
+    classes = ["link"]
+
     @override
     def render(self) -> a:
         return a(
             *self.children,
             href=self.attrs["to"],
-            style={"color": "#abc"},
+            style={"color": self.theme.colors.primary},
         )
 ```
 
