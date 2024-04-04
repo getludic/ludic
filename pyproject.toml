@@ -81,6 +81,24 @@ strict = true
 disallow_subclassing_any = false
 
 [tool.pytest.ini_options]
+testpaths = "tests"
+norecursedirs = ".git docs .pytest_cache .mypy_cache .ruff_cache"
 filterwarnings = [
     "ignore:The \\'app\\' shortcut is now deprecated. Use the explicit style \\'transport=WSGITransport\\(app=\\.\\.\\.\\)\\' instead\\.",
+]
+
+[tool.coverage.run]
+omit = ["tests/**"]
+
+[tool.coverage.paths]
+source = ["ludic", "examples"]
+
+[tool.coverage.report]
+show_missing = true
+precision = 2
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "pass"
 ]
