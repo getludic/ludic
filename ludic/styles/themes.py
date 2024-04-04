@@ -44,11 +44,18 @@ class Color(str):
 class Size(str):
     """Size class."""
 
-    value: int
+    value: float
     unit: Literal["px", "em"] = "px"  # Default unit is pixels
 
-    def __new__(cls, value: int, unit: Literal["px", "em"] = "px") -> "Size":
-        self = super().__new__(cls, f"{value}{unit}")
+    def __new__(cls, value: float, unit: Literal["px", "em"] = "px") -> "Size":
+        match unit:
+            case "em":
+                self = super().__new__(cls, f"{value:.1f}{unit}")
+            case "px":
+                self = super().__new__(cls, f"{value:d}{unit}")
+            case _:
+                raise ValueError(f"Invalid unit: {unit}")
+
         self.value = value
         self.unit = unit
         return self
@@ -62,7 +69,7 @@ class Size(str):
         Returns:
             str: Incremented size.
         """
-        return type(self)(int(self.value + float(self.value * factor)), self.unit)
+        return type(self)(self.value + float(self.value * factor), self.unit)
 
     def dec(self, factor: float = 1) -> Self:
         """Decrement size by a given factor.
@@ -73,7 +80,7 @@ class Size(str):
         Returns:
             str: Decremented size.
         """
-        return type(self)(int(self.value - float(self.value * factor)), self.unit)
+        return type(self)(self.value - float(self.value * factor), self.unit)
 
 
 @dataclass
@@ -136,6 +143,14 @@ class Theme(metaclass=ABCMeta):
         raise NotImplementedError
 
     def use(self, element: _T) -> _T:
+        """Apply the theme to an element.
+
+        Args:
+            element (_T): Element to apply the theme to.
+
+        Returns:
+            _T: The element with the theme applied.
+        """
         element.theme = self
         return element
 
