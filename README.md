@@ -15,6 +15,7 @@ Ludic is a lightweight framework for building HTML pages with a component approa
 - **Type-Guided components** utilizing Python's typing system
 - Uses the power of **Starlette** and **Async** for high-performance web development
 - Build HTML with the ease and power of Python **f-strings**
+- Add CSS styling to your components with **themes**
 
 ## Ideals
 
@@ -53,7 +54,7 @@ Table(
 )
 ```
 
-This structure can be type-checked thanks to Python's rich type system. Additionally, this `Table` component could have **dynamic properties** like sorting or even modification of data on the server.
+This structure can be type-checked thanks to Python's rich type system. Additionally, this `Table` component could have **dynamic properties** like sorting or filtering.
 
 ## Requirements
 

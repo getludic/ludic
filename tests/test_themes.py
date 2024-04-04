@@ -6,7 +6,10 @@ from ludic.styles.themes import (
     Color,
     Colors,
     DarkTheme,
+    Fonts,
+    FontSizes,
     LightTheme,
+    Size,
     get_default_theme,
     set_default_theme,
 )
@@ -39,6 +42,15 @@ def test_theme_colors() -> None:
     assert theme.colors.dark.lighten(0.5).rgb == (102, 102, 102)
 
     assert theme.colors.primary.darken(0.5).rgb == (97, 115, 126)
+
+
+def test_theme_font_sizes() -> None:
+    theme = LightTheme(
+        fonts=Fonts(sizes=FontSizes(small=Size(10, "px"), medium=Size(1.2, unit="em"))),
+    )
+
+    assert theme.fonts.sizes.small == "10px"
+    assert theme.fonts.sizes.medium == "1.2em"
 
 
 def test_themes_switching() -> None:
