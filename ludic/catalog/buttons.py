@@ -20,11 +20,17 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
                 "border": f"1px solid {theme.colors.light.darken(0.2)}",
                 "border-radius": "4px",
                 "cursor": "pointer",
-                "font-size": "1em",
+                "font-size": theme.fonts.sizes.medium,
                 "transition": "0.1s filter linear, 0.1s -webkit-filter linear",
             },
             "button.btn:hover": {
                 "filter": "brightness(85%)",
+            },
+            "button.btn.small": {
+                "font-size": theme.fonts.sizes.small,
+            },
+            "button.btn.large": {
+                "font-size": theme.fonts.sizes.large,
             },
         }
     )

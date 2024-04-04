@@ -1,5 +1,7 @@
+from ludic.catalog.forms import Form, InputField, TextAreaField
 from ludic.catalog.items import Key, Pairs, Value
 from ludic.catalog.navigation import Navigation, NavItem
+from ludic.catalog.tables import Table, TableHead, TableRow
 from ludic.catalog.typography import Link, Paragraph
 from ludic.html import b
 
@@ -57,4 +59,68 @@ def test_pairs() -> None:
             '<dt class="key">Age</dt>'
             '<dd class="value">42</dd>'
         "</dl>"
+    )  # fmt: skip
+
+
+def test_tables() -> None:
+    table = Table(
+        TableHead("Name", "Age"),
+        TableRow("John", 42),
+        TableRow("Jane", 43),
+    )
+
+    assert table.header == ("Name", "Age")
+    assert table.getlist("Name") == ["John", "Jane"]
+    assert table.getlist("Age") == [42, 43]
+    assert table.getlist("NOT_FOUND") == []
+
+    assert len(table.children) > 2
+    assert table.children[2].get_value(123) is None
+
+    assert table.to_html() == (
+        '<table class="table">'
+            "<thead>"
+                '<tr class="table-head"><th>Name</th><th>Age</th></tr>'
+            "</thead>"
+            "<tbody>"
+                '<tr class="table-row"><td>John</td><td>42</td></tr>'
+                '<tr class="table-row"><td>Jane</td><td>43</td></tr>'
+            "</tbody>"
+        "</table>"
+    )  # fmt: skip
+
+
+def test_form_fields() -> None:
+    form = Form(
+        InputField(value="Name", name="name"),
+        TextAreaField("Description", name="description"),
+    )
+
+    assert form.to_html() == (
+        '<form class="form">'
+            '<div class="form-field">'
+                '<input value="Name" name="name" id="name" />'
+            "</div>"
+            '<div class="form-field">'
+                '<textarea name="description" id="description">Description</textarea>'
+            "</div>"
+        "</form>"
+    )  # fmt: skip
+
+    form = Form(
+        InputField(value="Name", name="name", label="Foo"),
+        TextAreaField("Description", name="description", label="Bar"),
+    )
+
+    assert form.to_html() == (
+        '<form class="form">'
+            '<div class="form-field">'
+                '<label for="name">Foo</label>'
+                '<input value="Name" name="name" id="name" />'
+            "</div>"
+            '<div class="form-field">'
+                '<label for="description">Bar</label>'
+                '<textarea name="description" id="description">Description</textarea>'
+            "</div>"
+        "</form>"
     )  # fmt: skip
