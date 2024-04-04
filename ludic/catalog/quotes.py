@@ -7,6 +7,7 @@ from ludic.types import BaseElement, ComponentStrict
 
 class QuoteAttrs(Attrs, total=False):
     source_url: str
+    source_text: str
 
 
 class Quote(ComponentStrict[str, QuoteAttrs]):
@@ -21,17 +22,17 @@ class Quote(ComponentStrict[str, QuoteAttrs]):
                     "background-color": theme.colors.light,
                     "border-left": f"8px solid {theme.colors.light.darken(0.1)}",
                     "margin": "0",
-                    "margin-bottom": "20px",
+                    "margin-bottom": "10px",
                     "padding": "15px",
                 },
                 "blockquote p": {
-                    "font-size": "1.1em",
+                    "font-size": theme.fonts.sizes.large,
                     "margin-bottom": "10px",
                 },
                 "footer": {
-                    "font-size": "1.25em",
+                    "font-size": theme.fonts.sizes.medium,
                     "margin-top": "10px",
-                    "color": theme.colors.dark.lighten(1),
+                    "color": theme.colors.dark.lighten(0.5),
                 },
                 "footer a": {
                     "text-decoration": "none",
@@ -50,5 +51,6 @@ class Quote(ComponentStrict[str, QuoteAttrs]):
             blockquote(*map(p, self.children[0].split("\n")))
         ]
         if source_url := self.attrs.get("source_url"):
-            children.append(footer("Source: ", a(source_url, href=source_url)))
+            source_text = self.attrs.get("source_text", "Source: ")
+            children.append(footer(source_text, a(source_url, href=source_url)))
         return div(*children)

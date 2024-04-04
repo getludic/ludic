@@ -62,11 +62,21 @@ class ColumnMeta:
 class TableRow(Component[AnyChildren, GlobalAttrs]):
     """Simple component rendering as the HTML ``tr`` element."""
 
-    def get_text(self, index: int) -> str:
+    classes = ["table-row"]
+    styles = style.use(
+        lambda theme: {
+            "tr.table-row td": {
+                "border": f"1px solid {theme.colors.light.darken(0.2)}",
+                "padding": "12px",
+            }
+        }
+    )
+
+    def get_value(self, index: int) -> PrimitiveChildren | None:
         if len(self.children) > index:
             child = self.children[index]
-            return child.text if isinstance(child, BaseElement) else str(child)
-        return ""
+            return child.text if isinstance(child, BaseElement) else child
+        return None
 
     @override
     def render(self) -> tr:
@@ -78,6 +88,16 @@ class TableRow(Component[AnyChildren, GlobalAttrs]):
 
 class TableHead(Component[AnyChildren, GlobalAttrs]):
     """Simple component rendering as the HTML ``tr`` element."""
+
+    classes = ["table-head"]
+    styles = style.use(
+        lambda theme: {
+            "tr.table-head th": {
+                "border": f"1px solid {theme.colors.light.darken(0.2)}",
+                "padding": "12px",
+            }
+        }
+    )
 
     @property
     def header(self) -> tuple[PrimitiveChildren, ...]:
@@ -131,14 +151,6 @@ class Table(ComponentStrict[THead, *tuple[TRow, ...], TableAttrs]):
             "table.table": {
                 "width": "100%",  # type: ignore
                 "border-collapse": "collapse",  # type: ignore
-                "th": {
-                    "border": f"1px solid {theme.colors.light.darken(0.2)}",
-                    "padding": "12px",
-                },
-                "td": {
-                    "border": f"1px solid {theme.colors.light.darken(0.2)}",
-                    "padding": "12px",
-                },
                 "thead": {
                     "background-color": theme.colors.light,
                 },
@@ -164,7 +176,7 @@ class Table(ComponentStrict[THead, *tuple[TRow, ...], TableAttrs]):
 
             rows: list[TableRow] = cast(list[TableRow], self.children[1:])
             for row in rows:
-                if value := row.get_text(idx):
+                if value := row.get_value(idx):
                     result.append(value)
 
         return result

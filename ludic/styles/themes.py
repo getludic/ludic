@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Self, TypeVar
+from typing import TYPE_CHECKING, Literal, Self, TypeVar
 
 from .utils import darken_color, hex_to_rgb, lighten_color
 
@@ -41,6 +41,41 @@ class Color(str):
         return type(self)(lighten_color(self, factor))
 
 
+class Size(str):
+    """Size class."""
+
+    value: int
+    unit: Literal["px", "em"] = "px"  # Default unit is pixels
+
+    def __new__(cls, value: int, unit: Literal["px", "em"] = "px") -> "Size":
+        self = super().__new__(cls, f"{value}{unit}")
+        self.value = value
+        self.unit = unit
+        return self
+
+    def inc(self, factor: float = 1) -> Self:
+        """Increment size by a given factor.
+
+        Args:
+            factor (float, optional): Increment factor. Defaults to 1.
+
+        Returns:
+            str: Incremented size.
+        """
+        return type(self)(int(self.value + float(self.value * factor)), self.unit)
+
+    def dec(self, factor: float = 1) -> Self:
+        """Decrement size by a given factor.
+
+        Args:
+            factor (float, optional): Decrement factor. Defaults to 1.
+
+        Returns:
+            str: Decremented size.
+        """
+        return type(self)(int(self.value - float(self.value * factor)), self.unit)
+
+
 @dataclass
 class Colors:
     """Colors for a theme."""
@@ -62,9 +97,9 @@ class Colors:
 class FontSizes:
     """Font sizes for a theme."""
 
-    small: int = 12
-    medium: int = 14
-    large: int = 20
+    small: Size = Size(12)
+    medium: Size = Size(16)
+    large: Size = Size(20)
 
 
 @dataclass
