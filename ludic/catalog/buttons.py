@@ -14,10 +14,10 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
         lambda theme: {
             "button.btn": {
                 "background-color": theme.colors.light,
-                "color": theme.colors.dark,
+                "color": theme.colors.black,
                 "margin": "8px 10px 8px 0px",
-                "padding": "10px 20px",
-                "border": f"1px solid {theme.colors.light.darken(0.2)}",
+                "padding": "10px 17px",
+                "border": f"1px solid {theme.colors.light.darken(0.1)}",
                 "border-radius": "4px",
                 "cursor": "pointer",
                 "font-size": theme.fonts.sizes.medium,
@@ -49,8 +49,9 @@ class ButtonPrimary(Button):
     styles = style.use(
         lambda theme: {
             "button.btn-primary": {
+                "color": theme.colors.primary.readable(),
                 "background-color": theme.colors.primary,
-                "border-color": theme.colors.primary.darken(0.2),
+                "border-color": theme.colors.primary.darken(0.05),
             }
         }
     )
@@ -66,8 +67,9 @@ class ButtonSecondary(Button):
     styles = style.use(
         lambda theme: {
             "button.btn-secondary": {
+                "color": theme.colors.secondary.readable(),
                 "background-color": theme.colors.secondary,
-                "border-color": theme.colors.secondary.darken(0.2),
+                "border-color": theme.colors.secondary.darken(0.05),
             }
         }
     )
@@ -83,8 +85,9 @@ class ButtonSuccess(Button):
     styles = style.use(
         lambda theme: {
             "button.btn-success": {
+                "color": theme.colors.success.readable(),
                 "background-color": theme.colors.success,
-                "border-color": theme.colors.success.darken(0.2),
+                "border-color": theme.colors.success.darken(0.05),
             }
         }
     )
@@ -100,8 +103,9 @@ class ButtonDanger(Button):
     styles = style.use(
         lambda theme: {
             "button.btn-danger": {
+                "color": theme.colors.danger.readable(),
                 "background-color": theme.colors.danger,
-                "border-color": theme.colors.danger.darken(0.2),
+                "border-color": theme.colors.danger.darken(0.05),
             }
         }
     )
@@ -117,8 +121,9 @@ class ButtonWarning(Button):
     styles = style.use(
         lambda theme: {
             "button.btn-warning": {
+                "color": theme.colors.warning.readable(),
                 "background-color": theme.colors.warning,
-                "border-color": theme.colors.warning.darken(0.2),
+                "border-color": theme.colors.warning.darken(0.05),
             }
         }
     )
@@ -134,8 +139,9 @@ class ButtonInfo(Button):
     styles = style.use(
         lambda theme: {
             "button.btn-info": {
+                "color": theme.colors.info.readable(),
                 "background-color": theme.colors.info,
-                "border-color": theme.colors.info.darken(0.2),
+                "border-color": theme.colors.info.darken(0.05),
             }
         }
     )

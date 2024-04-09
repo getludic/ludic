@@ -39,7 +39,7 @@ def test_theme_colors() -> None:
     assert theme.colors.black.lighten(1).rgb == (255, 255, 255)
 
     assert theme.colors.light.darken(0.5).rgb == (119, 119, 119)
-    assert theme.colors.dark.lighten(0.5).rgb == (102, 102, 102)
+    assert theme.colors.dark.lighten(0.5).rgb == (153, 153, 153)
 
     assert theme.colors.primary.darken(0.5).rgb == (97, 115, 126)
 

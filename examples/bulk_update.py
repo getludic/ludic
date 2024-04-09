@@ -35,6 +35,8 @@ class Toast(span):
             Toast.target: {
                 "background": theme.colors.success,
                 "margin": "10px 20px",
+                "padding": "5px 8px",
+                "border-radius": "3px",
                 "opacity": "0",
                 "transition": "opacity 3s ease-out",
             },

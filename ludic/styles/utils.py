@@ -38,6 +38,20 @@ def rgb_to_hex(rgb: tuple[float, float, float]) -> str:
     return f"#{int(rgb[0]):02x}{int(rgb[1]):02x}{int(rgb[2]):02x}"
 
 
+def pick_readable_color_for(color: str) -> str:
+    """Get lighter or darker color variant of the given one depending on the luminance.
+
+    Args:
+        color (str): Color to find the readable opposite for.
+
+    Returns:
+        str: Readable opposite of the given color.
+    """
+    rgb = color if isinstance(color, tuple) else hex_to_rgb(color)
+    _, luminance, _ = colorsys.rgb_to_hls(*rgb)
+    return "#000" if luminance > 140 else "#fff"
+
+
 def scale_color(color: str, factor: float = 0.5) -> str:
     """Scale a color by a given factor.
 
@@ -54,7 +68,7 @@ def scale_color(color: str, factor: float = 0.5) -> str:
     if factor < 1:
         new_luminance = luminance * factor
     else:
-        new_luminance = (255 - luminance) * (factor - 1)
+        new_luminance = luminance + (255 - luminance) * (factor - 1)
 
     result = colorsys.hls_to_rgb(hue, min(255, max(1, new_luminance)), saturation)
     return rgb_to_hex(result)

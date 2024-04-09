@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Literal, Self, TypeVar
 
-from .utils import darken_color, hex_to_rgb, lighten_color
+from .utils import darken_color, hex_to_rgb, lighten_color, pick_readable_color_for
 
 if TYPE_CHECKING:
     from ludic.types import BaseElement
@@ -39,6 +39,17 @@ class Color(str):
             str: Lightened color.
         """
         return type(self)(lighten_color(self, factor))
+
+    def readable(self) -> Self:
+        """Get lighter or darker variant of the given color depending on the luminance.
+
+        Args:
+            color (str): Color to find the readable opposite for.
+
+        Returns:
+            str: Readable opposite of the given color.
+        """
+        return type(self)(pick_readable_color_for(self))
 
 
 class Size(str):
@@ -87,15 +98,16 @@ class Size(str):
 class Colors:
     """Colors for a theme."""
 
-    primary: Color = Color("#0d6efd")
-    secondary: Color = Color("#6c757d")
-    success: Color = Color("#198754")
-    info: Color = Color("#0dcaf0")
-    warning: Color = Color("#ffc107")
-    danger: Color = Color("#dc3545")
+    primary: Color = Color("#4ecdc4")
+    secondary: Color = Color("#fefefe")
+    success: Color = Color("#c7f464")
+    info: Color = Color("#fce303")
+    warning: Color = Color("#fc9003")
+    danger: Color = Color("#e32929")
 
-    dark: Color = Color("#313539")
-    light: Color = Color("#f8f9fa")
+    light: Color = Color("#f8f8f8")
+    dark: Color = Color("#414549")
+
     white: Color = Color("#fff")
     black: Color = Color("#222")
 
@@ -161,25 +173,27 @@ class DarkTheme(Theme):
 
     name: str = "dark"
 
+    colors: Colors = field(
+        default_factory=lambda: Colors(
+            primary=Color("#0d6efd"),
+            secondary=Color("#6c757d"),
+            success=Color("#198754"),
+            info=Color("#0dcaf0"),
+            warning=Color("#ffc107"),
+            danger=Color("#dc3545"),
+            light=Color("#414549"),
+            dark=Color("#f8f8f8"),
+            white=Color("#000"),
+            black=Color("#fff"),
+        )
+    )
+
 
 @dataclass
 class LightTheme(Theme):
     """Light theme."""
 
     name: str = "light"
-
-    colors: Colors = field(
-        default_factory=lambda: Colors(
-            primary=Color("#c2e7fd"),
-            secondary=Color("#fefefe"),
-            success=Color("#c9ffad"),
-            info=Color("#fff080"),
-            warning=Color("#ffc280"),
-            danger=Color("#ffaca1"),
-            light=Color("#f8f8f8"),
-            dark=Color("#414549"),
-        )
-    )
 
 
 _DEFAULT_THEME: Theme = LightTheme()
