@@ -96,21 +96,25 @@ def init_db() -> DB:
 
 
 class Page(Component[AnyChildren, NoAttrs]):
-    styles = {
-        "body": {
-            "display": "flex",
-            "flex-direction": "column",
-            "align-items": "center",
-            "min-height": "100vh",
-            "margin": "0",
-            "font-family": "'Arial', sans-serif",
-        },
-        "main": {
-            "width": "80%",
-            "max-width": "800px",
-            "padding": "20px",
-        },
-    }
+    styles = style.use(
+        lambda theme: {
+            "body": {
+                "color": theme.colors.dark,
+                "background-color": theme.colors.white,
+                "display": "flex",
+                "flex-direction": "column",
+                "align-items": "center",
+                "min-height": "100vh",
+                "margin": "0",
+                "font-family": "'Arial', sans-serif",
+            },
+            "main": {
+                "width": "80%",
+                "max-width": "800px",
+                "padding": "20px",
+            },
+        }
+    )
 
     @override
     def render(self) -> BaseElement:

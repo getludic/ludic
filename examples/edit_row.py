@@ -2,7 +2,11 @@ from typing import Annotated, NotRequired, Self, override
 
 from examples import Body, Header, Page, app, init_db
 from ludic.attrs import Attrs, HtmxAttrs
-from ludic.catalog.buttons import ButtonPrimary, ButtonSecondary
+from ludic.catalog.buttons import (
+    ButtonPrimary,
+    ButtonSecondary,
+    ButtonSuccess,
+)
 from ludic.catalog.forms import InputField
 from ludic.catalog.quotes import Quote
 from ludic.catalog.tables import ColumnMeta, Table, TableHead, TableRow
@@ -106,7 +110,7 @@ class PersonForm(Endpoint[PersonAttrs]):
             InputField(name="email", value=self.attrs["email"]),
             div(
                 ButtonSecondary("Cancel", hx_get=self.url_for(PersonRow)),
-                ButtonPrimary(
+                ButtonSuccess(
                     "Save",
                     hx_put=self.url_for(PersonRow),
                     hx_include="closest tr",

@@ -17,7 +17,7 @@ class Quote(ComponentStrict[str, QuoteAttrs]):
     styles = style.use(
         lambda theme: {
             ".quote": {
-                "margin-bottom": "40px",  # type: ignore
+                "margin-bottom": "20px",  # type: ignore
                 "blockquote": {
                     "background-color": theme.colors.light,
                     "border-left": f"8px solid {theme.colors.light.darken(0.1)}",

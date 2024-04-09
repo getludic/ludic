@@ -151,6 +151,7 @@ class Table(ComponentStrict[THead, *tuple[TRow, ...], TableAttrs]):
             "table.table": {
                 "width": "100%",  # type: ignore
                 "border-collapse": "collapse",  # type: ignore
+                "margin-bottom": "15px",  # type: ignore
                 "thead": {
                     "background-color": theme.colors.light,
                 },

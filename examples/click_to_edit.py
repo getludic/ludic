@@ -1,7 +1,7 @@
 from typing import Annotated, NotRequired, Self, override
 
 from examples import Body, Header, Page, app, init_db
-from ludic.catalog.buttons import ButtonDanger, ButtonPrimary
+from ludic.catalog.buttons import Button, ButtonDanger, ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form, create_fields
 from ludic.catalog.items import Pairs
 from ludic.catalog.quotes import Quote
@@ -71,7 +71,7 @@ class Contact(Endpoint[ContactAttrs]):
     def render(self) -> div:
         return div(
             Pairs(items=self.attrs.items()),
-            ButtonPrimary(
+            Button(
                 "Click To Edit",
                 hx_get=self.url_for(ContactForm),
             ),
@@ -99,4 +99,5 @@ class ContactForm(Endpoint[ContactAttrs]):
             ButtonDanger("Cancel", hx_get=self.url_for(Contact)),
             hx_put=self.url_for(Contact),
             hx_target="this",
+            hx_swap="outerHTML",
         )
