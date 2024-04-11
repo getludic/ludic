@@ -3,17 +3,24 @@ from typing import override
 from ludic.attrs import GlobalAttrs
 from ludic.html import a, b, div, style
 from ludic.styles.themes import (
-    Color,
     Colors,
     DarkTheme,
     Fonts,
     FontSizes,
     LightTheme,
-    Size,
     get_default_theme,
     set_default_theme,
 )
+from ludic.styles.types import Color, Size, Spacing
 from ludic.types import Component
+
+
+def test_spacing() -> None:
+    assert Spacing(10, 20, 30, 40) == "10px 20px 30px 40px"
+    assert Spacing(10, 20, 30, 40, unit="em") == "10em 20em 30em 40em"
+    assert Spacing(10, 20, 30) == "10px 20px 30px 20px"
+    assert Spacing(10, 20) == "10px 20px 10px 20px"
+    assert Spacing(10) == "10px 10px 10px 10px"
 
 
 def test_theme_colors() -> None:

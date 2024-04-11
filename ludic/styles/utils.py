@@ -98,3 +98,7 @@ def lighten_color(color: str, factor: float = 0.5) -> str:
         : Lightened color.
     """
     return scale_color(color, max(1, min(2, 1 + factor)))
+
+
+def first_not_none(*values: float | int | None) -> float | int:
+    return next((value for value in values if value is not None), 0)

@@ -105,18 +105,17 @@ class FormField(Component[TChildren, TAttrs]):
             ".form-field": {
                 "label": {
                     "display": "block",
-                    "margin-top": "12px",
-                    "margin-bottom": "8px",
+                    "margin": theme.spacing.new(12, 0, 8),
                     "font-weight": "bold",
                 },
                 "input": {
                     "width": "100%",
                     "padding": "10px",
-                    "margin": "5px 0",
+                    "margin": theme.spacing.new(5, 0),
                     "border": f"1px solid {theme.colors.light.darken(0.2)}",
                     "border-radius": "4px",
                     "box-sizing": "border-box",
-                    "font-size": "1em",
+                    "font-size": theme.fonts.sizes.medium,
                 },
             }
         }

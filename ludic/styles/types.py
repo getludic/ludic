@@ -1,5 +1,274 @@
 from collections.abc import Mapping
-from typing import Literal, TypedDict
+from typing import Literal, Self, TypedDict, overload
+
+from .utils import (
+    darken_color,
+    first_not_none,
+    hex_to_rgb,
+    lighten_color,
+    pick_readable_color_for,
+)
+
+
+class Color(str):
+    """Color class."""
+
+    @property
+    def rgb(self) -> tuple[int, int, int]:
+        """RGB color."""
+        return hex_to_rgb(self)
+
+    def darken(self, factor: float = 0.5) -> Self:
+        """Darken color by a given factor.
+
+        Args:
+            factor (float, optional): Darkening factor. Defaults to 0.5.
+
+        Returns:
+            str: Darkened color.
+        """
+        return type(self)(darken_color(self, factor))
+
+    def lighten(self, factor: float = 0.5) -> Self:
+        """Lighten color by a given factor.
+
+        Args:
+            factor (float, optional): Lightening factor. Defaults to 0.5.
+
+        Returns:
+            str: Lightened color.
+        """
+        return type(self)(lighten_color(self, factor))
+
+    def readable(self) -> Self:
+        """Get lighter or darker variant of the given color depending on the luminance.
+
+        Args:
+            color (str): Color to find the readable opposite for.
+
+        Returns:
+            str: Readable opposite of the given color.
+        """
+        return type(self)(pick_readable_color_for(self))
+
+
+class Size(str):
+    """Size class."""
+
+    value: float
+    unit: Literal["px", "em"] = "px"  # Default unit is pixels
+
+    def __new__(cls, value: float, unit: Literal["px", "em"] = "px") -> "Size":
+        match unit:
+            case "em":
+                self = super().__new__(
+                    cls, f"{(f"{value:.1f}").strip("0").rstrip(".")}{unit}"
+                )
+            case "px":
+                self = super().__new__(cls, f"{value:.0f}{unit}")
+            case _:
+                raise ValueError(f"Invalid unit: {unit}")
+
+        self.value = value
+        self.unit = unit
+        return self
+
+    def scale(self, factor: float) -> Self:
+        """Scale size by a given factor.
+
+        Args:
+            factor (float): Scaling factor.
+
+        Returns:
+            str: Scaled size.
+        """
+        return type(self)(self.value * factor, self.unit)
+
+    def inc(self, factor: float = 1) -> Self:
+        """Increment size by a given factor.
+
+        Args:
+            factor (float, optional): Increment factor. Defaults to 1.
+
+        Returns:
+            str: Incremented size.
+        """
+        return type(self)(self.value + float(self.value * factor), self.unit)
+
+    def dec(self, factor: float = 1) -> Self:
+        """Decrement size by a given factor.
+
+        Args:
+            factor (float, optional): Decrement factor. Defaults to 1.
+
+        Returns:
+            str: Decremented size.
+        """
+        return type(self)(self.value - float(self.value * factor), self.unit)
+
+
+class Spacing(str):
+    """Spacing class."""
+
+    top: Size
+    right: Size
+    bottom: Size
+    left: Size
+    unit: Literal["px", "em"]
+
+    @overload
+    def __new__(cls, /, *, unit: Literal["px", "em"] = "px") -> Self: ...
+
+    @overload
+    def __new__(cls, size: float, /, *, unit: Literal["px", "em"] = "px") -> Self: ...
+
+    @overload
+    def __new__(
+        cls,
+        top_and_bottom: float,
+        right_and_left: float,
+        /,
+        *,
+        unit: Literal["px", "em"] = "px",
+    ) -> Self: ...
+
+    @overload
+    def __new__(
+        cls,
+        top: float,
+        right_and_left: float,
+        left: float,
+        /,
+        *,
+        unit: Literal["px", "em"] = "px",
+    ) -> Self: ...
+
+    @overload
+    def __new__(
+        cls,
+        top: float,
+        right: float,
+        bottom: float,
+        left: float,
+        /,
+        *,
+        unit: Literal["px", "em"] = "px",
+    ) -> Self: ...
+
+    def __new__(
+        cls,
+        top: float = 4,
+        right: float | None = None,
+        bottom: float | None = None,
+        left: float | None = None,
+        /,
+        *,
+        unit: Literal["px", "em"] = "px",
+    ) -> Self:
+        top_size = Size(top, unit)
+        right_size = Size(first_not_none(right, top), unit)
+        bottom_size = Size(first_not_none(bottom, top), unit)
+        left_size = Size(first_not_none(left, right, top), unit)
+
+        self = super().__new__(
+            cls, f"{top_size} {right_size} {bottom_size} {left_size}"
+        )
+
+        self.top = top_size
+        self.right = right_size
+        self.bottom = bottom_size
+        self.left = left_size
+        self.unit = unit
+
+        return self
+
+    @overload
+    def new(self, /, *, unit: Literal["px", "em"] = "px") -> Self: ...
+
+    @overload
+    def new(self, size: float, /, *, unit: Literal["px", "em"] = "px") -> Self: ...
+
+    @overload
+    def new(
+        self,
+        top_and_bottom: float,
+        right_and_left: float,
+        /,
+        *,
+        unit: Literal["px", "em"] = "px",
+    ) -> Self: ...
+
+    @overload
+    def new(
+        self,
+        top: float,
+        right_and_left: float,
+        left: float,
+        /,
+        *,
+        unit: Literal["px", "em"] = "px",
+    ) -> Self: ...
+
+    @overload
+    def new(
+        self,
+        top: float,
+        right: float,
+        bottom: float,
+        left: float,
+        /,
+        *,
+        unit: Literal["px", "em"] = "px",
+    ) -> Self: ...
+
+    def new(
+        self,
+        top: float = 4,
+        right: float | None = None,
+        bottom: float | None = None,
+        left: float | None = None,
+        /,
+        *,
+        unit: Literal["px", "em"] = "px",
+    ) -> Self:
+        return type(self)(
+            top,
+            first_not_none(right, top),
+            first_not_none(bottom, top),
+            first_not_none(left, right, top),
+            unit=self.unit or unit,
+        )
+
+    @overload
+    def scale(cls, /) -> Self: ...
+
+    @overload
+    def scale(cls, size: float, /) -> Self: ...
+
+    @overload
+    def scale(cls, top_and_bottom: float, right_and_left: float, /) -> Self: ...
+
+    @overload
+    def scale(cls, top: float, right_and_left: float, left: float, /) -> Self: ...
+
+    @overload
+    def scale(cls, top: float, right: float, bottom: float, left: float, /) -> Self: ...
+
+    def scale(
+        self,
+        top: float = 1,
+        right: float | None = None,
+        bottom: float | None = None,
+        left: float | None = None,
+        /,
+    ) -> Self:
+        return type(self)(
+            self.top.scale(top).value,
+            self.right.scale(first_not_none(right, top)).value,
+            self.bottom.scale(first_not_none(bottom, top)).value,
+            self.left.scale(first_not_none(left, right, top)).value,
+        )
+
 
 CSSProperties = TypedDict(
     "CSSProperties",
