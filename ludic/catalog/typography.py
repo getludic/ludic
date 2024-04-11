@@ -1,7 +1,7 @@
 from typing import override
 
 from ludic.attrs import GlobalAttrs
-from ludic.html import a, p
+from ludic.html import a, p, style
 from ludic.types import (
     AnyChildren,
     Attrs,
@@ -26,6 +26,20 @@ class Link(ComponentStrict[PrimitiveChildren, LinkAttrs]):
         Link("Hello, World!", to="https://example.com")
     """
 
+    classes = ["link"]
+    styles = style.use(
+        lambda theme: {
+            "a.link": {
+                "font-size": theme.fonts.sizes.medium,
+                "color": theme.colors.primary.darken(0.3),
+                "text-decoration": "none",
+            },
+            "a.link:hover": {
+                "text-decoration": "underline",
+            },
+        }
+    )
+
     @override
     def render(self) -> a:
         return a(self.children[0], href=self.attrs["to"])
@@ -40,6 +54,11 @@ class Paragraph(Component[AnyChildren, GlobalAttrs]):
 
         Paragraph(f"Hello, {b("World")}!")
     """
+
+    classes = ["paragraph"]
+    styles = style.use(
+        lambda theme: {"p.paragraph": {"font-size": theme.fonts.sizes.medium}}
+    )
 
     @override
     def render(self) -> p:

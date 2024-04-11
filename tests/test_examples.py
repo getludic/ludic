@@ -1,10 +1,8 @@
 from starlette.testclient import TestClient
 
-from examples import app
-
 
 def test_bulk_update() -> None:
-    from examples.bulk_update import db
+    from examples.bulk_update import app, db
 
     with TestClient(app) as client:
         assert client.get("/").status_code == 200
@@ -21,11 +19,9 @@ def test_bulk_update() -> None:
         assert not db.people["3"].active
         assert not db.people["4"].active
 
-    app.routes.clear()
-
 
 def test_click_to_edit() -> None:
-    from examples.click_to_edit import db
+    from examples.click_to_edit import app, db
 
     with TestClient(app) as client:
         assert client.get("/").status_code == 200
@@ -43,22 +39,18 @@ def test_click_to_edit() -> None:
         assert client.put("/contacts/1", data=edit_data).status_code == 200
         assert db.contacts["1"].first_name == "Test"
 
-    app.routes.clear()
-
 
 def test_click_to_load() -> None:
-    import examples.click_to_load as _  # noqa
+    from examples.click_to_load import app
 
     with TestClient(app) as client:
         assert client.get("/").status_code == 200
         assert client.get("/contacts/").status_code == 200
         assert client.get("/contacts/?page=2").status_code == 200
 
-    app.routes.clear()
-
 
 def test_delete_row() -> None:
-    from examples.delete_row import db
+    from examples.delete_row import app, db
 
     with TestClient(app) as client:
         assert client.get("/").status_code == 200
@@ -67,11 +59,9 @@ def test_delete_row() -> None:
         assert client.delete("/people/123").status_code == 404
         assert db.people.get("1") is None
 
-    app.routes.clear()
-
 
 def test_edit_row() -> None:
-    from examples.edit_row import db
+    from examples.edit_row import app, db
 
     with TestClient(app) as client:
         assert client.get("/").status_code == 200
@@ -87,11 +77,9 @@ def test_edit_row() -> None:
         assert db.people["1"].name == "Test"
         assert db.people["1"].email == "test@example.com"
 
-    app.routes.clear()
-
 
 def test_lazy_loading() -> None:
-    import examples.lazy_loading as _  # noqa
+    from examples.lazy_loading import app
 
     with TestClient(app) as client:
         assert client.get("/").status_code == 200
@@ -99,15 +87,11 @@ def test_lazy_loading() -> None:
         assert response.status_code == 200
         assert b"Content Loaded" in response.content
 
-    app.routes.clear()
-
 
 def test_infinite_scroll() -> None:
-    import examples.infinite_scroll as _  # noqa
+    from examples.infinite_scroll import app
 
     with TestClient(app) as client:
         assert client.get("/").status_code == 200
         assert client.get("/contacts/").status_code == 200
         assert client.get("/contacts/?page=2").status_code == 200
-
-    app.routes.clear()

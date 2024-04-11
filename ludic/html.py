@@ -56,7 +56,6 @@ from .styles import (
     format_styles,
     from_components,
     from_loaded,
-    get_default_theme,
 )
 from .types import (
     AnyChildren,
@@ -315,9 +314,10 @@ class style(BaseElement, GlobalStyles):
         theme: Theme | None = None,
         **attrs: Unpack[StyleAttrs],
     ) -> None:
-        self.children = (styles,)
-        self.attrs = attrs
-        self.theme = theme or get_default_theme()
+        super().__init__(styles, **attrs)
+
+        if theme:
+            self.context["theme"] = theme
 
     @classmethod
     def use(cls, styles: GlobalStyles | Callable[[Theme], GlobalStyles]) -> Self:

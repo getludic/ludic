@@ -68,6 +68,7 @@ class TableRow(Component[AnyChildren, GlobalAttrs]):
             "tr.table-row td": {
                 "border": f"1px solid {theme.colors.light.darken(0.2)}",
                 "padding": "12px",
+                "font-size": theme.fonts.sizes.medium,
             }
         }
     )
@@ -95,6 +96,7 @@ class TableHead(Component[AnyChildren, GlobalAttrs]):
             "tr.table-head th": {
                 "border": f"1px solid {theme.colors.light.darken(0.2)}",
                 "padding": "12px",
+                "font-size": theme.fonts.sizes.medium,
             }
         }
     )

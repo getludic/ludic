@@ -72,8 +72,8 @@ def from_components(
 
         if not isinstance(styles, Mapping):
             continue
-        elif hasattr(styles, "theme"):
-            styles.theme = theme
+        elif hasattr(styles, "context"):
+            styles.context["theme"] = theme
 
         for key, value in styles.items():
             if isinstance(value, Mapping):

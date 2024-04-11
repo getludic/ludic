@@ -2,18 +2,12 @@ import inspect
 from collections.abc import Callable
 from typing import Any
 
+from starlette import routing
 from starlette.exceptions import HTTPException
 from starlette.responses import PlainTextResponse, Response
-from starlette.routing import Host, Mount, get_name
-from starlette.routing import (
-    Route as StarletteRoute,
-)
-from starlette.routing import (
-    Router as StarletteRouter,
-)
+from starlette.routing import Host
 from starlette.types import Receive, Scope, Send
 
-from .datastructures import URLPath
 from .endpoints import Endpoint
 from .requests import Request
 from .responses import prepare_response
@@ -24,6 +18,19 @@ __all__ = (
     "Route",
     "Router",
 )
+
+
+class Mount(routing.Mount):
+    """Mount class for Ludic components."""
+
+    def matches(self, scope: Scope) -> tuple[routing.Match, Scope]:
+        match, scope = super().matches(scope)
+        if match == routing.Match.FULL:
+            if partial := scope.get("partial_mount"):
+                scope["partial_mount"] = f"{partial}:{self.name}"
+            else:
+                scope["partial_mount"] = self.name
+        return match, scope
 
 
 class _FunctionHandler:
@@ -74,7 +81,7 @@ class _EndpointHandler:
         return make_response
 
 
-class Route(StarletteRoute):
+class Route(routing.Route):
     def __init__(
         self,
         path: str,
@@ -83,7 +90,7 @@ class Route(StarletteRoute):
         name: str | None = None,
         **kwargs: Any,
     ) -> None:
-        name = get_name(endpoint) if name is None else name
+        name = routing.get_name(endpoint) if name is None else name
         wrapped_route = endpoint
         if inspect.isfunction(endpoint) or inspect.ismethod(endpoint):
             wrapped_route = _FunctionHandler(endpoint)
@@ -93,12 +100,8 @@ class Route(StarletteRoute):
             endpoint.route = self  # type: ignore
         super().__init__(path, wrapped_route, name=name, **kwargs)
 
-    def url_path_for(self, name: str, /, **path_params: Any) -> URLPath:
-        result = super().url_path_for(name, **path_params)
-        return URLPath(result, result.protocol, result.host)
 
-
-class Router(StarletteRouter):
+class Router(routing.Router):
     def add_route(
         self,
         path: str,
@@ -115,6 +118,3 @@ class Router(StarletteRouter):
             include_in_schema=include_in_schema,
         )
         self.routes.append(route)
-
-    def url_path_for(self, name: str, /, **path_params: Any) -> URLPath:
-        return super().url_path_for(name, **path_params)  # type: ignore

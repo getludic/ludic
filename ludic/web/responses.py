@@ -91,6 +91,7 @@ async def prepare_response(
 
     response: Response
     if isinstance(raw_response, BaseElement):
+        raw_response.context["request"] = request
         response = LudicResponse(
             raw_response, status_code=status_code or 200, headers=headers
         )

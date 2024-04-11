@@ -74,6 +74,7 @@ fixable = ["ALL"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["ludic"]
+known-third-party = ["examples"]
 
 [tool.mypy]
 python_version = "3.12"

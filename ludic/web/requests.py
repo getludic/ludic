@@ -1,12 +1,57 @@
+import itertools
 from collections.abc import Callable
 from typing import Any
 
+import starlette
 from starlette.datastructures import URL, URLPath
-from starlette.requests import Request as StarletteRequest
-from starlette.routing import Route, Router, get_name
+from starlette.routing import NoMatchFound, Route, Router
 
 
-class Request(StarletteRequest):
+def join_mounts(prefix: str, suffix: str) -> str:
+    """Join mount prefixes and suffixes.
+
+    Args:
+        prefix: The prefix to join.
+        suffix: The suffix to join.
+    """
+    prefixes = prefix.split(":")
+    suffixes = suffix.split(":")
+
+    for part in prefixes:
+        if suffixes and suffixes[0] == part:
+            suffixes.pop(0)
+
+    return ":".join(itertools.chain(prefixes, suffixes))
+
+
+class Request(starlette.requests.Request):
+    def url_path_for(
+        self, endpoint: str | Callable[..., Any], /, **path_params: Any
+    ) -> URLPath:
+        """Get URL path for an endpoint.
+
+        Args:
+            endpoint: The endpoint to get the URL path for, can be name or a registered
+                endpoint class.
+            **path_params: URL path parameters.
+
+        Returns:
+            The URL path.
+        """
+        router: Router = self.scope["router"]
+
+        if isinstance(endpoint, str):
+            endpoint_name = endpoint
+        elif (route := getattr(endpoint, "route", None)) and isinstance(route, Route):
+            endpoint_name = route.name
+        else:
+            raise NoMatchFound(str(endpoint), path_params)
+
+        if partial_mount := self.scope.get("partial_mount"):
+            endpoint_name = join_mounts(partial_mount, endpoint_name)
+
+        return router.url_path_for(endpoint_name, **path_params)
+
     def url_for(self, endpoint: str | Callable[..., Any], /, **path_params: Any) -> URL:
         """Get URL for an endpoint.
 
@@ -18,16 +63,5 @@ class Request(StarletteRequest):
         Returns:
             The URL.
         """
-        url_path: URLPath
-        if (
-            not isinstance(endpoint, str)
-            and (route := getattr(endpoint, "route", None))
-            and isinstance(route, Route)
-        ):
-            url_path = route.url_path_for(route.name, **path_params)
-        else:
-            router: Router = self.scope["router"]
-            if not isinstance(endpoint, str):
-                endpoint = get_name(endpoint)
-            url_path = router.url_path_for(endpoint, **path_params)
+        url_path = self.url_path_for(endpoint, **path_params)
         return url_path.make_absolute_url(base_url=self.base_url)

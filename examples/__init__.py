@@ -1,10 +1,7 @@
-from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass
 from typing import Any, override
 
 from ludic.attrs import NoAttrs
-from ludic.catalog.typography import Paragraph
 from ludic.html import (
     body,
     div,
@@ -25,7 +22,6 @@ from ludic.types import (
     ComponentStrict,
     PrimitiveChildren,
 )
-from ludic.web import LudicApp
 
 
 @dataclass
@@ -150,7 +146,7 @@ class Header(ComponentStrict[PrimitiveChildren, NoAttrs]):
     @override
     def render(self) -> header:
         return header(
-            h1(f"Example - {self.children[0]}"),
+            h1(self.children[0]),
         )
 
 
@@ -158,28 +154,3 @@ class Body(Component[AnyChildren, NoAttrs]):
     @override
     def render(self) -> div:
         return div(*self.children)
-
-
-@asynccontextmanager
-async def lifespan(_: LudicApp) -> AsyncIterator[None]:
-    style.load(cache=True)
-    yield
-
-
-app = LudicApp(debug=True, lifespan=lifespan)
-
-
-@app.exception_handler(404)
-async def not_found() -> Page:
-    return Page(
-        Header("Page Not Found"),
-        Body(Paragraph("The page you are looking for was not found.")),
-    )
-
-
-@app.exception_handler(500)
-async def server_error() -> Page:
-    return Page(
-        Header("Server Error"),
-        Body(Paragraph("Server encountered an error during processing.")),
-    )
