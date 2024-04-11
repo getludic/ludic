@@ -1,97 +1,13 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Literal, Self, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
-from .utils import darken_color, hex_to_rgb, lighten_color, pick_readable_color_for
+from .types import Color, Size, Spacing
 
 if TYPE_CHECKING:
     from ludic.types import BaseElement
 
 _T = TypeVar("_T", bound="BaseElement")
-
-
-class Color(str):
-    """Color class."""
-
-    @property
-    def rgb(self) -> tuple[int, int, int]:
-        """RGB color."""
-        return hex_to_rgb(self)
-
-    def darken(self, factor: float = 0.5) -> Self:
-        """Darken color by a given factor.
-
-        Args:
-            factor (float, optional): Darkening factor. Defaults to 0.5.
-
-        Returns:
-            str: Darkened color.
-        """
-        return type(self)(darken_color(self, factor))
-
-    def lighten(self, factor: float = 0.5) -> Self:
-        """Lighten color by a given factor.
-
-        Args:
-            factor (float, optional): Lightening factor. Defaults to 0.5.
-
-        Returns:
-            str: Lightened color.
-        """
-        return type(self)(lighten_color(self, factor))
-
-    def readable(self) -> Self:
-        """Get lighter or darker variant of the given color depending on the luminance.
-
-        Args:
-            color (str): Color to find the readable opposite for.
-
-        Returns:
-            str: Readable opposite of the given color.
-        """
-        return type(self)(pick_readable_color_for(self))
-
-
-class Size(str):
-    """Size class."""
-
-    value: float
-    unit: Literal["px", "em"] = "px"  # Default unit is pixels
-
-    def __new__(cls, value: float, unit: Literal["px", "em"] = "px") -> "Size":
-        match unit:
-            case "em":
-                self = super().__new__(cls, f"{value:.1f}{unit}")
-            case "px":
-                self = super().__new__(cls, f"{value:d}{unit}")
-            case _:
-                raise ValueError(f"Invalid unit: {unit}")
-
-        self.value = value
-        self.unit = unit
-        return self
-
-    def inc(self, factor: float = 1) -> Self:
-        """Increment size by a given factor.
-
-        Args:
-            factor (float, optional): Increment factor. Defaults to 1.
-
-        Returns:
-            str: Incremented size.
-        """
-        return type(self)(self.value + float(self.value * factor), self.unit)
-
-    def dec(self, factor: float = 1) -> Self:
-        """Decrement size by a given factor.
-
-        Args:
-            factor (float, optional): Decrement factor. Defaults to 1.
-
-        Returns:
-            str: Decremented size.
-        """
-        return type(self)(self.value - float(self.value * factor), self.unit)
 
 
 @dataclass
@@ -144,6 +60,7 @@ class Theme(metaclass=ABCMeta):
 
     fonts: Fonts = field(default_factory=Fonts)
     colors: Colors = field(default_factory=Colors)
+    spacing: Spacing = field(default_factory=Spacing)
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Theme) and self.name == other.name

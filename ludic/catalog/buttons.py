@@ -15,8 +15,8 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
             "button.btn": {
                 "background-color": theme.colors.light,
                 "color": theme.colors.black,
-                "margin": "8px 10px 8px 0px",
-                "padding": "10px 17px",
+                "margin": theme.spacing.new(8, 10),
+                "padding": theme.spacing.new(10, 17),
                 "border": f"1px solid {theme.colors.light.darken(0.1)}",
                 "border-radius": "4px",
                 "cursor": "pointer",
