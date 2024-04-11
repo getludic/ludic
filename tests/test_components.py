@@ -8,7 +8,7 @@ from ludic.html import b
 
 def test_link() -> None:
     link = Link("A link!", to="https://example.com")
-    assert link.to_html() == '<a href="https://example.com">A link!</a>'
+    assert link.to_html() == '<a href="https://example.com" class="link">A link!</a>'
 
 
 def test_paragraph() -> None:
@@ -27,8 +27,11 @@ def test_paragraph() -> None:
         "</Paragraph>"
     )  # fmt: skip
     assert paragraph.to_html() == (
-        '<p>Hello, how <b>are you</b>? Click <a href="https://example.com">here</a>.</p>'
-    )
+        '<p class="paragraph">'
+            'Hello, how <b>are you</b>? '
+            'Click <a href="https://example.com" class="link">here</a>.'
+        '</p>'
+    )  # fmt: skip
 
 
 def test_navigation() -> None:
@@ -39,8 +42,8 @@ def test_navigation() -> None:
     )
     assert navigation.to_html() == (
         '<ul id="nav" class="navigation">'
-            '<li id="home"><a href="/">Home</a></li>'
-            '<li id="about"><a href="/about">About</a></li>'
+            '<li id="home"><a href="/" class="link">Home</a></li>'
+            '<li id="about"><a href="/about" class="link">About</a></li>'
         "</ul>"
     )  # fmt: skip
 

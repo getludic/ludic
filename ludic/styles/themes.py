@@ -116,9 +116,9 @@ class Colors:
 class FontSizes:
     """Font sizes for a theme."""
 
-    small: Size = Size(12)
-    medium: Size = Size(16)
-    large: Size = Size(20)
+    small: Size = Size(14)
+    medium: Size = Size(18)
+    large: Size = Size(24)
 
 
 @dataclass
@@ -163,7 +163,7 @@ class Theme(metaclass=ABCMeta):
         Returns:
             _T: The element with the theme applied.
         """
-        element.theme = self
+        element.context["theme"] = self
         return element
 
 

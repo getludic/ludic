@@ -1,21 +1,17 @@
 import inspect
 from collections.abc import Callable
-from typing import Any, ClassVar, Protocol
+from typing import Any, ClassVar, Protocol, cast
 
+from starlette.datastructures import URL
 from starlette.endpoints import HTTPEndpoint as BaseEndpoint
-from starlette.requests import Request
 from starlette.routing import Route
 
 from ludic.catalog.loaders import LazyLoader
 from ludic.types import AnyChildren, Component, NoChildren, TAttrs
 from ludic.utils import get_element_generic_args
 
-from .datastructures import URLPath
+from .requests import Request
 from .responses import prepare_response
-
-
-class AppProtocol(Protocol):
-    def url_path_for(self, name: str, /, **path_params: Any) -> URLPath: ...
 
 
 class RoutedProtocol(Protocol):
@@ -54,7 +50,6 @@ class Endpoint(Component[NoChildren, TAttrs]):
     """Base class for Ludic endpoints."""
 
     route: ClassVar[Route]
-    app: ClassVar[AppProtocol]
 
     def lazy_load(
         self,
@@ -74,9 +69,7 @@ class Endpoint(Component[NoChildren, TAttrs]):
             load_url=self.url_for(endpoint, **kwargs),
         )
 
-    def url_for(
-        self, endpoint: type[RoutedProtocol] | str, **path_params: Any
-    ) -> URLPath:
+    def url_for(self, endpoint: type[RoutedProtocol] | str, **path_params: Any) -> URL:
         """Get URL for an endpoint.
 
         Args:
@@ -86,7 +79,9 @@ class Endpoint(Component[NoChildren, TAttrs]):
         Returns:
             The URL.
         """
-        if not hasattr(self, "app"):
+        request = self.context.get("request")
+
+        if request is None or not isinstance(request, Request):
             raise RuntimeError(
                 f"{type(self).__name__} is not bound to an app, you need to set the"
                 f"{type(self).__name__}.app property in order to use Endpoint.url_for."
@@ -107,5 +102,4 @@ class Endpoint(Component[NoChildren, TAttrs]):
                     if key in endpoint.route.param_convertors
                 }
 
-        endpoint_name = endpoint if isinstance(endpoint, str) else endpoint.route.name
-        return self.app.url_path_for(endpoint_name, **path_params)
+        return cast(URL, request.url_for(endpoint, **path_params))

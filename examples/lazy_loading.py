@@ -1,15 +1,18 @@
 import asyncio
 
-from examples import Body, Header, Page, app
+from examples import Body, Header, Page
+
 from ludic.catalog.loaders import LazyLoader
 from ludic.catalog.quotes import Quote
 from ludic.html import div, svg
 from ludic.types import Safe
-from ludic.web import Request
+from ludic.web import LudicApp, Request
+
+app = LudicApp(debug=True)
 
 
 @app.get("/")
-async def homepage(request: Request) -> Page:
+async def index(request: Request) -> Page:
     return Page(
         Header("Lazy Loading"),
         Body(

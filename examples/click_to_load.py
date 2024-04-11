@@ -1,14 +1,17 @@
 from typing import Self, override
 
-from examples import Body, Header, Page, app
+from examples import Body, Header, Page
+
 from ludic.attrs import ButtonAttrs
 from ludic.catalog.buttons import ButtonPrimary
 from ludic.catalog.quotes import Quote
 from ludic.catalog.tables import Table, TableHead, TableRow
 from ludic.html import td
 from ludic.types import Attrs, Blank, Component, ComponentStrict
-from ludic.web import Endpoint
+from ludic.web import Endpoint, LudicApp
 from ludic.web.datastructures import QueryParams
+
+app = LudicApp(debug=True)
 
 
 class ContactAttrs(Attrs):
@@ -50,19 +53,8 @@ class LoadMoreButton(ComponentStrict[LoadMoreAttrs]):
         )
 
 
-class ContactsTable(Component[TableRow, Attrs]):
-    @override
-    def render(self) -> Table:
-        return Table(
-            TableHead("ID", "Name", "Email"),
-            *self.children,
-            style={"text-align": "center"},
-        )
-
-
 @app.get("/")
 async def index() -> Page:
-    slice = await ContactsSlice.get(QueryParams(page=1))
     return Page(
         Header("Click To Edit"),
         Body(
@@ -71,7 +63,7 @@ async def index() -> Page:
                 "a table of data.",
                 source_url="https://htmx.org/examples/click-to-load/",
             ),
-            ContactsTable(*slice.render().children),
+            ContactsTable(await ContactsSlice.get(QueryParams(page=1))),
         ),
     )
 
@@ -94,10 +86,22 @@ class ContactsSlice(Endpoint[ContactsSliceAttrs]):
             TableRow(
                 td(
                     LoadMoreButton(
-                        url=self.url_for(ContactsSlice).query(page=next_page)
+                        url=self.url_for(ContactsSlice).include_query_params(
+                            page=next_page
+                        )
                     ),
                     colspan=3,
                 ),
                 id=LoadMoreButton.target,
             ),
+        )
+
+
+class ContactsTable(Component[ContactsSlice, Attrs]):
+    @override
+    def render(self) -> Table[TableHead, ContactsSlice]:
+        return Table(
+            TableHead("ID", "Name", "Email"),
+            *self.children,
+            style={"text-align": "center"},
         )

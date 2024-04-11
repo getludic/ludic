@@ -83,11 +83,16 @@ class BaseElement(metaclass=ABCMeta):
     children: Sequence[Any]
     attrs: Mapping[str, Any]
 
-    _theme: Theme | None = None
+    context: dict[str, Any]
 
     def __init_subclass__(cls) -> None:
         ELEMENT_REGISTRY.setdefault(cls.__name__, [])
         ELEMENT_REGISTRY[cls.__name__].append(cls)
+
+    def __init__(self, *children: Any, **attrs: Any) -> None:
+        self.context = {}
+        self.children = children
+        self.attrs = attrs
 
     def __str__(self) -> str:
         return self.to_string()
@@ -134,12 +139,8 @@ class BaseElement(metaclass=ABCMeta):
     ) -> str:
         formatted = []
         for child in self.children:
-            if (
-                isinstance(child, BaseElement)
-                and child._theme is None
-                and self._theme is not None
-            ):
-                child.theme = self.theme
+            if isinstance(child, BaseElement):
+                child.context.update(self.context)
             formatted.append(format_fun(child))
         return "".join(formatted)
 
@@ -159,12 +160,10 @@ class BaseElement(metaclass=ABCMeta):
     @property
     def theme(self) -> Theme:
         """Get the theme of the element."""
-        return self._theme or get_default_theme()
-
-    @theme.setter
-    def theme(self, value: Theme) -> None:
-        """Set the theme of the element."""
-        self._theme = value
+        if context_theme := self.context.get("theme"):
+            if isinstance(context_theme, Theme):
+                return context_theme
+        return get_default_theme()
 
     def is_simple(self) -> bool:
         """Check if the element is simple (i.e. contains only one primitive type)."""
@@ -214,7 +213,7 @@ class BaseElement(metaclass=ABCMeta):
         classes = list(dom.classes)
 
         while dom != (rendered_dom := dom.render()):
-            rendered_dom._theme = dom._theme
+            rendered_dom.context.update(dom.context)
             dom = rendered_dom
             classes += dom.classes
 
@@ -305,6 +304,7 @@ class Element(Generic[TChildren, TAttrs], BaseElement):
         # FIXME: https://github.com/python/typing/issues/1399
         **attributes: Unpack[TAttrs],  # type: ignore
     ) -> None:
+        super().__init__()
         self.attrs = cast(TAttrs, attributes)
         self.children = tuple(self.formatter.extract(*children))
 
@@ -326,5 +326,6 @@ class ElementStrict(Generic[*TChildrenArgs, TAttrs], BaseElement):
         # FIXME: https://github.com/python/typing/issues/1399
         **attrs: Unpack[TAttrs],  # type: ignore
     ) -> None:
+        super().__init__()
         self.attrs = cast(TAttrs, attrs)
         self.children = tuple(self.formatter.extract(*children))

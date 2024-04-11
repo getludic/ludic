@@ -117,7 +117,6 @@ class LudicApp(Starlette):
 
         def register(endpoint: type[TEndpoint]) -> type[TEndpoint]:
             self.add_route(path, endpoint, include_in_schema=include_in_schema)
-            endpoint.app = self
             return endpoint
 
         return register

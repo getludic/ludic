@@ -1,20 +1,18 @@
 import json
 from collections.abc import MutableMapping
 from typing import Any
-from urllib.parse import urlencode
 
 from starlette.datastructures import (
+    URL,
     FormData,
     QueryParams,
+    URLPath,
 )
 from starlette.datastructures import Headers as BaseHeaders
-from starlette.datastructures import (
-    URLPath as BaseURLPath,
-)
 
 from ludic import types
 
-__all__ = ("FormData", "Headers", "QueryParams", "URLPath")
+__all__ = ("FormData", "Headers", "QueryParams", "URL", "URLPath")
 
 
 class Headers(BaseHeaders):
@@ -36,14 +34,3 @@ class Headers(BaseHeaders):
                     new_headers[key] = json.dumps(value)
 
         super().__init__(new_headers, raw, scope)
-
-
-class URLPath(BaseURLPath):
-    """A URL path string that may also hold an associated protocol and/or host.
-
-    Used by the routing to return `url_path_for` matches.
-    """
-
-    def query(self, **kwargs: Any) -> "URLPath":
-        query = urlencode([(str(key), str(value)) for key, value in kwargs.items()])
-        return URLPath(f"{self}?{query}", self.protocol, self.host)

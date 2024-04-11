@@ -1,11 +1,14 @@
 from typing import Self, override
 
-from examples import Body, Header, Page, app
+from examples import Body, Header, Page
+
 from ludic.catalog.quotes import Quote
 from ludic.catalog.tables import Table, TableHead, TableRow
 from ludic.types import Attrs, Blank, Component
-from ludic.web import Endpoint
+from ludic.web import Endpoint, LudicApp
 from ludic.web.datastructures import QueryParams
+
+app = LudicApp(debug=True)
 
 
 class ContactAttrs(Attrs):
@@ -30,19 +33,8 @@ def load_contacts(page: int) -> list[ContactAttrs]:
     ]
 
 
-class ContactsTable(Component[TableRow, Attrs]):
-    @override
-    def render(self) -> Table:
-        return Table(
-            TableHead("ID", "Name", "Email"),
-            *self.children,
-            style={"text-align": "center"},
-        )
-
-
 @app.get("/")
 async def index() -> Page:
-    slice = await ContactsSlice.get(QueryParams(page=1))
     return Page(
         Header("Infinite Scroll"),
         Body(
@@ -51,7 +43,7 @@ async def index() -> Page:
                 "on user scrolling action.",
                 source_url="https://htmx.org/examples/infinite-scroll/",
             ),
-            ContactsTable(*slice.render().children),
+            ContactsTable(await ContactsSlice.get(QueryParams(page=1))),
         ),
     )
 
@@ -73,8 +65,20 @@ class ContactsSlice(Endpoint[ContactsSliceAttrs]):
             *(TableRow(*rows) for rows in init),
             TableRow(
                 *last,
-                hx_get=self.url_for(ContactsSlice).query(page=self.attrs["page"] + 1),
+                hx_get=self.url_for(ContactsSlice).include_query_params(
+                    page=self.attrs["page"] + 1
+                ),
                 hx_trigger="revealed",
                 hx_swap="afterend",
             ),
+        )
+
+
+class ContactsTable(Component[ContactsSlice, Attrs]):
+    @override
+    def render(self) -> Table[TableHead, ContactsSlice]:
+        return Table(
+            TableHead("ID", "Name", "Email"),
+            *self.children,
+            style={"text-align": "center"},
         )
