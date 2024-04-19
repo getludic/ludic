@@ -1,12 +1,13 @@
 from typing import Annotated, NotRequired, Self, override
 
-from examples import Body, Header, Page, init_db
+from examples import Page, init_db
 
 from ludic.catalog.buttons import Button, ButtonDanger, ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form, create_fields
+from ludic.catalog.headers import H1, H2
 from ludic.catalog.items import Pairs
+from ludic.catalog.layouts import Box, Cluster, Stack
 from ludic.catalog.quotes import Quote
-from ludic.html import div
 from ludic.types import Attrs
 from ludic.web import Endpoint, LudicApp
 from ludic.web.exceptions import NotFoundError
@@ -34,15 +35,14 @@ class ContactAttrs(Attrs):
 @app.get("/")
 async def index() -> Page:
     return Page(
-        Header("Click To Edit"),
-        Body(
-            Quote(
-                "The click to edit pattern provides a way to offer inline editing "
-                "of all or part of a record without a page refresh.",
-                source_url="https://htmx.org/examples/click-to-edit/",
-            ),
-            *[Contact(**contact.dict()) for contact in db.contacts.values()],
+        H1("Click To Edit"),
+        Quote(
+            "The click to edit pattern provides a way to offer inline editing "
+            "of all or part of a record without a page refresh.",
+            source_url="https://htmx.org/examples/click-to-edit/",
         ),
+        H2("Demo"),
+        Box(*[Contact(**contact.dict()) for contact in db.contacts.values()]),
     )
 
 
@@ -70,12 +70,14 @@ class Contact(Endpoint[ContactAttrs]):
         return cls(**contact.dict())
 
     @override
-    def render(self) -> div:
-        return div(
+    def render(self) -> Stack:
+        return Stack(
             Pairs(items=self.attrs.items()),
-            Button(
-                "Click To Edit",
-                hx_get=self.url_for(ContactForm),
+            Cluster(
+                Button(
+                    "Click To Edit",
+                    hx_get=self.url_for(ContactForm),
+                ),
             ),
             hx_target="this",
             hx_swap="outerHTML",
@@ -97,8 +99,10 @@ class ContactForm(Endpoint[ContactAttrs]):
     def render(self) -> Form:
         return Form(
             *create_fields(self.attrs, spec=ContactAttrs),
-            ButtonPrimary("Submit"),
-            ButtonDanger("Cancel", hx_get=self.url_for(Contact)),
+            Cluster(
+                ButtonPrimary("Submit"),
+                ButtonDanger("Cancel", hx_get=self.url_for(Contact)),
+            ),
             hx_put=self.url_for(Contact),
             hx_target="this",
             hx_swap="outerHTML",

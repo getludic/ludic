@@ -1,9 +1,9 @@
 from typing import Self, override
 
-from examples import Body, Header, Page
+from examples import Page
 
-from ludic.attrs import ButtonAttrs
 from ludic.catalog.buttons import ButtonPrimary
+from ludic.catalog.headers import H1, H2
 from ludic.catalog.quotes import Quote
 from ludic.catalog.tables import Table, TableHead, TableRow
 from ludic.html import td
@@ -25,7 +25,7 @@ class ContactsSliceAttrs(Attrs):
     contacts: list[ContactAttrs]
 
 
-class LoadMoreAttrs(ButtonAttrs):
+class LoadMoreAttrs(Attrs):
     url: str
 
 
@@ -56,15 +56,14 @@ class LoadMoreButton(ComponentStrict[LoadMoreAttrs]):
 @app.get("/")
 async def index() -> Page:
     return Page(
-        Header("Click To Edit"),
-        Body(
-            Quote(
-                "This example shows how to implement click-to-load the next page in "
-                "a table of data.",
-                source_url="https://htmx.org/examples/click-to-load/",
-            ),
-            ContactsTable(await ContactsSlice.get(QueryParams(page=1))),
+        H1("Click To Load"),
+        Quote(
+            "This example shows how to implement click-to-load the next page in "
+            "a table of data.",
+            source_url="https://htmx.org/examples/click-to-load/",
         ),
+        H2("Demo"),
+        ContactsTable(await ContactsSlice.get(QueryParams(page=1))),
     )
 
 
@@ -88,7 +87,7 @@ class ContactsSlice(Endpoint[ContactsSliceAttrs]):
                     LoadMoreButton(
                         url=self.url_for(ContactsSlice).include_query_params(
                             page=next_page
-                        )
+                        ),
                     ),
                     colspan=3,
                 ),
@@ -103,5 +102,5 @@ class ContactsTable(Component[ContactsSlice, Attrs]):
         return Table(
             TableHead("ID", "Name", "Email"),
             *self.children,
-            style={"text-align": "center"},
+            classes=["text-align-center"],
         )

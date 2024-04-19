@@ -17,21 +17,19 @@ class Quote(ComponentStrict[str, QuoteAttrs]):
     styles = style.use(
         lambda theme: {
             ".quote": {
-                "margin-bottom": "20px",  # type: ignore
                 "blockquote": {
                     "background-color": theme.colors.light,
-                    "border-left": f"8px solid {theme.colors.light.darken(0.1)}",
-                    "margin": "0",
-                    "margin-bottom": "10px",
-                    "padding": "15px",
+                    "border-left": (
+                        f"{theme.borders.thick} solid {theme.colors.light.darken(0.05)}"
+                    ),
+                    "margin-bottom": theme.sizes.xxs,
+                    "padding": f"{theme.sizes.l} {theme.sizes.m}",
                 },
                 "blockquote p": {
-                    "font-size": theme.fonts.sizes.medium,
-                    "margin-bottom": "10px",
+                    "font-size": theme.fonts.size,
                 },
                 "footer": {
-                    "font-size": theme.fonts.sizes.small,
-                    "margin-top": "10px",
+                    "font-size": theme.fonts.size.scale(0.9),
                     "color": theme.colors.dark.lighten(0.5),
                 },
                 "footer a": {

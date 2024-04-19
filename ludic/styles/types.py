@@ -1,13 +1,14 @@
 from collections.abc import Mapping
-from typing import Literal, Self, TypedDict, overload
+from typing import Literal, Self, TypedDict
 
 from .utils import (
     darken_color,
-    first_not_none,
     hex_to_rgb,
     lighten_color,
     pick_readable_color_for,
 )
+
+SizeUnit = Literal["px", "ex", "em", "ch", "rem", "vw", "vh", "vmin", "vmax", "%"]
 
 
 class Color(str):
@@ -56,18 +57,19 @@ class Size(str):
     """Size class."""
 
     value: float
-    unit: Literal["px", "em"] = "px"  # Default unit is pixels
+    unit: SizeUnit = "rem"
 
-    def __new__(cls, value: float, unit: Literal["px", "em"] = "px") -> "Size":
+    def __new__(cls, value: float, unit: SizeUnit = "rem") -> "Size":
         match unit:
-            case "em":
-                self = super().__new__(
-                    cls, f"{(f"{value:.1f}").strip("0").rstrip(".")}{unit}"
-                )
-            case "px":
+            case "px" | "ch":
                 self = super().__new__(cls, f"{value:.0f}{unit}")
             case _:
-                raise ValueError(f"Invalid unit: {unit}")
+                formatted = f"{value:.2f}".rstrip("0").rstrip(".")
+                if not formatted or formatted == "0":
+                    formatted = "0"
+                else:
+                    formatted = f"{formatted}{unit}"
+                self = super().__new__(cls, formatted)
 
         self.value = value
         self.unit = unit
@@ -105,169 +107,6 @@ class Size(str):
             str: Decremented size.
         """
         return type(self)(self.value - float(self.value * factor), self.unit)
-
-
-class Spacing(str):
-    """Spacing class."""
-
-    top: Size
-    right: Size
-    bottom: Size
-    left: Size
-    unit: Literal["px", "em"]
-
-    @overload
-    def __new__(cls, /, *, unit: Literal["px", "em"] = "px") -> Self: ...
-
-    @overload
-    def __new__(cls, size: float, /, *, unit: Literal["px", "em"] = "px") -> Self: ...
-
-    @overload
-    def __new__(
-        cls,
-        top_and_bottom: float,
-        right_and_left: float,
-        /,
-        *,
-        unit: Literal["px", "em"] = "px",
-    ) -> Self: ...
-
-    @overload
-    def __new__(
-        cls,
-        top: float,
-        right_and_left: float,
-        left: float,
-        /,
-        *,
-        unit: Literal["px", "em"] = "px",
-    ) -> Self: ...
-
-    @overload
-    def __new__(
-        cls,
-        top: float,
-        right: float,
-        bottom: float,
-        left: float,
-        /,
-        *,
-        unit: Literal["px", "em"] = "px",
-    ) -> Self: ...
-
-    def __new__(
-        cls,
-        top: float = 4,
-        right: float | None = None,
-        bottom: float | None = None,
-        left: float | None = None,
-        /,
-        *,
-        unit: Literal["px", "em"] = "px",
-    ) -> Self:
-        top_size = Size(top, unit)
-        right_size = Size(first_not_none(right, top), unit)
-        bottom_size = Size(first_not_none(bottom, top), unit)
-        left_size = Size(first_not_none(left, right, top), unit)
-
-        self = super().__new__(
-            cls, f"{top_size} {right_size} {bottom_size} {left_size}"
-        )
-
-        self.top = top_size
-        self.right = right_size
-        self.bottom = bottom_size
-        self.left = left_size
-        self.unit = unit
-
-        return self
-
-    @overload
-    def new(self, /, *, unit: Literal["px", "em"] = "px") -> Self: ...
-
-    @overload
-    def new(self, size: float, /, *, unit: Literal["px", "em"] = "px") -> Self: ...
-
-    @overload
-    def new(
-        self,
-        top_and_bottom: float,
-        right_and_left: float,
-        /,
-        *,
-        unit: Literal["px", "em"] = "px",
-    ) -> Self: ...
-
-    @overload
-    def new(
-        self,
-        top: float,
-        right_and_left: float,
-        left: float,
-        /,
-        *,
-        unit: Literal["px", "em"] = "px",
-    ) -> Self: ...
-
-    @overload
-    def new(
-        self,
-        top: float,
-        right: float,
-        bottom: float,
-        left: float,
-        /,
-        *,
-        unit: Literal["px", "em"] = "px",
-    ) -> Self: ...
-
-    def new(
-        self,
-        top: float = 4,
-        right: float | None = None,
-        bottom: float | None = None,
-        left: float | None = None,
-        /,
-        *,
-        unit: Literal["px", "em"] = "px",
-    ) -> Self:
-        return type(self)(
-            top,
-            first_not_none(right, top),
-            first_not_none(bottom, top),
-            first_not_none(left, right, top),
-            unit=self.unit or unit,
-        )
-
-    @overload
-    def scale(cls, /) -> Self: ...
-
-    @overload
-    def scale(cls, size: float, /) -> Self: ...
-
-    @overload
-    def scale(cls, top_and_bottom: float, right_and_left: float, /) -> Self: ...
-
-    @overload
-    def scale(cls, top: float, right_and_left: float, left: float, /) -> Self: ...
-
-    @overload
-    def scale(cls, top: float, right: float, bottom: float, left: float, /) -> Self: ...
-
-    def scale(
-        self,
-        top: float = 1,
-        right: float | None = None,
-        bottom: float | None = None,
-        left: float | None = None,
-        /,
-    ) -> Self:
-        return type(self)(
-            self.top.scale(top).value,
-            self.right.scale(first_not_none(right, top)).value,
-            self.bottom.scale(first_not_none(bottom, top)).value,
-            self.left.scale(first_not_none(left, right, top)).value,
-        )
 
 
 CSSProperties = TypedDict(
@@ -585,6 +424,8 @@ CSSProperties = TypedDict(
         ],
         "height": str,
         "hyphens": Literal["none", "manual", "auto"],
+        # I
+        "inline-size": str,
         # J
         "justify-content": Literal[
             "flex-start",
@@ -602,7 +443,7 @@ CSSProperties = TypedDict(
         "left": str,
         "letter-spacing": str,
         "line-break": Literal["auto", "loose", "normal", "strict"],
-        "line-height": str,
+        "line-height": float,
         "list-style": str,
         "list-style-image": str,
         "list-style-position": Literal["inside", "outside"],
@@ -880,7 +721,7 @@ CSSProperties = TypedDict(
 # FIXME: Currently, it is impossible to properly type nested CSS properties
 # defined similar as in SCSS, it will be possible when the following PEP is
 # implemented and supported by type checkers: https://peps.python.org/pep-0728/
-GlobalStyles = Mapping[str, "CSSProperties | GlobalStyles"]
+GlobalStyles = Mapping[str | tuple[str, ...], "CSSProperties | GlobalStyles"]
 """CSS styles for elements or components which are defined by setting the ``styles``
 class property.
 

@@ -333,10 +333,10 @@ class style(BaseElement, GlobalStyles):
     def load(cls, cache: bool = False, theme: Theme | None = None) -> Self:
         return cls(from_loaded(cache=cache, theme=theme), type="text/css")
 
-    def __getitem__(self, key: str) -> CSSProperties | GlobalStyles:
+    def __getitem__(self, key: str | tuple[str, ...]) -> CSSProperties | GlobalStyles:
         return self.styles[key]
 
-    def __iter__(self) -> Iterator[str]:
+    def __iter__(self) -> Iterator[str | tuple[str, ...]]:
         return iter(self.styles.keys())
 
     def __len__(self) -> int:

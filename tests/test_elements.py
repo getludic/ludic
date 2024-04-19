@@ -102,7 +102,7 @@ def test_button_get() -> None:
         div(label("Email"), ": joe@blow.com"),
         button(
             "Click To Edit",
-            class_="btn btn-primary",
+            classes=["btn", "btn-primary"],
             hx_get="/contact/1/edit",
         ),
         hx_target="this",

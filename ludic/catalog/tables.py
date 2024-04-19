@@ -62,17 +62,6 @@ class ColumnMeta:
 class TableRow(Component[AnyChildren, GlobalAttrs]):
     """Simple component rendering as the HTML ``tr`` element."""
 
-    classes = ["table-row"]
-    styles = style.use(
-        lambda theme: {
-            "tr.table-row td": {
-                "border": f"1px solid {theme.colors.light.darken(0.2)}",
-                "padding": "12px",
-                "font-size": theme.fonts.sizes.medium,
-            }
-        }
-    )
-
     def get_value(self, index: int) -> PrimitiveChildren | None:
         if len(self.children) > index:
             child = self.children[index]
@@ -89,17 +78,6 @@ class TableRow(Component[AnyChildren, GlobalAttrs]):
 
 class TableHead(Component[AnyChildren, GlobalAttrs]):
     """Simple component rendering as the HTML ``tr`` element."""
-
-    classes = ["table-head"]
-    styles = style.use(
-        lambda theme: {
-            "tr.table-head th": {
-                "border": f"1px solid {theme.colors.light.darken(0.2)}",
-                "padding": "12px",
-                "font-size": theme.fonts.sizes.medium,
-            }
-        }
-    )
 
     @property
     def header(self) -> tuple[PrimitiveChildren, ...]:
@@ -153,14 +131,22 @@ class Table(ComponentStrict[THead, *tuple[TRow, ...], TableAttrs]):
             "table.table": {
                 "width": "100%",  # type: ignore
                 "border-collapse": "collapse",  # type: ignore
-                "margin-bottom": "15px",  # type: ignore
                 "thead": {
                     "background-color": theme.colors.light,
                 },
-                "button.btn": {
-                    "margin": "0 5px",
+                "tr th": {
+                    "border": (
+                        f"{theme.borders.thin} solid {theme.colors.light.darken(0.1)}"
+                    ),
+                    "padding": f"{theme.sizes.xxs} {theme.sizes.xxxs}",
                 },
-            }
+                "tr td": {
+                    "border": (
+                        f"{theme.borders.thin} solid {theme.colors.light.darken(0.1)}"
+                    ),
+                    "padding": f"{theme.sizes.xxs} {theme.sizes.xxxs}",
+                },
+            },
         }
     )
 

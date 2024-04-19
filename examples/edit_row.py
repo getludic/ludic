@@ -1,6 +1,6 @@
 from typing import Annotated, NotRequired, Self, override
 
-from examples import Body, Header, Page, init_db
+from examples import Page, init_db
 
 from ludic.attrs import Attrs, HtmxAttrs
 from ludic.catalog.buttons import (
@@ -9,9 +9,10 @@ from ludic.catalog.buttons import (
     ButtonSuccess,
 )
 from ludic.catalog.forms import InputField
+from ludic.catalog.headers import H1, H2
+from ludic.catalog.layouts import Cluster
 from ludic.catalog.quotes import Quote
 from ludic.catalog.tables import ColumnMeta, Table, TableHead, TableRow
-from ludic.html import div
 from ludic.types import JavaScript
 from ludic.web import Endpoint, LudicApp
 from ludic.web.exceptions import NotFoundError
@@ -34,14 +35,13 @@ class PeopleAttrs(Attrs):
 @app.get("/")
 async def index() -> Page:
     return Page(
-        Header("Edit Row"),
-        Body(
-            Quote(
-                "This example shows how to implement editable rows.",
-                source_url="https://htmx.org/examples/edit-row/",
-            ),
-            await PeopleTable.get(),
+        H1("Edit Row"),
+        Quote(
+            "This example shows how to implement editable rows.",
+            source_url="https://htmx.org/examples/edit-row/",
         ),
+        H2("Demo"),
+        await PeopleTable.get(),
     )
 
 
@@ -90,6 +90,7 @@ class PersonRow(Endpoint[PersonAttrs]):
                 hx_get=self.url_for(PersonForm),
                 hx_trigger="edit",
                 on_click=self.on_click_script,
+                classes=["small"],
             ),
         )
 
@@ -110,15 +111,21 @@ class PersonForm(Endpoint[PersonAttrs]):
         return TableRow(
             InputField(name="name", value=self.attrs["name"]),
             InputField(name="email", value=self.attrs["email"]),
-            div(
-                ButtonSecondary("Cancel", hx_get=self.url_for(PersonRow)),
+            Cluster(
+                ButtonSecondary(
+                    "Cancel",
+                    hx_get=self.url_for(PersonRow),
+                    classes=["small"],
+                ),
                 ButtonSuccess(
                     "Save",
                     hx_put=self.url_for(PersonRow),
                     hx_include="closest tr",
+                    classes=["small"],
                 ),
+                classes=["cluster-small"],
             ),
-            class_="editing",
+            classes=["editing"],
         )
 
 
@@ -134,5 +141,5 @@ class PeopleTable(Endpoint[PeopleAttrs]):
             TableHead("Name", "Email", "Action"),
             *(PersonRow(**person) for person in self.attrs["people"]),
             body_attrs=HtmxAttrs(hx_target="closest tr", hx_swap="outerHTML"),
-            style={"text-align": "center"},
+            classes=["text-align-center"],
         )

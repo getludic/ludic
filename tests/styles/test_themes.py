@@ -4,27 +4,18 @@ from ludic.attrs import GlobalAttrs
 from ludic.html import a, b, div, style
 from ludic.styles.themes import (
     Colors,
-    DarkTheme,
     Fonts,
-    FontSizes,
-    LightTheme,
     get_default_theme,
     set_default_theme,
 )
-from ludic.styles.types import Color, Size, Spacing
+from ludic.styles.types import Color, Size
 from ludic.types import Component
 
-
-def test_spacing() -> None:
-    assert Spacing(10, 20, 30, 40) == "10px 20px 30px 40px"
-    assert Spacing(10, 20, 30, 40, unit="em") == "10em 20em 30em 40em"
-    assert Spacing(10, 20, 30) == "10px 20px 30px 20px"
-    assert Spacing(10, 20) == "10px 20px 10px 20px"
-    assert Spacing(10) == "10px 10px 10px 10px"
+from . import BarTheme, FooTheme
 
 
 def test_theme_colors() -> None:
-    theme = LightTheme(
+    theme = FooTheme(
         colors=Colors(
             primary=Color("#c2e7fd"),
             white=Color("#fff"),
@@ -52,29 +43,26 @@ def test_theme_colors() -> None:
 
 
 def test_theme_font_sizes() -> None:
-    theme = LightTheme(
-        fonts=Fonts(sizes=FontSizes(small=Size(10, "px"), medium=Size(1.2, unit="em"))),
-    )
+    theme = FooTheme(fonts=Fonts(size=Size(10, "px")))
 
-    assert theme.fonts.sizes.small == "10px"
-    assert theme.fonts.sizes.medium == "1.2em"
+    assert theme.fonts.size == "10px"
+    assert theme.fonts.plain == "sans-serif"
 
 
 def test_themes_switching() -> None:
-    dark, light = DarkTheme(), LightTheme()
+    foo, bar = FooTheme(), BarTheme()
 
-    assert get_default_theme() == light
-    set_default_theme(dark)
-    assert get_default_theme() == dark
-    set_default_theme(light)
-    assert get_default_theme() == light
+    set_default_theme(foo)
+    assert get_default_theme() == foo
+    set_default_theme(bar)
+    assert get_default_theme() == bar
 
 
 def test_element_theme_switching() -> None:
-    dark = DarkTheme()
-    light = LightTheme()
+    foo = FooTheme()
+    bar = BarTheme()
 
-    set_default_theme(light)
+    set_default_theme(bar)
 
     class C1(Component[str, GlobalAttrs]):
         styles = style.use(
@@ -101,31 +89,31 @@ def test_element_theme_switching() -> None:
         @override
         def render(self) -> div:
             return div(
-                dark.use(C1(*self.children)),
+                foo.use(C1(*self.children)),
                 id="c2",
                 style={"background-color": self.theme.colors.primary},
             )
 
     assert C2("World").to_html() == (
-        f'<div id="c2" style="background-color:{light.colors.primary}">'
+        f'<div id="c2" style="background-color:{bar.colors.primary}">'
           '<div id="c1">'
-            f'<b style="color:{dark.colors.secondary}">Hello, </b>'
+            f'<b style="color:{foo.colors.secondary}">Hello, </b>'
             '<a href="https://example.com">World</a>'
           "</div>"
         "</div>"
     )  # fmt: skip
     assert style.from_components(C1, C2).to_html() == (
         '<style type="text/css">\n'
-          f"#c1 a {{ color: {light.colors.warning}; }}\n"
-          f"#c2 a {{ color: {light.colors.danger}; }}\n"
+          f"#c1 a {{ color: {bar.colors.warning}; }}\n"
+          f"#c2 a {{ color: {bar.colors.danger}; }}\n"
         "</style>"
     )  # fmt: skip
 
-    set_default_theme(dark)
+    set_default_theme(foo)
 
     assert style.from_components(C1, C2).to_html() == (
         '<style type="text/css">\n'
-          f"#c1 a {{ color: {dark.colors.warning}; }}\n"
-          f"#c2 a {{ color: {dark.colors.danger}; }}\n"
+          f"#c1 a {{ color: {foo.colors.warning}; }}\n"
+          f"#c2 a {{ color: {foo.colors.danger}; }}\n"
         "</style>"
     )  # fmt: skip

@@ -15,6 +15,7 @@ class HtmlAttrs(Attrs, total=False):
     id: str
     accesskey: str
     class_: Annotated[str, Alias("class")]
+    classes: Annotated[list[str], Alias("class")]  # merged with class_
     contenteditable: Literal["true", "false"]
     dir: Literal["ltr", "rtl", "auto"]
     draggable: Literal["true", "false"]

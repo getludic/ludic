@@ -25,6 +25,8 @@ def format_attr_value(key: str, value: Any, is_html: bool = False) -> str:
             f"{dict_key}:{html.escape(dict_value, False)}"
             for dict_key, dict_value in value.items()
         )
+    elif isinstance(value, list):
+        value = " ".join(html.escape(v, False) for v in value)
     elif isinstance(value, bool):
         if is_html and not key.startswith("hx"):
             value = html.escape(key, False) if value else ""
@@ -72,10 +74,14 @@ def format_attrs(
                 return args[1]
         return key
 
-    result = {}
+    result: dict[str, str] = {}
     for key, value in attrs.items():
         if formatted_value := format_attr_value(key, value, is_html=is_html):
-            result[_get_key(key)] = formatted_value
+            alias = _get_key(key)
+            if alias in result:
+                result[alias] += " " + formatted_value
+            else:
+                result[alias] = formatted_value
     return result
 
 
