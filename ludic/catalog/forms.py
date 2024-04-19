@@ -109,12 +109,12 @@ class FormField(Component[TChildren, TAttrs]):
                     "margin": f"{theme.sizes.xxxs} 0 {theme.sizes.xxs}",
                 },
                 "input": {
-                    "width": "100%",
-                    "padding": f"{theme.sizes.xs} {theme.sizes.xxxs}",
+                    "inline-size": "100%",
+                    "padding": f"{theme.sizes.xxxs} {theme.sizes.xs}",
                     "border": f"1px solid {theme.colors.light.darken(0.2)}",
-                    "border-radius": "4px",
+                    "border-radius": theme.rounding.normal,
                     "box-sizing": "border-box",
-                    "font-size": theme.fonts.size,
+                    "font-size": theme.fonts.size.scale(0.9),
                 },
             }
         }
