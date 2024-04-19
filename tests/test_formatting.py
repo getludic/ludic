@@ -71,8 +71,7 @@ def test_component_with_f_string() -> None:
         "</Paragraph>"
     )  # fmt: skip
     assert paragraph.to_html() == (
-        '<p class="paragraph">Hello, how <strong>are you</strong>? '
-        'Click <a href="https://example.com" class="link">here</a>.</p>'
+        '<p>Hello, how <strong>are you</strong>? Click <a href="https://example.com">here</a>.</p>'
     )
 
 

@@ -8,7 +8,7 @@ from ludic.html import b
 
 def test_link() -> None:
     link = Link("A link!", to="https://example.com")
-    assert link.to_html() == '<a href="https://example.com" class="link">A link!</a>'
+    assert link.to_html() == '<a href="https://example.com">A link!</a>'
 
 
 def test_paragraph() -> None:
@@ -27,9 +27,9 @@ def test_paragraph() -> None:
         "</Paragraph>"
     )  # fmt: skip
     assert paragraph.to_html() == (
-        '<p class="paragraph">'
+        '<p>'
             'Hello, how <b>are you</b>? '
-            'Click <a href="https://example.com" class="link">here</a>.'
+            'Click <a href="https://example.com">here</a>.'
         '</p>'
     )  # fmt: skip
 
@@ -41,10 +41,12 @@ def test_navigation() -> None:
         id="nav",
     )
     assert navigation.to_html() == (
-        '<ul id="nav" class="navigation">'
-            '<li id="home"><a href="/" class="link">Home</a></li>'
-            '<li id="about"><a href="/about" class="link">About</a></li>'
-        "</ul>"
+        '<nav id="nav">'
+            "<ul>"
+                '<li id="home"><a href="/">Home</a></li>'
+                '<li id="about"><a href="/about">About</a></li>'
+            "</ul>"
+        "</nav>"
     )  # fmt: skip
 
 
@@ -56,11 +58,11 @@ def test_pairs() -> None:
         Value(42),
     )
     assert pairs.to_html() == (
-        '<dl class="pairs">'
-            '<dt class="key">Name</dt>'
-            '<dd class="value">John</dd>'
-            '<dt class="key">Age</dt>'
-            '<dd class="value">42</dd>'
+        '<dl class="stack stack-small">'
+            '<dt>Name</dt>'
+            '<dd>John</dd>'
+            '<dt>Age</dt>'
+            '<dd>42</dd>'
         "</dl>"
     )  # fmt: skip
 
@@ -83,11 +85,11 @@ def test_tables() -> None:
     assert table.to_html() == (
         '<table class="table">'
             "<thead>"
-                '<tr class="table-head"><th>Name</th><th>Age</th></tr>'
+                '<tr><th>Name</th><th>Age</th></tr>'
             "</thead>"
             "<tbody>"
-                '<tr class="table-row"><td>John</td><td>42</td></tr>'
-                '<tr class="table-row"><td>Jane</td><td>43</td></tr>'
+                '<tr><td>John</td><td>42</td></tr>'
+                '<tr><td>Jane</td><td>43</td></tr>'
             "</tbody>"
         "</table>"
     )  # fmt: skip
@@ -100,7 +102,7 @@ def test_form_fields() -> None:
     )
 
     assert form.to_html() == (
-        '<form class="form">'
+        '<form class="form stack">'
             '<div class="form-field">'
                 '<input value="Name" name="name" id="name" />'
             "</div>"
@@ -116,7 +118,7 @@ def test_form_fields() -> None:
     )
 
     assert form.to_html() == (
-        '<form class="form">'
+        '<form class="form stack">'
             '<div class="form-field">'
                 '<label for="name">Foo</label>'
                 '<input value="Name" name="name" id="name" />'

@@ -105,17 +105,16 @@ class FormField(Component[TChildren, TAttrs]):
             ".form-field": {
                 "label": {
                     "display": "block",
-                    "margin": theme.spacing.new(12, 0, 8),
                     "font-weight": "bold",
+                    "margin": f"{theme.sizes.xxxs} 0 {theme.sizes.xxs}",
                 },
                 "input": {
                     "width": "100%",
-                    "padding": "10px",
-                    "margin": theme.spacing.new(5, 0),
+                    "padding": f"{theme.sizes.xs} {theme.sizes.xxxs}",
                     "border": f"1px solid {theme.colors.light.darken(0.2)}",
                     "border-radius": "4px",
                     "box-sizing": "border-box",
-                    "font-size": theme.fonts.sizes.medium,
+                    "font-size": theme.fonts.size,
                 },
             }
         }
@@ -165,7 +164,7 @@ class TextAreaField(FormField[PrimitiveChildren, TextAreaFieldAttrs]):
 class Form(Component[ComplexChildren, FormAttrs]):
     """A component helper for creating HTML forms."""
 
-    classes = ["form"]
+    classes = ["form", "stack"]
 
     @override
     def render(self) -> form:

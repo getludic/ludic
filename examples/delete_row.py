@@ -1,9 +1,10 @@
 from typing import Self, override
 
-from examples import Body, Header, Page, init_db
+from examples import Page, init_db
 
 from ludic.attrs import Attrs, HtmxAttrs
 from ludic.catalog.buttons import ButtonDanger
+from ludic.catalog.headers import H1, H2
 from ludic.catalog.quotes import Quote
 from ludic.catalog.tables import Table, TableHead, TableRow
 from ludic.web import Endpoint, LudicApp
@@ -27,15 +28,14 @@ class PeopleAttrs(Attrs):
 @app.get("/")
 def index() -> Page:
     return Page(
-        Header("Delete Row"),
-        Body(
-            Quote(
-                "This example shows how to implement a delete button that removes "
-                "a table row upon completion.",
-                source_url="https://htmx.org/examples/delete-row/",
-            ),
-            PeopleTable.get(),
+        H1("Delete Row"),
+        Quote(
+            "This example shows how to implement a delete button that removes "
+            "a table row upon completion.",
+            source_url="https://htmx.org/examples/delete-row/",
         ),
+        H2("Demo"),
+        PeopleTable.get(),
     )
 
 
@@ -54,7 +54,9 @@ class PersonRow(Endpoint[PersonAttrs]):
             self.attrs["name"],
             self.attrs["email"],
             "Active" if self.attrs["active"] else "Inactive",
-            ButtonDanger("Delete", hx_delete=self.url_for(PersonRow)),
+            ButtonDanger(
+                "Delete", hx_delete=self.url_for(PersonRow), classes=["small"]
+            ),
         )
 
 
@@ -81,5 +83,5 @@ class PeopleTable(Endpoint[PeopleAttrs]):
                 hx_target="closest tr",
                 hx_swap="outerHTML swap:1s",
             ),
-            style={"text-align": "center"},
+            classes=["text-align-center"],
         )

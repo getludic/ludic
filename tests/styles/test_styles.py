@@ -1,6 +1,8 @@
 from ludic.html import style
 from ludic.types import AnyChildren, Attrs, Component
 
+from . import FooTheme
+
 
 class A(Component[AnyChildren, Attrs]):
     styles = {
@@ -107,7 +109,7 @@ def test_styles_with_at_rule() -> None:
 
 
 def test_styles_collection() -> None:
-    assert style.from_components(A, B).to_html() == (
+    assert style.from_components(A, B, theme=FooTheme()).to_html() == (
         '<style type="text/css">\n'
         "a { color: red; }\n"
         ".content { background: #ffe; padding: 10px; }\n"

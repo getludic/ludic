@@ -1,7 +1,8 @@
 from typing import Self, override
 
-from examples import Body, Header, Page
+from examples import Page
 
+from ludic.catalog.headers import H1, H2
 from ludic.catalog.quotes import Quote
 from ludic.catalog.tables import Table, TableHead, TableRow
 from ludic.types import Attrs, Blank, Component
@@ -36,15 +37,14 @@ def load_contacts(page: int) -> list[ContactAttrs]:
 @app.get("/")
 async def index() -> Page:
     return Page(
-        Header("Infinite Scroll"),
-        Body(
-            Quote(
-                "The infinite scroll pattern provides a way to load content dynamically"
-                "on user scrolling action.",
-                source_url="https://htmx.org/examples/infinite-scroll/",
-            ),
-            ContactsTable(await ContactsSlice.get(QueryParams(page=1))),
+        H1("Infinite Scroll"),
+        Quote(
+            "The infinite scroll pattern provides a way to load content dynamically"
+            "on user scrolling action.",
+            source_url="https://htmx.org/examples/infinite-scroll/",
         ),
+        H2("Demo"),
+        ContactsTable(await ContactsSlice.get(QueryParams(page=1))),
     )
 
 
@@ -80,5 +80,5 @@ class ContactsTable(Component[ContactsSlice, Attrs]):
         return Table(
             TableHead("ID", "Name", "Email"),
             *self.children,
-            style={"text-align": "center"},
+            classes=["text-align-center"],
         )

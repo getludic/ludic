@@ -2,7 +2,8 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypeVar
 
-from .types import Color, Size, Spacing
+from .types import Color, Size
+from .utils import clamp
 
 if TYPE_CHECKING:
     from ludic.types import BaseElement
@@ -29,38 +30,90 @@ class Colors:
 
 
 @dataclass
-class FontSizes:
-    """Font sizes for a theme."""
+class Header:
+    """Header for a theme."""
 
-    small: Size = Size(14)
-    medium: Size = Size(18)
-    large: Size = Size(24)
+    size: Size = Size(1.5, "em")
+    anchor: bool = True
 
 
 @dataclass
-class FontFamilies:
-    """Font families for a theme."""
+class Headers:
+    """Headers for a theme."""
 
-    headers: str = "serif"
-    paragraphs: str = "sans-serif"
-    monospace: str = "monospace"
+    h1: Header = field(default_factory=lambda: Header(size=Size(3, "em"), anchor=False))
+    h2: Header = field(
+        default_factory=lambda: Header(size=Size(2.5, "em"), anchor=True)
+    )
+    h3: Header = field(default_factory=lambda: Header(size=Size(2, "em"), anchor=False))
+    h4: Header = field(
+        default_factory=lambda: Header(size=Size(1.5, "em"), anchor=False)
+    )
+    h5: Header = field(
+        default_factory=lambda: Header(size=Size(1.25, "em"), anchor=False)
+    )
+    h6: Header = field(default_factory=lambda: Header(size=Size(1, "em"), anchor=False))
 
 
 @dataclass
 class Fonts:
     """Font sizes for a theme."""
 
-    families: FontFamilies = field(default_factory=FontFamilies)
-    sizes: FontSizes = field(default_factory=FontSizes)
+    plain: str = "sans-serif"
+    serif: str = "serif"
+    mono: str = "monospace"
+
+    size: Size = Size(1.02, "em")
+
+
+@dataclass
+class Sizes:
+    """Size for a theme."""
+
+    xxxxs: str = clamp(Size(0.33), Size(0.39), Size(0.18))
+    xxxs: str = clamp(Size(0.41), Size(0.47), Size(0.25))
+    xxs: str = clamp(Size(0.51), Size(0.57), Size(0.35))
+    xs: str = clamp(Size(0.64), Size(0.69), Size(0.5))
+    s: str = clamp(Size(0.8), Size(0.84), Size(0.71))
+    m: str = clamp(Size(1), Size(1), Size(1))
+    l: str = clamp(Size(1.25), Size(1.19), Size(1.41))  # noqa
+    xl: str = clamp(Size(1.56), Size(1.39), Size(2))
+    xxl: str = clamp(Size(1.95), Size(1.61), Size(2.83))
+    xxxl: str = clamp(Size(2.44), Size(1.83), Size(4))
+    xxxxl: str = clamp(Size(3.05), Size(2.04), Size(5.65))
+
+
+@dataclass
+class Borders:
+    """Border sizes for a theme."""
+
+    thin: str = clamp(Size(0.1), Size(0.18), Size(0.05))
+    normal: str = clamp(Size(0.2), Size(0.25), Size(0.1))
+    thick: str = clamp(Size(0.3), Size(0.4), Size(0.2))
+
+
+@dataclass
+class Rounding:
+    """Border rounding for a theme."""
+
+    less: str = clamp(Size(0.15), Size(0.20), Size(0.08))
+    normal: str = clamp(Size(0.2), Size(0.25), Size(0.12))
+    more: str = clamp(Size(0.25), Size(0.35), Size(0.18))
 
 
 @dataclass
 class Theme(metaclass=ABCMeta):
     """An abstract base class for theme classes."""
 
+    measure: Size = Size(70, "ch")
+    line_height: float = 1.4
+
+    borders: Borders = field(default_factory=Borders)
+    rounding: Rounding = field(default_factory=Rounding)
     fonts: Fonts = field(default_factory=Fonts)
     colors: Colors = field(default_factory=Colors)
-    spacing: Spacing = field(default_factory=Spacing)
+    sizes: Sizes = field(default_factory=Sizes)
+    headers: Headers = field(default_factory=Headers)
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Theme) and self.name == other.name

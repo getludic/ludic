@@ -220,7 +220,7 @@ class BaseElement(metaclass=ABCMeta):
         element_tag = f"{dom.html_header}\n" if dom.html_header else ""
 
         hidden = dom.html_name == "__hidden__"
-        element_tag = "" if hidden else f"<{dom.html_name}"
+        element_tag += "" if hidden else f"<{dom.html_name}"
 
         if not hidden and (dom.has_attributes() or classes):
             attributes_str = dom._format_attributes(classes, is_html=True)
@@ -283,7 +283,7 @@ TChildrenArgs = TypeVarTuple("TChildrenArgs", default=Unpack[tuple[AnyChildren, 
 See also: :class:`ludic.types.ComponentStrict`.
 """
 
-TAttrs = TypeVar("TAttrs", bound=Attrs, default=Attrs, covariant=True)
+TAttrs = TypeVar("TAttrs", bound=Attrs | NoAttrs, default=Attrs, covariant=True)
 """Type variable for elements representing type of attributes (the type of **kwargs)."""
 
 

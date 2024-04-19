@@ -6,7 +6,7 @@ from ludic.types import ComponentStrict, PrimitiveChildren
 class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
     """Simple component creating an HTML button.
 
-    The component creates a button with the ``btn`` class.
+    The component creates a button.
     """
 
     classes = ["btn"]
@@ -15,22 +15,23 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
             "button.btn": {
                 "background-color": theme.colors.light,
                 "color": theme.colors.black,
-                "margin": theme.spacing.new(8, 10),
-                "padding": theme.spacing.new(10, 17),
+                "padding": f"{theme.sizes.xxs} {theme.sizes.s}",
                 "border": f"1px solid {theme.colors.light.darken(0.1)}",
-                "border-radius": "4px",
+                "border-radius": theme.rounding.normal,
                 "cursor": "pointer",
-                "font-size": theme.fonts.sizes.medium,
+                "font-size": theme.fonts.size,
                 "transition": "0.1s filter linear, 0.1s -webkit-filter linear",
             },
             "button.btn:hover": {
                 "filter": "brightness(85%)",
             },
             "button.btn.small": {
-                "font-size": theme.fonts.sizes.small,
+                "font-size": theme.fonts.size.scale(0.9),
+                "padding": f"{theme.sizes.xxxs} {theme.sizes.xs}",
             },
             "button.btn.large": {
-                "font-size": theme.fonts.sizes.large,
+                "font-size": theme.fonts.size.scale(1.2),
+                "padding": f"{theme.sizes.xs} {theme.sizes.m}",
             },
         }
     )
@@ -42,13 +43,13 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
 class ButtonPrimary(Button):
     """Simple component creating an HTML button.
 
-    The component creates a button with the ``btn btn-primary`` class.
+    The component creates a button with the ``primary`` class.
     """
 
-    classes = ["btn", "btn-primary"]
+    classes = ["btn", "primary"]
     styles = style.use(
         lambda theme: {
-            "button.btn-primary": {
+            "button.btn.primary": {
                 "color": theme.colors.primary.readable(),
                 "background-color": theme.colors.primary,
                 "border-color": theme.colors.primary.darken(0.05),
@@ -60,13 +61,13 @@ class ButtonPrimary(Button):
 class ButtonSecondary(Button):
     """Simple component creating an HTML button.
 
-    The component creates a button with the ``btn btn-secondary`` class.
+    The component creates a button with the ``secondary`` class.
     """
 
-    classes = ["btn", "btn-secondary"]
+    classes = ["btn", "secondary"]
     styles = style.use(
         lambda theme: {
-            "button.btn-secondary": {
+            "button.btn.secondary": {
                 "color": theme.colors.secondary.readable(),
                 "background-color": theme.colors.secondary,
                 "border-color": theme.colors.secondary.darken(0.05),
@@ -78,13 +79,13 @@ class ButtonSecondary(Button):
 class ButtonSuccess(Button):
     """Simple component creating an HTML button.
 
-    The component creates a button with the ``btn btn-success`` class.
+    The component creates a button with the ``success`` class.
     """
 
-    classes = ["btn", "btn-success"]
+    classes = ["btn", "success"]
     styles = style.use(
         lambda theme: {
-            "button.btn-success": {
+            "button.btn.success": {
                 "color": theme.colors.success.readable(),
                 "background-color": theme.colors.success,
                 "border-color": theme.colors.success.darken(0.05),
@@ -96,13 +97,13 @@ class ButtonSuccess(Button):
 class ButtonDanger(Button):
     """Simple component creating an HTML button.
 
-    The component creates a button with the ``btn btn-danger`` class.
+    The component creates a button with the ``danger`` class.
     """
 
-    classes = ["btn", "btn-danger"]
+    classes = ["btn", "danger"]
     styles = style.use(
         lambda theme: {
-            "button.btn-danger": {
+            "button.btn.danger": {
                 "color": theme.colors.danger.readable(),
                 "background-color": theme.colors.danger,
                 "border-color": theme.colors.danger.darken(0.05),
@@ -114,13 +115,13 @@ class ButtonDanger(Button):
 class ButtonWarning(Button):
     """Simple component creating an HTML button.
 
-    The component creates a button with the ``btn btn-warning`` class.
+    The component creates a button with the ``warning`` class.
     """
 
-    classes = ["btn", "btn-warning"]
+    classes = ["btn", "warning"]
     styles = style.use(
         lambda theme: {
-            "button.btn-warning": {
+            "button.btn.warning": {
                 "color": theme.colors.warning.readable(),
                 "background-color": theme.colors.warning,
                 "border-color": theme.colors.warning.darken(0.05),
@@ -132,13 +133,13 @@ class ButtonWarning(Button):
 class ButtonInfo(Button):
     """Simple component creating an HTML button.
 
-    The component creates a button with the ``btn btn-info`` class.
+    The component creates a button with the ``info`` class.
     """
 
-    classes = ["btn", "btn-info"]
+    classes = ["btn", "info"]
     styles = style.use(
         lambda theme: {
-            "button.btn-info": {
+            "button.btn.info": {
                 "color": theme.colors.info.readable(),
                 "background-color": theme.colors.info,
                 "border-color": theme.colors.info.darken(0.05),

@@ -2,8 +2,6 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from examples import (
-    Body,
-    Header,
     Page,
     bulk_update,
     click_to_edit,
@@ -14,6 +12,7 @@ from examples import (
     lazy_loading,
 )
 
+from ludic.catalog.headers import H1
 from ludic.catalog.lists import List
 from ludic.catalog.typography import Link, Paragraph
 from ludic.html import style
@@ -45,21 +44,19 @@ app = LudicApp(
 @app.get("/")
 async def homepage(request: Request) -> Page:
     return Page(
-        Header("Ludic Examples"),
-        Body(
-            Paragraph(
-                "Here are examples demonstrating how to use the framework "
-                f"together with {Link("htmx.org", to="https://htmx.org")}:"
-            ),
-            List(
-                Link("Bulk Update", to=request.url_for("bulk_update:index")),
-                Link("Click to Edit", to=request.url_for("click_to_edit:index")),
-                Link("Click to Load", to=request.url_for("click_to_load:index")),
-                Link("Delete Row", to=request.url_for("delete_row:index")),
-                Link("Edit Row", to=request.url_for("edit_row:index")),
-                Link("Infinite Scroll", to=request.url_for("infinite_scroll:index")),
-                Link("Lazy Loading", to=request.url_for("lazy_loading:index")),
-            ),
+        H1("Ludic Examples"),
+        Paragraph(
+            "Here are examples demonstrating how to use the framework "
+            f"together with {Link("htmx.org", to="https://htmx.org")}:"
+        ),
+        List(
+            Link("Bulk Update", to=request.url_for("bulk_update:index")),
+            Link("Click to Edit", to=request.url_for("click_to_edit:index")),
+            Link("Click to Load", to=request.url_for("click_to_load:index")),
+            Link("Delete Row", to=request.url_for("delete_row:index")),
+            Link("Edit Row", to=request.url_for("edit_row:index")),
+            Link("Infinite Scroll", to=request.url_for("infinite_scroll:index")),
+            Link("Lazy Loading", to=request.url_for("lazy_loading:index")),
         ),
     )
 
@@ -67,14 +64,14 @@ async def homepage(request: Request) -> Page:
 @app.exception_handler(404)
 async def not_found() -> Page:
     return Page(
-        Header("Page Not Found"),
-        Body(Paragraph("The page you are looking for was not found.")),
+        H1("Page Not Found"),
+        Paragraph("The page you are looking for was not found."),
     )
 
 
 @app.exception_handler(500)
 async def server_error() -> Page:
     return Page(
-        Header("Server Error"),
-        Body(Paragraph("Server encountered an error during processing.")),
+        H1("Server Error"),
+        Paragraph("Server encountered an error during processing."),
     )

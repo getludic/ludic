@@ -17,7 +17,9 @@ def format_styles(styles: GlobalStyles, separator: str = "\n") -> str:
         styles (GlobalStyles): Styles to format.
     """
     result: list[str] = []
-    nodes_to_parse: list[tuple[list[str], str | Mapping[str, Any]]] = [([], styles)]
+    nodes_to_parse: list[
+        tuple[list[str], str | Mapping[str | tuple[str, ...], Any]]
+    ] = [([], styles)]
 
     while nodes_to_parse:
         parents, node = nodes_to_parse.pop(0)
@@ -27,12 +29,14 @@ def format_styles(styles: GlobalStyles, separator: str = "\n") -> str:
             content.append(node)
         else:
             for key, value in node.items():
-                if isinstance(value, str):
+                if isinstance(value, str | int | float):
                     content.append(f"{key}: {value};")
                 elif isinstance(value, Mapping):
-                    if key.startswith("@"):
-                        value = format_styles(value, separator=" ")
-                    nodes_to_parse.append(([*parents, key], value))
+                    keys = (key,) if isinstance(key, str | int | float) else key
+                    for key in keys:
+                        if key.startswith("@"):
+                            value = format_styles(value, separator=" ")
+                        nodes_to_parse.append(([*parents, key], value))
 
         if content:
             result.append(f"{" ".join(parents)} {{ {" ".join(content)} }}")
@@ -64,8 +68,8 @@ def from_components(
     This would render an HTML page containing the ``<style>`` element
     with the styles the given components.
     """
-    all_styles: dict[str, CSSProperties | GlobalStyles] = {}
     theme = theme or get_default_theme()
+    all_styles: dict[str | tuple[str, ...], CSSProperties | GlobalStyles] = {}
 
     for component in components:
         styles = getattr(component, "styles", {})

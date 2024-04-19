@@ -1,9 +1,11 @@
 from typing import Annotated, Self, override
 
-from examples import Body, Header, Page, init_db
+from examples import Page, init_db
 
 from ludic.catalog.buttons import ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form
+from ludic.catalog.headers import H1, H2
+from ludic.catalog.layouts import Cluster
 from ludic.catalog.quotes import Quote
 from ludic.catalog.tables import ColumnMeta, Table, create_rows
 from ludic.html import span, style
@@ -36,8 +38,8 @@ class Toast(span):
         lambda theme: {
             Toast.target: {
                 "background": theme.colors.success,
-                "margin": "10px 20px",
-                "padding": "5px 8px",
+                "padding": f"{theme.sizes.xxxxs} {theme.sizes.xxxs}",
+                "font-size": theme.fonts.size.scale(0.9),
                 "border-radius": "3px",
                 "opacity": "0",
                 "transition": "opacity 3s ease-out",
@@ -56,15 +58,14 @@ class Toast(span):
 @app.get("/")
 async def index() -> Page:
     return Page(
-        Header("Bulk Update"),
-        Body(
-            Quote(
-                "This demo shows how to implement a common pattern where rows are "
-                "selected and then bulk updated.",
-                source_url="https://htmx.org/examples/bulk-update/",
-            ),
-            await PeopleTable.get(),
+        H1("Bulk Update"),
+        Quote(
+            "This demo shows how to implement a common pattern where rows are "
+            "selected and then bulk updated.",
+            source_url="https://htmx.org/examples/bulk-update/",
         ),
+        H2("Demo"),
+        await PeopleTable.get(),
     )
 
 
@@ -91,8 +92,10 @@ class PeopleTable(Endpoint[PeopleAttrs]):
     def render(self) -> Form:
         return Form(
             Table(*create_rows(self.attrs["people"], spec=PersonAttrs)),
-            ButtonPrimary("Bulk Update", type="submit"),
-            Toast(),
+            Cluster(
+                ButtonPrimary("Bulk Update", type="submit"),
+                Toast(),
+            ),
             hx_post=self.url_for(PeopleTable),
             hx_target=Toast.target,
             hx_swap="outerHTML settle:3s",

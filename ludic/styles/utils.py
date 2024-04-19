@@ -102,3 +102,7 @@ def lighten_color(color: str, factor: float = 0.5) -> str:
 
 def first_not_none(*values: float | int | None) -> float | int:
     return next((value for value in values if value is not None), 0)
+
+
+def clamp(min: str, val: str, max: str) -> str:
+    return f"clamp({min}, {val}, {max})"

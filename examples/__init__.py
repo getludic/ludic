@@ -2,25 +2,12 @@ from dataclasses import asdict, dataclass
 from typing import Any, override
 
 from ludic.attrs import NoAttrs
-from ludic.html import (
-    body,
-    div,
-    h1,
-    head,
-    header,
-    html,
-    main,
-    meta,
-    script,
-    style,
-    title,
-)
+from ludic.catalog.layouts import Center, Stack
+from ludic.catalog.pages import Body, Head, HtmlPage
+from ludic.html import meta
 from ludic.types import (
     AnyChildren,
-    BaseElement,
     Component,
-    ComponentStrict,
-    PrimitiveChildren,
 )
 
 
@@ -92,65 +79,16 @@ def init_db() -> DB:
 
 
 class Page(Component[AnyChildren, NoAttrs]):
-    styles = style.use(
-        lambda theme: {
-            "body": {
-                "color": theme.colors.dark,
-                "background-color": theme.colors.white,
-                "display": "flex",
-                "flex-direction": "column",
-                "align-items": "center",
-                "min-height": "100vh",
-                "margin": "0",
-                "font-family": "'Arial', sans-serif",
-            },
-            "main": {
-                "width": "80%",
-                "max-width": "800px",
-                "padding": "20px",
-            },
-        }
-    )
-
     @override
-    def render(self) -> BaseElement:
-        return html(
-            head(
-                title("Ludic Example"),
-                style.load(cache=True),
+    def render(self) -> HtmlPage:
+        return HtmlPage(
+            Head(
                 meta(charset="utf-8"),
                 meta(name="viewport", content="width=device-width, initial-scale=1.0"),
+                title="HTMX Examples",
             ),
-            body(
-                main(*self.children),
-                script(src="https://unpkg.com/htmx.org@1.9.10"),
+            Body(
+                Center(Stack(*self.children), style={"padding": self.theme.sizes.xxl}),
+                htmx_version="1.9.10",
             ),
         )
-
-
-class Header(ComponentStrict[PrimitiveChildren, NoAttrs]):
-    styles = style.use(
-        lambda theme: {
-            "header": {
-                "text-align": "center",
-            },
-            "header h1": {
-                "font-size": "3.5em",
-                "line-height": "1.2",
-                "margin-bottom": "35px",
-                "font-family": theme.fonts.families.headers,
-            },
-        }
-    )
-
-    @override
-    def render(self) -> header:
-        return header(
-            h1(self.children[0]),
-        )
-
-
-class Body(Component[AnyChildren, NoAttrs]):
-    @override
-    def render(self) -> div:
-        return div(*self.children)
