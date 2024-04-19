@@ -1,17 +1,11 @@
 from typing import override
 
 from ludic.attrs import GlobalAttrs
-from ludic.html import (
-    div,
-    style,
-)
-from ludic.types import (
-    AnyChildren,
-    Component,
-)
+from ludic.html import div, style
+from ludic.types import ComponentStrict
 
 
-class Stack(Component[AnyChildren, GlobalAttrs]):
+class Stack(div):
     """Stack is a block component which renders its children with a space between them.
 
     Example usage:
@@ -55,12 +49,8 @@ class Stack(Component[AnyChildren, GlobalAttrs]):
         }
     )
 
-    @override
-    def render(self) -> div:
-        return div(*self.children, **self.attrs)
 
-
-class Box(Component[AnyChildren, GlobalAttrs]):
+class Box(div):
     """A component which applies padding from all sides.
 
     Thus the inner content of the `Box` is spaced in all directions equally.
@@ -98,12 +88,8 @@ class Box(Component[AnyChildren, GlobalAttrs]):
         }
     )
 
-    @override
-    def render(self) -> div:
-        return div(*self.children, **self.attrs)
 
-
-class Center(Component[AnyChildren, GlobalAttrs]):
+class Center(div):
     """A component which horizontally centers its children.
 
     Example usage:
@@ -130,12 +116,8 @@ class Center(Component[AnyChildren, GlobalAttrs]):
         }
     )
 
-    @override
-    def render(self) -> div:
-        return div(*self.children, **self.attrs)
 
-
-class Cluster(Component[AnyChildren, GlobalAttrs]):
+class Cluster(div):
     """A component for inline children to be rendered in a row.
 
     All contained children have a space (margin) between them.
@@ -167,6 +149,62 @@ class Cluster(Component[AnyChildren, GlobalAttrs]):
         }
     )
 
+
+class Sidebar(div):
+    """The sidebar part of a WithSidebar component."""
+
+    classes = ["sidebar"]
+    styles = {
+        ".with-sidebar > .sidebar": {
+            "flex-grow": 1,
+        },
+    }
+
+
+class NotSidebar(div):
+    """The content part of a WithSidebar component."""
+
+    classes = ["not-sidebar"]
+    styles = {
+        ".with-sidebar > .not-sidebar": {
+            "flex-basis": 0,
+            "flex-grow": 999,
+            "min-inline-size": "50%",
+        },
+    }
+
+
+class WithSidebar(
+    ComponentStrict[NotSidebar | Sidebar, Sidebar | NotSidebar, GlobalAttrs]
+):
+    """A component with a content and a sidebar.
+
+    Example usage:
+
+        WithSidebar(
+            Sidebar(...),
+            NotSidebar(...),
+        )
+
+    Or you can put the sidebar on the right side:
+
+        WithSidebar(
+            NotSidebar(...),
+            Sidebar(...),
+        )
+    """
+
+    classes = ["with-sidebar"]
+    styles = style.use(
+        lambda theme: {
+            ".with-sidebar": {
+                "display": "flex",
+                "flex-wrap": "wrap",
+                "gap": theme.sizes.xl,
+            },
+        }
+    )
+
     @override
     def render(self) -> div:
-        return div(*self.children, **self.attrs)
+        return div(self.children[0], self.children[1])

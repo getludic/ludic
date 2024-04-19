@@ -21,7 +21,7 @@ class NavItem(Component[PrimitiveChildren, NavItemAttrs]):
     @override
     def render(self) -> li:
         label = str(self.children[0])
-        return li(Link(label, to=self.attrs["to"]), id=label.lower())
+        return li(Link(label, to=self.attrs["to"]), id=label.lower().replace(" ", "-"))
 
 
 class Navigation(Component[NavItem, GlobalAttrs]):
@@ -35,6 +35,16 @@ class Navigation(Component[NavItem, GlobalAttrs]):
         )
     """
 
+    classes = ["navigation"]
+    styles = {
+        "nav.navigation > ul": {
+            "list-style": "none",
+            "padding": "0",
+        }
+    }
+
     @override
     def render(self) -> nav:
-        return nav(ul(*self.children), **self.attrs_for(nav))
+        return nav(
+            ul(*self.children, classes=["stack", "stack-small"]), **self.attrs_for(nav)
+        )

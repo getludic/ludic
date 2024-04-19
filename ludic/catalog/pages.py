@@ -99,9 +99,6 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             ("ul", "ol"): {
                 "padding-inline-start": theme.sizes.xl,
             },
-            "li": {
-                "margin-block-start": theme.sizes.xxxs,
-            },
             ("img", "svg"): {
                 "width": "100%",
             },
