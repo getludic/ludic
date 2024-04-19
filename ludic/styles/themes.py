@@ -105,7 +105,7 @@ class Rounding:
 class Theme(metaclass=ABCMeta):
     """An abstract base class for theme classes."""
 
-    measure: Size = Size(70, "ch")
+    measure: Size = Size(80, "ch")
     line_height: float = 1.4
 
     borders: Borders = field(default_factory=Borders)

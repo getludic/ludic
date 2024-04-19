@@ -33,6 +33,9 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
                 "font-size": theme.fonts.size.scale(1.2),
                 "padding": f"{theme.sizes.xs} {theme.sizes.m}",
             },
+            ".box button.btn": {
+                "background-color": theme.colors.white,
+            },
         }
     )
 
