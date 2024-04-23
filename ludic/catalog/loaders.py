@@ -94,8 +94,7 @@ class LazyLoader(Component[AnyChildren, LazyLoaderAttrs]):
 
     @override
     def render(self) -> div:
-        return div(
-            self.attrs.get("placeholder", Loading()),
-            hx_get=self.attrs["load_url"],
-            hx_trigger="load",
-        )
+        self.attrs.setdefault("hx_trigger", "load")
+        self.attrs.setdefault("hx_get", self.attrs["load_url"])
+        self.attrs.setdefault("hx_swap", "outerHTML")
+        return div(self.attrs.get("placeholder", Loading()), **self.attrs_for(div))

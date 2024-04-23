@@ -83,8 +83,8 @@ class Endpoint(Component[NoChildren, TAttrs]):
 
         if request is None or not isinstance(request, Request):
             raise RuntimeError(
-                f"{type(self).__name__} is not bound to an app, you need to set the"
-                f"{type(self).__name__}.app property in order to use Endpoint.url_for."
+                f"{type(self).__name__} is not bound to a request, you can only use "
+                f"the {type(self).__name__}.url_for method in the context of a request."
             )
 
         if inspect.isclass(endpoint) and issubclass(endpoint, Endpoint):

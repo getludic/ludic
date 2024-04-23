@@ -1,5 +1,7 @@
+from typing import override
+
 from ludic.attrs import ButtonAttrs
-from ludic.html import button, style
+from ludic.html import a, button, style
 from ludic.types import ComponentStrict, PrimitiveChildren
 
 
@@ -12,34 +14,37 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
     classes = ["btn"]
     styles = style.use(
         lambda theme: {
-            "button.btn": {
+            ".btn": {
                 "background-color": theme.colors.light,
                 "color": theme.colors.black,
                 "padding": f"{theme.sizes.xxs} {theme.sizes.s}",
-                "border": f"1px solid {theme.colors.light.darken(0.1)}",
+                "border": "none",
                 "border-radius": theme.rounding.normal,
                 "cursor": "pointer",
                 "font-size": theme.fonts.size,
                 "transition": "0.1s filter linear, 0.1s -webkit-filter linear",
             },
-            "button.btn:hover": {
+            ".btn:hover": {
                 "filter": "brightness(85%)",
             },
-            "button.btn.small": {
-                "font-size": theme.fonts.size.scale(0.9),
+            ".btn.small": {
+                "font-size": theme.fonts.size * 0.9,
                 "padding": f"{theme.sizes.xxxs} {theme.sizes.xs}",
             },
-            "button.btn.large": {
-                "font-size": theme.fonts.size.scale(1.2),
+            ".btn.large": {
+                "font-size": theme.fonts.size * 1.2,
                 "padding": f"{theme.sizes.xs} {theme.sizes.m}",
             },
-            ".box button.btn": {
-                "background-color": theme.colors.white,
+            ".box .btn": {
+                "background-color": theme.colors.dark,
+                "color": theme.colors.light,
+                "border-color": theme.colors.dark,
             },
         }
     )
 
-    def render(self) -> button:
+    @override
+    def render(self) -> button | a:
         return button(self.children[0], **self.attrs)
 
 
@@ -52,10 +57,9 @@ class ButtonPrimary(Button):
     classes = ["btn", "primary"]
     styles = style.use(
         lambda theme: {
-            "button.btn.primary": {
+            ".btn.primary": {
                 "color": theme.colors.primary.readable(),
                 "background-color": theme.colors.primary,
-                "border-color": theme.colors.primary.darken(0.05),
             }
         }
     )
@@ -70,13 +74,48 @@ class ButtonSecondary(Button):
     classes = ["btn", "secondary"]
     styles = style.use(
         lambda theme: {
-            "button.btn.secondary": {
+            ".btn.secondary": {
                 "color": theme.colors.secondary.readable(),
                 "background-color": theme.colors.secondary,
-                "border-color": theme.colors.secondary.darken(0.05),
             }
         }
     )
+
+
+class ButtonLink(Button):
+    """Simple component creating an HTML button.
+
+    The component creates a button with the ``secondary`` class.
+    """
+
+    classes = ["btn", "link"]
+    styles = style.use(
+        lambda theme: {
+            (".btn.link", ".box .btn.link"): {
+                "color": theme.colors.dark,
+                "background": "none",
+                "border": "none",
+                "text-decoration": "none",
+                "display": "inline-block",
+            },
+            (".btn.link.active", ".btn.link.active:hover"): {
+                "background-color": theme.colors.light,
+            },
+            (".box .btn.link.active", ".box .btn.link.active:hover"): {
+                "color": theme.colors.light,
+                "background-color": theme.colors.dark,
+            },
+            (".btn.link:hover", ".box .btn.link:hover"): {
+                "color": theme.colors.dark,
+                "background-color": theme.colors.light,
+                "text-decoration": "none",
+            },
+        }
+    )
+
+    @override
+    def render(self) -> a:
+        return a(self.children[0], **self.attrs)
 
 
 class ButtonSuccess(Button):
@@ -88,10 +127,9 @@ class ButtonSuccess(Button):
     classes = ["btn", "success"]
     styles = style.use(
         lambda theme: {
-            "button.btn.success": {
+            ".btn.success": {
                 "color": theme.colors.success.readable(),
                 "background-color": theme.colors.success,
-                "border-color": theme.colors.success.darken(0.05),
             }
         }
     )
@@ -106,10 +144,9 @@ class ButtonDanger(Button):
     classes = ["btn", "danger"]
     styles = style.use(
         lambda theme: {
-            "button.btn.danger": {
+            ".btn.danger": {
                 "color": theme.colors.danger.readable(),
                 "background-color": theme.colors.danger,
-                "border-color": theme.colors.danger.darken(0.05),
             }
         }
     )
@@ -124,10 +161,9 @@ class ButtonWarning(Button):
     classes = ["btn", "warning"]
     styles = style.use(
         lambda theme: {
-            "button.btn.warning": {
+            ".btn.warning": {
                 "color": theme.colors.warning.readable(),
                 "background-color": theme.colors.warning,
-                "border-color": theme.colors.warning.darken(0.05),
             }
         }
     )
@@ -142,10 +178,9 @@ class ButtonInfo(Button):
     classes = ["btn", "info"]
     styles = style.use(
         lambda theme: {
-            "button.btn.info": {
+            ".btn.info": {
                 "color": theme.colors.info.readable(),
                 "background-color": theme.colors.info,
-                "border-color": theme.colors.info.darken(0.05),
             }
         }
     )

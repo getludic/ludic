@@ -5,7 +5,24 @@ from ludic.html import li, ol, ul
 from ludic.types import AnyChildren, Component
 
 
-class List(Component[AnyChildren, GlobalAttrs]):
+class ListAttrs(GlobalAttrs, total=False):
+    items: list[AnyChildren]
+
+
+class Item(Component[AnyChildren, GlobalAttrs]):
+    """Simple component simulating an item in a list.
+
+    Example usage:
+
+        Item("Item 1")
+    """
+
+    @override
+    def render(self) -> li:
+        return li(*self.children, **self.attrs)
+
+
+class List(Component[Item, ListAttrs]):
     """Simple component simulating a list.
 
     There is basically just an alias for the :class:`ul` element
@@ -13,18 +30,19 @@ class List(Component[AnyChildren, GlobalAttrs]):
 
     Example usage:
 
-        List("Item 1", "Item 2")
+        List(Item("Item 1"), Item("Item 2"))
     """
 
     @override
     def render(self) -> ul:
-        return ul(
-            *(child if isinstance(child, li) else li(child) for child in self.children),
-            **self.attrs,
-        )
+        if items := self.attrs.get("items"):
+            children = tuple(map(Item, items))
+        else:
+            children = self.children
+        return ul(*children, **self.attrs)
 
 
-class NumberedList(Component[AnyChildren, GlobalAttrs]):
+class NumberedList(Component[Item, ListAttrs]):
     """Simple component simulating a numbered list.
 
     There is basically just an alias for the :class:`ol` element
@@ -32,12 +50,13 @@ class NumberedList(Component[AnyChildren, GlobalAttrs]):
 
     Example usage:
 
-        NumberedList("Item 1", "Item 2")
+        NumberedList(Item("Item 1"), Item("Item 2"))
     """
 
     @override
     def render(self) -> ol:
-        return ol(
-            *(child if isinstance(child, li) else li(child) for child in self.children),
-            **self.attrs,
-        )
+        if items := self.attrs.get("items"):
+            children = tuple(map(Item, items))
+        else:
+            children = self.children
+        return ol(*children, **self.attrs)

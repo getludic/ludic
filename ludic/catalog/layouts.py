@@ -2,7 +2,7 @@ from typing import override
 
 from ludic.attrs import GlobalAttrs
 from ludic.html import div, style
-from ludic.types import ComponentStrict
+from ludic.types import AnyChildren, ComponentStrict
 
 
 class Stack(div):
@@ -26,25 +26,28 @@ class Stack(div):
                 "display": "flex",
                 "flex-direction": "column",
                 "justify-content": "flex-start",
-                "inline-size": "100%",
             },
             ".stack > *": {
                 "margin-block": "0",
+                "inline-size": "100%",
             },
             ".stack > * + *": {
-                "margin-block-start": theme.sizes.l,
+                "margin-block-start": theme.sizes.xl,
             },
-            ".stack.stack-recursive *": {
+            ".stack.recursive *": {
                 "margin-block": "0",
             },
-            ".stack.stack-recursive * + *": {
-                "margin-block-start": theme.sizes.l,
+            ".stack.recursive * + *": {
+                "margin-block-start": theme.sizes.xl,
             },
-            ".stack.stack-small > * + *": {
+            ".stack.tiny > * + *": {
+                "margin-block-start": theme.sizes.xxxxs,
+            },
+            ".stack.small > * + *": {
                 "margin-block-start": theme.sizes.s,
             },
-            ".stack.stack-large > * + *": {
-                "margin-block-start": theme.sizes.xxl,
+            ".stack.large > * + *": {
+                "margin-block-start": theme.sizes.xxxxl,
             },
         }
     )
@@ -70,20 +73,24 @@ class Box(div):
     styles = style.use(
         lambda theme: {
             ".box": {
-                "padding": theme.sizes.l,
+                "padding": theme.sizes.xl,
+                "color": theme.colors.dark,
+            },
+            ".box:not(.transparent)": {
                 "border": (
                     f"{theme.borders.thin} solid {theme.colors.light.darken(0.05)}"
                 ),
                 "border-radius": theme.rounding.more,
-                "color": theme.colors.dark,
                 "background-color": theme.colors.light,
             },
-            ".box *": {
+            ".box:not(.transparent) *": {
                 "color": "inherit",
             },
             ".box.invert": {
                 "color": theme.colors.light,
                 "background-color": theme.colors.dark,
+                "border": f"{theme.borders.thin} solid {theme.colors.dark}",
+                "border-radius": theme.rounding.more,
             },
         }
     )
@@ -107,11 +114,8 @@ class Center(div):
                 "box-sizing": "content-box",
                 "margin-inline": "auto",
                 "max-inline-size": theme.measure,
-                "padding-inline-start": theme.sizes.l,
-                "padding-inline-end": theme.sizes.l,
-                "display": "flex",
-                "flex-direction": "column",
-                "align-items": "center",
+                "padding-inline-start": theme.sizes.xxxl,
+                "padding-inline-end": theme.sizes.xxxl,
             }
         }
     )
@@ -136,15 +140,21 @@ class Cluster(div):
             ".cluster": {
                 "display": "flex",
                 "flex-wrap": "wrap",
-                "gap": theme.sizes.m,
+                "gap": theme.sizes.l,
                 "justify-content": "flex-start",
                 "align-items": "center",
             },
-            ".cluster.cluster-small": {
+            ".cluster.center": {
+                "justify-content": "center",
+            },
+            ".cluster.flex-end": {
+                "justify-content": "flex-end",
+            },
+            ".cluster.small": {
                 "gap": theme.sizes.xxs,
             },
-            ".cluster.cluster-large": {
-                "gap": theme.sizes.xl,
+            ".cluster.large": {
+                "gap": theme.sizes.xxl,
             },
         }
     )
@@ -154,42 +164,22 @@ class Sidebar(div):
     """The sidebar part of a WithSidebar component."""
 
     classes = ["sidebar"]
-    styles = {
-        ".with-sidebar > .sidebar": {
-            "flex-grow": 1,
-        },
-    }
 
 
-class NotSidebar(div):
-    """The content part of a WithSidebar component."""
-
-    classes = ["not-sidebar"]
-    styles = {
-        ".with-sidebar > .not-sidebar": {
-            "flex-basis": 0,
-            "flex-grow": 999,
-            "min-inline-size": "50%",
-        },
-    }
-
-
-class WithSidebar(
-    ComponentStrict[NotSidebar | Sidebar, Sidebar | NotSidebar, GlobalAttrs]
-):
+class WithSidebar(ComponentStrict[AnyChildren, AnyChildren, GlobalAttrs]):
     """A component with a content and a sidebar.
 
     Example usage:
 
         WithSidebar(
             Sidebar(...),
-            NotSidebar(...),
+            div(...),
         )
 
     Or you can put the sidebar on the right side:
 
         WithSidebar(
-            NotSidebar(...),
+            div(...),
             Sidebar(...),
         )
     """
@@ -200,7 +190,22 @@ class WithSidebar(
             ".with-sidebar": {
                 "display": "flex",
                 "flex-wrap": "wrap",
-                "gap": theme.sizes.xl,
+                "gap": theme.sizes.xxl,
+            },
+            ".with-sidebar > .sidebar": (
+                {
+                    "flex-basis": theme.layouts.sidebar.side_width,
+                    "flex-grow": 1,
+                }
+                if theme.layouts.sidebar.side_width
+                else {
+                    "flex-grow": 1,
+                }
+            ),
+            ".with-sidebar > :not(.sidebar)": {
+                "flex-basis": 0,
+                "flex-grow": 999,
+                "min-inline-size": theme.layouts.sidebar.content_min_width,
             },
         }
     )
@@ -208,3 +213,42 @@ class WithSidebar(
     @override
     def render(self) -> div:
         return div(self.children[0], self.children[1])
+
+
+class Switcher(div):
+    """A component switching between horizontal and vertical layouts.
+
+    All the children are either composed horizontally or vertically
+    depending on the width of the viewport.
+
+    Example usage:
+
+        Switcher(
+            div(...),
+            div(...),
+            div(...),
+        )
+    """
+
+    classes = ["switcher"]
+    styles = style.use(
+        lambda theme: {
+            ".switcher": {
+                "display": "flex",
+                "flex-wrap": "wrap",
+                "gap": theme.sizes.xxl,
+            },
+            ".switcher > *": {
+                "flex-grow": 1,
+                "flex-basis": (
+                    f"calc(({theme.layouts.switcher.threshold} - 100%) * 999)"
+                ),
+            },
+            (
+                f".switcher > :nth-last-child(n+{theme.layouts.switcher.limit+1})",
+                f".switcher > :nth-last-child(n+{theme.layouts.switcher.limit+1}) ~ *",
+            ): {
+                "flex-basis": "100%",
+            },
+        }
+    )

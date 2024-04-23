@@ -32,6 +32,11 @@ full = [
     "python-multipart>=0.0.9",
     "starlette",
     "typeguard>=4.1.5",
+    "pygments",
+]
+dev = [
+    "mypy",
+    "types-pygments",
 ]
 test = [
     "pytest",

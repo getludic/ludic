@@ -88,7 +88,10 @@ class Page(Component[AnyChildren, NoAttrs]):
                 title="HTMX Examples",
             ),
             Body(
-                Center(Stack(*self.children), style={"padding": self.theme.sizes.xxl}),
+                Center(
+                    Stack(*self.children, id="content"),
+                    style={"padding": self.theme.sizes.xxl},
+                ),
                 htmx_version="1.9.10",
             ),
         )

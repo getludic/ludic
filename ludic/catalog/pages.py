@@ -58,21 +58,27 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             # elements styling
             "h1": {
                 "font-size": theme.headers.h1.size,
+                "font-family": theme.fonts.serif,
             },
             "h2": {
                 "font-size": theme.headers.h2.size,
+                "font-family": theme.fonts.serif,
             },
             "h3": {
                 "font-size": theme.headers.h3.size,
+                "font-family": theme.fonts.serif,
             },
             "h4": {
                 "font-size": theme.headers.h4.size,
+                "font-family": theme.fonts.serif,
             },
             "h5": {
                 "font-size": theme.headers.h5.size,
+                "font-family": theme.fonts.serif,
             },
             "h6": {
                 "font-size": theme.headers.h6.size,
+                "font-family": theme.fonts.serif,
             },
             "a": {
                 "color": theme.colors.primary.darken(0.3),
@@ -80,6 +86,13 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             },
             "a:hover": {
                 "text-decoration": "underline",
+            },
+            "pre": {
+                "overflow": "auto",
+            },
+            ("code", "pre", "pre *"): {
+                "font-family": theme.fonts.mono,
+                "font-size": theme.fonts.size * 0.9,
             },
             "dl": {
                 "margin-block": "0",
@@ -108,6 +121,28 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             # utilities
             ".text-align-center": {
                 "text-align": "center",
+            },
+            ".text-align-right": {
+                "text-align": "right",
+            },
+            ".text-align-left": {
+                "text-align": "left",
+            },
+            ".no-border": {
+                "border": "none !important",
+                "border-radius": "0 !important",
+            },
+            ".no-padding": {
+                "padding": "0 !important",
+            },
+            ".no-inline-padding": {
+                "padding-inline": "0 !important",
+            },
+            ".no-margin": {
+                "margin": "0 !important",
+            },
+            ".no-inline-margin": {
+                "margin-inline": "0 !important",
             },
         }
     )

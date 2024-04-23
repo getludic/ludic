@@ -29,7 +29,7 @@ class Quote(ComponentStrict[str, QuoteAttrs]):
                     "font-size": theme.fonts.size,
                 },
                 "footer": {
-                    "font-size": theme.fonts.size.scale(0.9),
+                    "font-size": theme.fonts.size * 0.9,
                     "color": theme.colors.dark.lighten(0.5),
                 },
                 "footer a": {

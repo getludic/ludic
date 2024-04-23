@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypeVar
 
 from .types import Color, Size
-from .utils import clamp
 
 if TYPE_CHECKING:
     from ludic.types import BaseElement
@@ -59,9 +58,9 @@ class Headers:
 class Fonts:
     """Font sizes for a theme."""
 
-    plain: str = "sans-serif"
-    serif: str = "serif"
-    mono: str = "monospace"
+    plain: str = "Helvetica Neue, Helvetica, Arial, sans-serif"
+    serif: str = "Georgia, serif"
+    mono: str = "Space Mono, Roboto Mono, monospace"
 
     size: Size = Size(1.02, "em")
 
@@ -70,50 +69,84 @@ class Fonts:
 class Sizes:
     """Size for a theme."""
 
-    xxxxs: str = clamp(Size(0.33), Size(0.39), Size(0.18))
-    xxxs: str = clamp(Size(0.41), Size(0.47), Size(0.25))
-    xxs: str = clamp(Size(0.51), Size(0.57), Size(0.35))
-    xs: str = clamp(Size(0.64), Size(0.69), Size(0.5))
-    s: str = clamp(Size(0.8), Size(0.84), Size(0.71))
-    m: str = clamp(Size(1), Size(1), Size(1))
-    l: str = clamp(Size(1.25), Size(1.19), Size(1.41))  # noqa
-    xl: str = clamp(Size(1.56), Size(1.39), Size(2))
-    xxl: str = clamp(Size(1.95), Size(1.61), Size(2.83))
-    xxxl: str = clamp(Size(2.44), Size(1.83), Size(4))
-    xxxxl: str = clamp(Size(3.05), Size(2.04), Size(5.65))
+    xxxxs: Size = Size(0.39)
+    xxxs: Size = Size(0.47)
+    xxs: Size = Size(0.57)
+    xs: Size = Size(0.69)
+    s: Size = Size(0.84)
+    m: Size = Size(1)
+    l: Size = Size(1.19)  # noqa
+    xl: Size = Size(1.39)
+    xxl: Size = Size(1.61)
+    xxxl: Size = Size(1.83)
+    xxxxl: Size = Size(2.04)
 
 
 @dataclass
 class Borders:
     """Border sizes for a theme."""
 
-    thin: str = clamp(Size(0.1), Size(0.18), Size(0.05))
-    normal: str = clamp(Size(0.2), Size(0.25), Size(0.1))
-    thick: str = clamp(Size(0.3), Size(0.4), Size(0.2))
+    thin: Size = Size(0.1)
+    normal: Size = Size(0.23)
+    thick: Size = Size(0.42)
 
 
 @dataclass
 class Rounding:
     """Border rounding for a theme."""
 
-    less: str = clamp(Size(0.15), Size(0.20), Size(0.08))
-    normal: str = clamp(Size(0.2), Size(0.25), Size(0.12))
-    more: str = clamp(Size(0.25), Size(0.35), Size(0.18))
+    less: Size = Size(0.20)
+    normal: Size = Size(0.25)
+    more: Size = Size(0.35)
+
+
+@dataclass
+class Sidebar:
+    """Sidebar layout config for a theme."""
+
+    # The width of the sidebar (empty means not set; defaults to the content width)
+    side_width: Size | None = None
+
+    # The narrowest the content element can be before wrapping. Should be a percentage.
+    content_min_width: str = "60%"
+
+
+@dataclass
+class Switcher:
+    """Switcher layout config for a theme."""
+
+    # The container width at which the component switches between a horizontal and
+    # vertical layout
+    threshold: Size = Size(40, "rem")
+
+    # The maximum number of elements allowed to appear in the horizontal configuration
+    limit: int = 4
+
+
+@dataclass
+class Layouts:
+    """Layout configuration for a theme."""
+
+    sidebar: Sidebar = field(default_factory=Sidebar)
+    switcher: Switcher = field(default_factory=Switcher)
 
 
 @dataclass
 class Theme(metaclass=ABCMeta):
-    """An abstract base class for theme classes."""
+    """An abstract base class for theme configuration."""
 
-    measure: Size = Size(80, "ch")
+    measure: Size = Size(110, "ch")
     line_height: float = 1.4
 
-    borders: Borders = field(default_factory=Borders)
-    rounding: Rounding = field(default_factory=Rounding)
     fonts: Fonts = field(default_factory=Fonts)
     colors: Colors = field(default_factory=Colors)
     sizes: Sizes = field(default_factory=Sizes)
+
+    borders: Borders = field(default_factory=Borders)
+    rounding: Rounding = field(default_factory=Rounding)
     headers: Headers = field(default_factory=Headers)
+
+    layouts: Layouts = field(default_factory=Layouts)
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Theme) and self.name == other.name

@@ -96,13 +96,18 @@ class LudicApp(Starlette):
         method: Literal[
             "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
         ] = "GET",
+        name: str | None = None,
         include_in_schema: bool = True,
     ) -> Callable[[TCallable], TCallable]:
         """Register an endpoint to the application."""
 
         def register(handler: TCallable) -> TCallable:
             self.add_route(
-                path, handler, methods=[method], include_in_schema=include_in_schema
+                path,
+                handler,
+                methods=[method],
+                name=name,
+                include_in_schema=include_in_schema,
             )
             return handler
 
@@ -111,12 +116,15 @@ class LudicApp(Starlette):
     def endpoint(
         self,
         path: str,
+        name: str | None = None,
         include_in_schema: bool = True,
     ) -> Callable[[type[TEndpoint]], type[TEndpoint]]:
         """Register a Ludic class endpoint to the application."""
 
         def register(endpoint: type[TEndpoint]) -> type[TEndpoint]:
-            self.add_route(path, endpoint, include_in_schema=include_in_schema)
+            self.add_route(
+                path, endpoint, name=name, include_in_schema=include_in_schema
+            )
             return endpoint
 
         return register

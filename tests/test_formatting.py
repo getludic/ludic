@@ -67,11 +67,15 @@ def test_component_with_f_string() -> None:
     assert paragraph.children[3].attrs["to"] == "https://example.com"
     assert paragraph.to_string(pretty=False) == (
         "<Paragraph>"
-          'Hello, how <strong>are you</strong>? Click <Link to="https://example.com">here</Link>.'
+          'Hello, how <strong>are you</strong>? '
+          'Click <Link to="https://example.com">here</Link>.'
         "</Paragraph>"
     )  # fmt: skip
     assert paragraph.to_html() == (
-        '<p>Hello, how <strong>are you</strong>? Click <a href="https://example.com">here</a>.</p>'
+        "<p>"
+        "Hello, how <strong>are you</strong>? Click "
+        '<a href="https://example.com" target="_blank">here</a>.'
+        "</p>"
     )
 
 
