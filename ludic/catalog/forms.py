@@ -114,7 +114,7 @@ class FormField(Component[TChildren, TAttrs]):
                     "border": f"1px solid {theme.colors.light.darken(0.2)}",
                     "border-radius": theme.rounding.normal,
                     "box-sizing": "border-box",
-                    "font-size": theme.fonts.size.scale(0.9),
+                    "font-size": theme.fonts.size * 0.9,
                 },
             }
         }

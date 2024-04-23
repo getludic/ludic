@@ -1,6 +1,6 @@
 from typing import override
 
-from ludic.attrs import Attrs
+from ludic.attrs import Attrs, GlobalAttrs
 from ludic.html import a, div, h1, h2, h3, h4, style
 from ludic.types import Component, ComponentStrict
 
@@ -19,8 +19,8 @@ class Anchor(Component[str, AnchorAttrs]):
         lambda theme: {
             "a.anchor": {
                 "font-family": theme.fonts.serif,
-                "font-size": theme.fonts.size.scale(2.5),
-                "color": theme.colors.dark.lighten(0.5),
+                "font-size": theme.fonts.size * 2.5,
+                "color": theme.colors.light.darken(0.1),
                 "text-decoration": "none",
             },
             "a.anchor:hover": {
@@ -37,11 +37,11 @@ class Anchor(Component[str, AnchorAttrs]):
         )
 
 
-class WitchAnchorAttrs(Attrs, total=False):
+class WithAnchorAttrs(GlobalAttrs, total=False):
     anchor: Anchor
 
 
-class WithAnchor(ComponentStrict[h1 | h2 | h3 | h4 | str, WitchAnchorAttrs]):
+class WithAnchor(ComponentStrict[h1 | h2 | h3 | h4 | str, WithAnchorAttrs]):
     """Component which renders its content (header) with a clickable anchor."""
 
     classes = ["with-anchor"]
@@ -62,11 +62,12 @@ class WithAnchor(ComponentStrict[h1 | h2 | h3 | h4 | str, WitchAnchorAttrs]):
     def render(self) -> div:
         element: h1 | h2 | h3 | h4
         if isinstance(self.children[0], str):
-            element = h1(self.children[0], id=text_to_kebab(self.children[0]))
+            element = h1(self.children[0])
         else:
             element = self.children[0]
 
-        id = element.attrs.get("id", text_to_kebab(element.text))
+        element.attrs.setdefault("id", text_to_kebab(element.text))
+        id = element.attrs["id"]
 
         return div(
             element,
@@ -74,12 +75,12 @@ class WithAnchor(ComponentStrict[h1 | h2 | h3 | h4 | str, WitchAnchorAttrs]):
         )
 
 
-class H1(ComponentStrict[str, WitchAnchorAttrs]):
+class H1(ComponentStrict[str, WithAnchorAttrs]):
     """Component rendering as h1 with an optional clickable anchor."""
 
     @override
     def render(self) -> h1 | WithAnchor:
-        header = h1(self.children[0], style={"font-family": self.theme.fonts.serif})
+        header = h1(self.children[0], **self.attrs_for(h1))
         if anchor := self.attrs.get("anchor"):
             return WithAnchor(header, anchor=anchor)
         elif self.theme.headers.h1.anchor:
@@ -88,12 +89,12 @@ class H1(ComponentStrict[str, WitchAnchorAttrs]):
             return header
 
 
-class H2(ComponentStrict[str, WitchAnchorAttrs]):
+class H2(ComponentStrict[str, WithAnchorAttrs]):
     """Component rendering as h2 with an optional clickable anchor."""
 
     @override
     def render(self) -> h2 | WithAnchor:
-        header = h2(self.children[0], style={"font-family": self.theme.fonts.serif})
+        header = h2(self.children[0], **self.attrs_for(h2))
         if anchor := self.attrs.get("anchor"):
             return WithAnchor(header, anchor=anchor)
         elif self.theme.headers.h2.anchor:
@@ -102,12 +103,12 @@ class H2(ComponentStrict[str, WitchAnchorAttrs]):
             return header
 
 
-class H3(ComponentStrict[str, WitchAnchorAttrs]):
+class H3(ComponentStrict[str, WithAnchorAttrs]):
     """Component rendering as h3 with an optional clickable anchor."""
 
     @override
     def render(self) -> h3 | WithAnchor:
-        header = h3(self.children[0], style={"font-family": self.theme.fonts.serif})
+        header = h3(self.children[0], **self.attrs_for(h3))
         if anchor := self.attrs.get("anchor"):
             return WithAnchor(header, anchor=anchor)
         elif self.theme.headers.h3.anchor:
@@ -116,12 +117,12 @@ class H3(ComponentStrict[str, WitchAnchorAttrs]):
             return header
 
 
-class H4(ComponentStrict[str, WitchAnchorAttrs]):
+class H4(ComponentStrict[str, WithAnchorAttrs]):
     """Component rendering as h4 with an optional clickable anchor."""
 
     @override
     def render(self) -> h4 | WithAnchor:
-        header = h4(self.children[0], style={"font-family": self.theme.fonts.serif})
+        header = h4(self.children[0], **self.attrs_for(h4))
         if anchor := self.attrs.get("anchor"):
             return WithAnchor(header, anchor=anchor)
         elif self.theme.headers.h4.anchor:

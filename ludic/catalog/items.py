@@ -55,10 +55,10 @@ class Pairs(Component[Key | Value, PairsAttrs]):
         )
     """
 
-    classes = ["stack", "stack-small"]
+    classes = ["stack", "small"]
     styles = style.use(
         lambda theme: {
-            ".stack.stack-small > dt + dd": {
+            ".stack.small > dt + dd": {
                 "margin-block-start": theme.sizes.xxxxs,
             },
         }

@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import Literal, Self, TypedDict
+from typing import Literal, LiteralString, Self, SupportsIndex, TypedDict
 
 from .utils import (
     darken_color,
@@ -75,7 +75,7 @@ class Size(str):
         self.unit = unit
         return self
 
-    def scale(self, factor: float) -> Self:
+    def __mul__(self, factor: float | int | LiteralString | SupportsIndex) -> Self:
         """Scale size by a given factor.
 
         Args:
@@ -84,29 +84,38 @@ class Size(str):
         Returns:
             str: Scaled size.
         """
-        return type(self)(self.value * factor, self.unit)
+        if isinstance(factor, float | int):
+            return type(self)(self.value * factor, self.unit)
+        else:
+            return self
 
-    def inc(self, factor: float = 1) -> Self:
+    def __add__(self, value: float | int | LiteralString | SupportsIndex) -> Self:
         """Increment size by a given factor.
 
         Args:
-            factor (float, optional): Increment factor. Defaults to 1.
+            value (float, optional): Increment value.
 
         Returns:
             str: Incremented size.
         """
-        return type(self)(self.value + float(self.value * factor), self.unit)
+        if isinstance(value, float | int):
+            return type(self)(self.value + value, self.unit)
+        else:
+            return self
 
-    def dec(self, factor: float = 1) -> Self:
+    def __sub__(self, value: float | int | LiteralString | SupportsIndex) -> Self:
         """Decrement size by a given factor.
 
         Args:
-            factor (float, optional): Decrement factor. Defaults to 1.
+            value (float, optional): Decrement value.
 
         Returns:
             str: Decremented size.
         """
-        return type(self)(self.value - float(self.value * factor), self.unit)
+        if isinstance(value, float | int):
+            return type(self)(self.value - value, self.unit)
+        else:
+            return self
 
 
 CSSProperties = TypedDict(
@@ -312,11 +321,11 @@ CSSProperties = TypedDict(
         # F
         "filter": str,
         "flex": str,
-        "flex-basis": float,
+        "flex-basis": float | str,
         "flex-direction": Literal["row", "row-reverse", "column", "column-reverse"],
         "flex-flow": str,
-        "flex-grow": float,
-        "flex-shrink": float,
+        "flex-grow": float | str,
+        "flex-shrink": float | str,
         "flex-wrap": Literal["nowrap", "wrap", "wrap-reverse"],
         "float": Literal["left", "right", "none"],
         "font": str,

@@ -8,7 +8,9 @@ from ludic.html import b
 
 def test_link() -> None:
     link = Link("A link!", to="https://example.com")
-    assert link.to_html() == '<a href="https://example.com">A link!</a>'
+    assert link.to_html() == '<a href="https://example.com" target="_blank">A link!</a>'
+    link = Link("A link!", to="/home")
+    assert link.to_html() == '<a href="/home">A link!</a>'
 
 
 def test_paragraph() -> None:
@@ -29,7 +31,7 @@ def test_paragraph() -> None:
     assert paragraph.to_html() == (
         '<p>'
             'Hello, how <b>are you</b>? '
-            'Click <a href="https://example.com">here</a>.'
+            'Click <a href="https://example.com" target="_blank">here</a>.'
         '</p>'
     )  # fmt: skip
 
@@ -41,10 +43,12 @@ def test_navigation() -> None:
         id="nav",
     )
     assert navigation.to_html() == (
-        '<nav id="nav">'
-            "<ul>"
-                '<li id="home"><a href="/">Home</a></li>'
-                '<li id="about"><a href="/about">About</a></li>'
+        '<nav id="nav" class="navigation">'
+            '<ul class="stack small">'
+                '<li class="nav-item"><a href="/" class="small btn link">Home</a></li>'
+                '<li class="nav-item">'
+                    '<a href="/about" class="small btn link">About</a>'
+                '</li>'
             "</ul>"
         "</nav>"
     )  # fmt: skip
@@ -58,7 +62,7 @@ def test_pairs() -> None:
         Value(42),
     )
     assert pairs.to_html() == (
-        '<dl class="stack stack-small">'
+        '<dl class="stack small">'
             '<dt>Name</dt>'
             '<dd>John</dd>'
             '<dt>Age</dt>'

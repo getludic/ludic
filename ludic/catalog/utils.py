@@ -20,3 +20,17 @@ def text_to_kebab(name: str) -> str:
         str: The text in kebab case.
     """
     return "-".join(value.lower() for value in name.split())
+
+
+def remove_whitespaces(text: str) -> str:
+    """Remove leading whitespaces from a text.
+
+    Args:
+        text (str): The text.
+
+    Returns:
+        str: The text without leading whitespaces.
+    """
+    by_line = text.split("\n")
+    min_whitespaces = min(len(line) - len(line.lstrip()) for line in by_line if line)
+    return "\n".join(line[min_whitespaces:].rstrip() for line in by_line).strip()

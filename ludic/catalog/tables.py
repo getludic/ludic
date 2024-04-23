@@ -129,7 +129,7 @@ class Table(ComponentStrict[THead, *tuple[TRow, ...], TableAttrs]):
     styles = style.use(
         lambda theme: {
             "table.table": {
-                "width": "100%",  # type: ignore
+                "inline-size": "100%",  # type: ignore
                 "border-collapse": "collapse",  # type: ignore
                 "thead": {
                     "background-color": theme.colors.light,

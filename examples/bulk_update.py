@@ -39,7 +39,7 @@ class Toast(span):
             Toast.target: {
                 "background": theme.colors.success,
                 "padding": f"{theme.sizes.xxxxs} {theme.sizes.xxxs}",
-                "font-size": theme.fonts.size.scale(0.9),
+                "font-size": theme.fonts.size * 0.9,
                 "border-radius": "3px",
                 "opacity": "0",
                 "transition": "opacity 3s ease-out",

@@ -2,11 +2,10 @@ import asyncio
 
 from examples import Page
 
-from ludic.catalog.headers import H1, H2
+from ludic.catalog.headers import H1, H2, H3
+from ludic.catalog.layouts import Box
 from ludic.catalog.loaders import LazyLoader
 from ludic.catalog.quotes import Quote
-from ludic.html import svg
-from ludic.types import Safe
 from ludic.web import LudicApp, Request
 
 app = LudicApp(debug=True)
@@ -26,17 +25,10 @@ async def index(request: Request) -> Page:
 
 
 @app.get("/load/{seconds:int}")
-async def load_svg(seconds: int) -> svg:
+async def load_svg(seconds: int) -> Box:
     await asyncio.sleep(seconds)
-    return svg(
-        Safe(
-            '<rect width="100%" height="100%" fill="#eee" />\n'
-            '<text x="310" y="215" text-anchor="middle" fill="#555">'
-            "Content Loaded"
-            "</text>"
-        ),
-        version="1.1",
-        width="700",
-        height="400",
-        style={"font-size": "2em"},
+    return Box(
+        H3("Content Loaded!", classes=["text-align-center"]),
+        classes=["invert"],
+        style={"padding-top": "10rem", "padding-bottom": "10rem"},
     )

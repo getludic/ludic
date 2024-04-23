@@ -48,9 +48,15 @@ class Request(starlette.requests.Request):
             raise NoMatchFound(str(endpoint), path_params)
 
         if partial_mount := self.scope.get("partial_mount"):
-            endpoint_name = join_mounts(partial_mount, endpoint_name)
-
-        return router.url_path_for(endpoint_name, **path_params)
+            try:
+                return router.url_path_for(
+                    join_mounts(partial_mount, endpoint_name),
+                    **path_params,
+                )
+            except NoMatchFound:
+                return router.url_path_for(endpoint_name, **path_params)
+        else:
+            return router.url_path_for(endpoint_name, **path_params)
 
     def url_for(self, endpoint: str | Callable[..., Any], /, **path_params: Any) -> URL:
         """Get URL for an endpoint.

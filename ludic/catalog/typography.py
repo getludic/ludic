@@ -1,24 +1,42 @@
-from typing import override
+from typing import NotRequired, override
+
+try:
+    from pygments import highlight
+    from pygments.formatters import HtmlFormatter
+    from pygments.lexers import get_lexer_by_name
+
+    pygments_loaded = True
+except ImportError:
+    pygments_loaded = False
 
 from ludic.attrs import GlobalAttrs
-from ludic.html import a, p
+from ludic.html import a, code, p, pre, style
 from ludic.types import (
     AnyChildren,
     Attrs,
     Component,
     ComponentStrict,
     PrimitiveChildren,
+    Safe,
 )
+
+from .utils import remove_whitespaces
 
 
 class LinkAttrs(Attrs):
     to: str
+    external: NotRequired[bool]
 
 
 class Link(ComponentStrict[PrimitiveChildren, LinkAttrs]):
     """Simple component simulating a link.
 
-    The difference between :class:`Link` and :class:`a` is that this component
+    The main difference between :class:`Link` and :class:`a` is that this component
+    automatically adds the ``target="_blank"`` attribute to the link if the link
+    points to an external resource. This can be overridden by setting the
+    ``external`` attribute to ``False``.
+
+    Another difference between :class:`Link` and :class:`a` is that this component
     expects only one primitive child, so it cannot contain any nested elements.
 
     Example usage:
@@ -28,7 +46,18 @@ class Link(ComponentStrict[PrimitiveChildren, LinkAttrs]):
 
     @override
     def render(self) -> a:
-        return a(self.children[0], href=self.attrs["to"])
+        attrs = {"href": self.attrs["to"]}
+
+        match self.attrs.get("external", "auto"):
+            case True:
+                attrs["target"] = "_blank"
+            case False:
+                pass
+            case "auto":
+                if self.attrs["to"].startswith("http"):
+                    attrs["target"] = "_blank"
+
+        return a(self.children[0], **attrs)
 
 
 class Paragraph(Component[AnyChildren, GlobalAttrs]):
@@ -44,3 +73,67 @@ class Paragraph(Component[AnyChildren, GlobalAttrs]):
     @override
     def render(self) -> p:
         return p(*self.children, **self.attrs)
+
+
+class Code(Component[str, GlobalAttrs]):
+    """Simple component simulating a code block.
+
+    Example usage:
+
+        Code("print('Hello, World!')")
+    """
+
+    classes = ["code"]
+    styles = style.use(
+        lambda theme: {
+            ".code": {
+                "background-color": theme.colors.light,
+                "padding": f"{theme.sizes.xxxxs * 0.5} {theme.sizes.xxs}",
+                "border": f"1px solid {theme.colors.light.darken(0.2)}",
+                "border-radius": theme.rounding.less,
+            }
+        }
+    )
+
+    @override
+    def render(self) -> code:
+        return code(*self.children, **self.attrs)
+
+
+class CodeBlockAttrs(GlobalAttrs, total=False):
+    language: str
+    remove_whitespaces: bool
+
+
+class CodeBlock(Component[str, CodeBlockAttrs]):
+    """Simple component simulating a code block.
+
+    Example usage:
+
+        CodeBlock("print('Hello, World!')")
+    """
+
+    classes = ["code-block"]
+    styles = style.use(
+        lambda theme: {
+            ".code-block": {
+                "background-color": theme.colors.light,
+                "padding": theme.sizes.l,
+            },
+        }
+    )
+
+    @override
+    def render(self) -> pre:
+        content = "".join(self.children)
+
+        if self.attrs.get("remove_whitespaces", True):
+            content = remove_whitespaces(content)
+
+        if pygments_loaded and (language := self.attrs.get("language")):
+            lexer = get_lexer_by_name(language)
+            formatter = HtmlFormatter(noclasses=True, nobackground=True, nowrap=True)
+            block = Safe(highlight(content, lexer, formatter))
+            return pre(block, **self.attrs_for(pre))
+        else:
+            return pre(content, **self.attrs_for(pre))
