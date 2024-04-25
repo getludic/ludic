@@ -472,6 +472,34 @@ class SvgAttrs(GlobalAttrs, total=False):
     xmlns: str
     height: int
     width: int
+    viewBox: str
+    clip_path: Annotated[str, Alias("clip-path")]
+    clip_rule: Annotated[str, Alias("clip-rule")]
+    fill: str
+    fill_rule: Annotated[str, Alias("fill-rule")]
+    stroke: str
+    stroke_dasharray: Annotated[str, Alias("stroke-dasharray")]
+    stroke_dashoffset: Annotated[str, Alias("stroke-dashoffset")]
+    stroke_linecap: Annotated[str, Alias("stroke-linecap")]
+    stroke_linejoin: Annotated[str, Alias("stroke-linejoin")]
+    stroke_miterlimit: Annotated[str, Alias("stroke-miterlimit")]
+    stroke_opacity: Annotated[str, Alias("stroke-opacity")]
+    stroke_width: Annotated[str, Alias("stroke-width")]
+    transform: str
+
+
+class CircleAttrs(SvgAttrs, total=False):
+    cx: str
+    cy: str
+    r: str
+
+
+class PathAttrs(SvgAttrs, total=False):
+    d: str
+
+
+class PolylineAttrs(SvgAttrs, total=False):
+    points: str
 
 
 class IframeAttrs(GlobalAttrs, total=False):

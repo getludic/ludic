@@ -44,6 +44,9 @@ from .attrs import (
     SourceAttrs,
     StyleAttrs,
     SvgAttrs,
+    CircleAttrs,
+    PathAttrs,
+    PolylineAttrs,
     TdAttrs,
     TextAreaAttrs,
     ThAttrs,
@@ -200,6 +203,18 @@ class img(Element[NoChildren, ImgAttrs]):
 
 class svg(Element[AnyChildren, SvgAttrs]):
     html_name = "svg"
+
+
+class circle(Element[AnyChildren, CircleAttrs]):
+    html_name = "circle"
+
+
+class path(Element[AnyChildren, PathAttrs]):
+    html_name = "path"
+
+
+class polyline(Element[AnyChildren, PolylineAttrs]):
+    html_name = "polyline"
 
 
 class b(Element[AnyChildren, GlobalAttrs]):
