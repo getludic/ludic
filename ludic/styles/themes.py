@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypeVar
 
-from .types import Color, Size
+from .types import Color, ColorRange, Size
 
 if TYPE_CHECKING:
     from ludic.types import BaseElement
@@ -14,12 +14,12 @@ _T = TypeVar("_T", bound="BaseElement")
 class Colors:
     """Colors for a theme."""
 
-    primary: Color = Color("#4ecdc4")
-    secondary: Color = Color("#fefefe")
-    success: Color = Color("#c7f464")
-    info: Color = Color("#fce303")
-    warning: Color = Color("#fc9003")
-    danger: Color = Color("#e32929")
+    primary: Color = ColorRange(["#276662", "#4ecdc4", "#dbf5f3"])
+    secondary: Color = ColorRange(["#f1f1f1", "#fefefe", "#fff"])
+    success: Color = ColorRange(["#637a32", "#c7f464", "#eefbd0"])
+    info: Color = ColorRange(["#978801", "#fce303", "#fef9cc"])
+    warning: Color = ColorRange(["#7e4801", "#fc9003", "#fee8cc"])
+    danger: Color = ColorRange(["#711414", "#e32929", "#f9d4d4"])
 
     light: Color = Color("#f8f8f8")
     dark: Color = Color("#414549")
@@ -42,7 +42,7 @@ class Headers:
 
     h1: Header = field(default_factory=lambda: Header(size=Size(3, "em"), anchor=False))
     h2: Header = field(
-        default_factory=lambda: Header(size=Size(2.5, "em"), anchor=True)
+        default_factory=lambda: Header(size=Size(2.5, "em"), anchor=False)
     )
     h3: Header = field(default_factory=lambda: Header(size=Size(2, "em"), anchor=False))
     h4: Header = field(
@@ -62,7 +62,7 @@ class Fonts:
     serif: str = "Georgia, serif"
     mono: str = "Space Mono, Roboto Mono, monospace"
 
-    size: Size = Size(1.02, "em")
+    size: Size = Size(1.01, "em")
 
 
 @dataclass
@@ -75,11 +75,11 @@ class Sizes:
     xs: Size = Size(0.69)
     s: Size = Size(0.84)
     m: Size = Size(1)
-    l: Size = Size(1.19)  # noqa
-    xl: Size = Size(1.39)
-    xxl: Size = Size(1.61)
-    xxxl: Size = Size(1.83)
-    xxxxl: Size = Size(2.04)
+    l: Size = Size(1.16)  # noqa
+    xl: Size = Size(1.4)
+    xxl: Size = Size(1.68)
+    xxxl: Size = Size(2.01)
+    xxxxl: Size = Size(2.41)
 
 
 @dataclass
@@ -136,7 +136,7 @@ class Theme(metaclass=ABCMeta):
     """An abstract base class for theme configuration."""
 
     measure: Size = Size(110, "ch")
-    line_height: float = 1.4
+    line_height: float = 1.5
 
     fonts: Fonts = field(default_factory=Fonts)
     colors: Colors = field(default_factory=Colors)

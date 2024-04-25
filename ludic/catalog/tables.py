@@ -136,13 +136,13 @@ class Table(ComponentStrict[THead, *tuple[TRow, ...], TableAttrs]):
                 },
                 "tr th": {
                     "border": (
-                        f"{theme.borders.thin} solid {theme.colors.light.darken(0.1)}"
+                        f"{theme.borders.thin} solid {theme.colors.light.darken(1)}"
                     ),
                     "padding": f"{theme.sizes.xxs} {theme.sizes.xxxs}",
                 },
                 "tr td": {
                     "border": (
-                        f"{theme.borders.thin} solid {theme.colors.light.darken(0.1)}"
+                        f"{theme.borders.thin} solid {theme.colors.light.darken(1)}"
                     ),
                     "padding": f"{theme.sizes.xxs} {theme.sizes.xxxs}",
                 },

@@ -31,15 +31,15 @@ def test_theme_colors() -> None:
     assert theme.colors.dark.rgb == (51, 51, 51)
     assert theme.colors.black.rgb == (0, 0, 0)
 
-    assert theme.colors.white.darken(0.5).rgb == (127, 127, 127)
-    assert theme.colors.white.darken(1).rgb == (1, 1, 1)
-    assert theme.colors.black.lighten(0.5).rgb == (127, 127, 127)
-    assert theme.colors.black.lighten(1).rgb == (255, 255, 255)
+    assert theme.colors.white.darken(10).rgb == (127, 127, 127)
+    assert theme.colors.white.darken(20).rgb == (1, 1, 1)
+    assert theme.colors.black.lighten(10).rgb == (127, 127, 127)
+    assert theme.colors.black.lighten(20).rgb == (255, 255, 255)
 
-    assert theme.colors.light.darken(0.5).rgb == (119, 119, 119)
-    assert theme.colors.dark.lighten(0.5).rgb == (153, 153, 153)
+    assert theme.colors.light.darken(10).rgb == (119, 119, 119)
+    assert theme.colors.dark.lighten(10).rgb == (153, 153, 153)
 
-    assert theme.colors.primary.darken(0.5).rgb == (97, 115, 126)
+    assert theme.colors.primary.darken(10).rgb == (97, 115, 126)
 
 
 def test_theme_font_sizes() -> None:
@@ -47,6 +47,13 @@ def test_theme_font_sizes() -> None:
 
     assert theme.fonts.size == "10px"
     assert theme.fonts.plain == "Helvetica Neue, Helvetica, Arial, sans-serif"
+
+    assert theme.fonts.size - 1 == "9px"
+    assert theme.fonts.size + 5 == "15px"
+    assert theme.fonts.size * 2 == "20px"
+
+    assert theme.fonts.size + "2" == "10px"
+    assert theme.fonts.size - "ab" == "10px"
 
 
 def test_themes_switching() -> None:

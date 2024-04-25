@@ -19,27 +19,27 @@ class Color(str):
         """RGB color."""
         return hex_to_rgb(self)
 
-    def darken(self, factor: float = 0.5) -> Self:
-        """Darken color by a given factor.
+    def darken(self, shift: int = 1) -> Self:
+        """Pick darker color from the range by given shift.
 
         Args:
-            factor (float, optional): Darkening factor. Defaults to 0.5.
+            shift (int, optional): Darkening shift. Defaults to 1.
 
         Returns:
             str: Darkened color.
         """
-        return type(self)(darken_color(self, factor))
+        return type(self)(darken_color(self, shift / 20))
 
-    def lighten(self, factor: float = 0.5) -> Self:
-        """Lighten color by a given factor.
+    def lighten(self, shift: int = 1) -> Self:
+        """Pick lighter color from the range by given shift.
 
         Args:
-            factor (float, optional): Lightening factor. Defaults to 0.5.
+            shift (int, optional): Lightening shift. Defaults to 1.
 
         Returns:
             str: Lightened color.
         """
-        return type(self)(lighten_color(self, factor))
+        return type(self)(lighten_color(self, shift / 20))
 
     def readable(self) -> Self:
         """Get lighter or darker variant of the given color depending on the luminance.
@@ -51,6 +51,54 @@ class Color(str):
             str: Readable opposite of the given color.
         """
         return type(self)(pick_readable_color_for(self))
+
+
+class ColorRange(Color):
+    """Color class."""
+
+    variants: list[str]
+    position: int
+
+    def __new__(
+        cls, variants: list[str] | str, position: int | None = None
+    ) -> "ColorRange":
+        if isinstance(variants, str):
+            variants = [variants]
+
+        new_position = position or (len(variants) // 2)
+
+        self = super().__new__(cls, variants[new_position])
+        self.variants = variants
+        self.position = new_position
+        return self
+
+    def darken(self, shift: int = 1) -> Self:
+        """Pick darker color from the range by given shift.
+
+        Args:
+            shift (int, optional): Darkening shift. Defaults to 1.
+
+        Returns:
+            str: Darkened color.
+        """
+        if 0 <= self.position - shift < len(self.variants):
+            return type(self)(self.variants, self.position - shift)
+        else:
+            return type(self)(self.variants, 0)
+
+    def lighten(self, shift: int = 1) -> Self:
+        """Pick lighter color from the range by given shift.
+
+        Args:
+            shift (int, optional): Lightening shift. Defaults to 1.
+
+        Returns:
+            str: Lightened color.
+        """
+        if 0 <= self.position + shift < len(self.variants):
+            return type(self)(self.variants, self.position + shift)
+        else:
+            return type(self)(self.variants, len(self.variants) - 1)
 
 
 class Size(str):

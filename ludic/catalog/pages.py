@@ -1,12 +1,16 @@
+import json
 from typing import override
 
 from ludic.attrs import Attrs, NoAttrs
-from ludic.html import body, head, html, script, style, title
-from ludic.types import AnyChildren, Component, ComponentStrict
+from ludic.html import body, head, html, link, meta, script, style, title
+from ludic.types import AnyChildren, BaseElement, Component, ComponentStrict
 
 
 class HtmlHeadAttrs(Attrs, total=False):
     title: str
+    favicon: str
+    load_styles: bool
+    htmx_config: dict[str, str]
 
 
 class HtmlBodyAttrs(Attrs, total=False):
@@ -18,11 +22,16 @@ class HtmlBodyAttrs(Attrs, total=False):
 class Head(Component[AnyChildren, HtmlHeadAttrs]):
     @override
     def render(self) -> head:
-        return head(
-            title(self.attrs.get("title", "Ludic App")),
-            style.load(cache=True),
-            *self.children,
-        )
+        elements: list[BaseElement] = [title(self.attrs.get("title", "Ludic App"))]
+
+        if favicon := self.attrs.get("favicon"):
+            elements.append(link(rel="icon", href=favicon, type="image/x-icon"))
+        if config := self.attrs.get("htmx_config", {"defaultSwapStyle": "outerHTML"}):
+            elements.append(meta(name="htmx-config", content=json.dumps(config)))
+        if self.attrs.get("load_styles", True):
+            elements.append(style.load(cache=True))
+
+        return head(*elements, *self.children)
 
 
 class Body(Component[AnyChildren, HtmlBodyAttrs]):
@@ -81,7 +90,7 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
                 "font-family": theme.fonts.serif,
             },
             "a": {
-                "color": theme.colors.primary.darken(0.3),
+                "color": theme.colors.primary.darken(2),
                 "text-decoration": "none",
             },
             "a:hover": {
@@ -92,7 +101,7 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             },
             ("code", "pre", "pre *"): {
                 "font-family": theme.fonts.mono,
-                "font-size": theme.fonts.size * 0.9,
+                "font-size": theme.fonts.size * 0.95,
             },
             "dl": {
                 "margin-block": "0",
@@ -110,13 +119,16 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
                 "margin-left": "0",
             },
             ("ul", "ol"): {
-                "padding-inline-start": theme.sizes.xl,
+                "padding-inline-start": theme.sizes.xxl,
+            },
+            ("ul > li + li", "ol > li + li", "li > ul", "li > ol"): {
+                "margin-block-start": theme.sizes.xxxxs,
             },
             ("img", "svg"): {
                 "width": "100%",
             },
             "button": {
-                "line-height": theme.line_height - 0.2,
+                "line-height": 1,
             },
             # utilities
             ".text-align-center": {
