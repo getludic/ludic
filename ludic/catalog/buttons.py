@@ -97,6 +97,7 @@ class ButtonLink(Button):
                 "border": "none",
                 "text-decoration": "none",
                 "display": "inline-block",
+                "line-height": 1,
             },
             (".btn.link.active", ".btn.link.active:hover"): {
                 "background-color": theme.colors.light,

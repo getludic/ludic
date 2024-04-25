@@ -1,9 +1,19 @@
 from ludic.catalog.forms import Form, InputField, TextAreaField
+from ludic.catalog.headers import H1, H2, H3, H4, Anchor
 from ludic.catalog.items import Key, Pairs, Value
+from ludic.catalog.messages import (
+    Message,
+    MessageDanger,
+    MessageInfo,
+    MessageSuccess,
+    MessageWarning,
+    Title,
+)
 from ludic.catalog.navigation import Navigation, NavItem
 from ludic.catalog.tables import Table, TableHead, TableRow
 from ludic.catalog.typography import Link, Paragraph
 from ludic.html import b
+from ludic.styles import themes
 
 
 def test_link() -> None:
@@ -133,3 +143,75 @@ def test_form_fields() -> None:
             "</div>"
         "</form>"
     )  # fmt: skip
+
+
+def test_header_anchor() -> None:
+    assert Anchor(target="test").to_html() == '<a href="#test" class="anchor">#</a>'
+    assert (
+        Anchor("url", target="test").to_html()
+        == '<a href="#test" class="anchor">url</a>'
+    )
+
+
+def test_headers() -> None:
+    assert H1("Header 1").to_html() == "<h1>Header 1</h1>"
+    assert H2("Header 2").to_html() == "<h2>Header 2</h2>"
+    assert H3("Header 3").to_html() == "<h3>Header 3</h3>"
+    assert H4("Header 4").to_html() == "<h4>Header 4</h4>"
+
+    theme = themes.LightTheme(
+        headers=themes.Headers(
+            h1=themes.Header(anchor=True),
+            h2=themes.Header(anchor=True),
+            h3=themes.Header(anchor=True),
+            h4=themes.Header(anchor=True),
+        )
+    )
+    assert theme.use(H1("Header 1")).to_html() == (
+        '<div class="with-anchor">'
+            '<h1 id="header-1">Header 1</h1>'
+            '<a href="#header-1" class="anchor">#</a>'
+        '</div>'
+    )  # fmt: skip
+    assert theme.use(H2("Header 2")).to_html() == (
+        '<div class="with-anchor">'
+            '<h2 id="header-2">Header 2</h2>'
+            '<a href="#header-2" class="anchor">#</a>'
+        '</div>'
+    )  # fmt: skip
+    assert theme.use(H3("Header 3")).to_html() == (
+        '<div class="with-anchor">'
+            '<h3 id="header-3">Header 3</h3>'
+            '<a href="#header-3" class="anchor">#</a>'
+        '</div>'
+    )  # fmt: skip
+    assert theme.use(H4("Header 4")).to_html() == (
+        '<div class="with-anchor">'
+            '<h4 id="header-4">Header 4</h4>'
+            '<a href="#header-4" class="anchor">#</a>'
+        '</div>'
+    )  # fmt: skip
+
+
+def test_messages() -> None:
+    assert Message("test").to_html() == (
+        '<div class="message"><div class="content">test</div></div>'
+    )
+    assert Message(Title("Title"), "Content message").to_html() == (
+        '<div class="message">'
+        '<div class="title">Title</div>'
+        '<div class="content">Content message</div>'
+        "</div>"
+    )
+    assert MessageSuccess("test").to_html() == (
+        '<div class="message success"><div class="content">test</div></div>'
+    )
+    assert MessageInfo("test").to_html() == (
+        '<div class="message info"><div class="content">test</div></div>'
+    )
+    assert MessageWarning("test").to_html() == (
+        '<div class="message warning"><div class="content">test</div></div>'
+    )
+    assert MessageDanger("test").to_html() == (
+        '<div class="message danger"><div class="content">test</div></div>'
+    )

@@ -20,7 +20,7 @@ class Quote(ComponentStrict[str, QuoteAttrs]):
                 "blockquote": {
                     "background-color": theme.colors.light,
                     "border-left": (
-                        f"{theme.borders.thick} solid {theme.colors.light.darken(0.05)}"
+                        f"{theme.borders.thick} solid {theme.colors.light.darken(1)}"
                     ),
                     "margin-bottom": theme.sizes.xxs,
                     "padding": f"{theme.sizes.l} {theme.sizes.m}",
@@ -30,11 +30,11 @@ class Quote(ComponentStrict[str, QuoteAttrs]):
                 },
                 "footer": {
                     "font-size": theme.fonts.size * 0.9,
-                    "color": theme.colors.dark.lighten(0.5),
+                    "color": theme.colors.dark.lighten(1),
                 },
                 "footer a": {
                     "text-decoration": "none",
-                    "color": theme.colors.dark.darken(0.5),
+                    "color": theme.colors.dark.darken(1),
                 },
                 "footer a:hover": {
                     "text-decoration": "underline",

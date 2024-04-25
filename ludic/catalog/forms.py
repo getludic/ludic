@@ -111,7 +111,7 @@ class FormField(Component[TChildren, TAttrs]):
                 "input": {
                     "inline-size": "100%",
                     "padding": f"{theme.sizes.xxxs} {theme.sizes.xs}",
-                    "border": f"1px solid {theme.colors.light.darken(0.2)}",
+                    "border": f"1px solid {theme.colors.light.darken(2)}",
                     "border-radius": theme.rounding.normal,
                     "box-sizing": "border-box",
                     "font-size": theme.fonts.size * 0.9,

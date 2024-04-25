@@ -78,7 +78,7 @@ class Box(div):
             },
             ".box:not(.transparent)": {
                 "border": (
-                    f"{theme.borders.thin} solid {theme.colors.light.darken(0.05)}"
+                    f"{theme.borders.thin} solid {theme.colors.light.darken(1)}"
                 ),
                 "border-radius": theme.rounding.more,
                 "background-color": theme.colors.light,
@@ -144,7 +144,7 @@ class Cluster(div):
                 "justify-content": "flex-start",
                 "align-items": "center",
             },
-            ".cluster.center": {
+            ".cluster.centered": {
                 "justify-content": "center",
             },
             ".cluster.flex-end": {
@@ -190,7 +190,7 @@ class WithSidebar(ComponentStrict[AnyChildren, AnyChildren, GlobalAttrs]):
             ".with-sidebar": {
                 "display": "flex",
                 "flex-wrap": "wrap",
-                "gap": theme.sizes.xxl,
+                "gap": theme.sizes.xxxxl,
             },
             ".with-sidebar > .sidebar": (
                 {

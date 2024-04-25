@@ -88,8 +88,7 @@ class Code(Component[str, GlobalAttrs]):
         lambda theme: {
             ".code": {
                 "background-color": theme.colors.light,
-                "padding": f"{theme.sizes.xxxxs * 0.5} {theme.sizes.xxs}",
-                "border": f"1px solid {theme.colors.light.darken(0.2)}",
+                "padding": f"{theme.sizes.xxxxs * 0.3} {theme.sizes.xxxs}",
                 "border-radius": theme.rounding.less,
             }
         }

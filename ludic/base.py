@@ -131,7 +131,10 @@ class BaseElement(metaclass=ABCMeta):
             else:
                 attrs["class"] = " ".join(classes)
 
-        return " ".join(f'{key}="{value}"' for key, value in attrs.items())
+        return " ".join(
+            f'{key}="{value}"' if '"' not in value else f"{key}='{value}'"
+            for key, value in attrs.items()
+        )
 
     def _format_children(
         self,
