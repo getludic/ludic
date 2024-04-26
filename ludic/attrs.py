@@ -472,7 +472,7 @@ class SvgAttrs(GlobalAttrs, total=False):
     xmlns: str
     height: int
     width: int
-    viewBox: str
+    view_box: Annotated[str, Alias("viewBox")]
     clip_path: Annotated[str, Alias("clip-path")]
     clip_rule: Annotated[str, Alias("clip-rule")]
     fill: str
