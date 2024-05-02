@@ -45,6 +45,7 @@ from .attrs import (
     StyleAttrs,
     SvgAttrs,
     CircleAttrs,
+    LineAttrs,
     PathAttrs,
     PolylineAttrs,
     TdAttrs,
@@ -207,6 +208,10 @@ class svg(Element[AnyChildren, SvgAttrs]):
 
 class circle(Element[AnyChildren, CircleAttrs]):
     html_name = "circle"
+
+
+class line(Element[AnyChildren, LineAttrs]):
+    html_name = "line"
 
 
 class path(Element[AnyChildren, PathAttrs]):
