@@ -494,6 +494,13 @@ class CircleAttrs(SvgAttrs, total=False):
     r: str
 
 
+class LineAttrs(SvgAttrs, total=False):
+    x1: str
+    x2: str
+    y1: str
+    y2: str
+
+
 class PathAttrs(SvgAttrs, total=False):
     d: str
 
