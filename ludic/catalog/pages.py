@@ -101,7 +101,6 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             },
             ("code", "pre", "pre *"): {
                 "font-family": theme.fonts.mono,
-                "font-size": theme.fonts.size * 0.95,
             },
             "dl": {
                 "margin-block": "0",
@@ -121,8 +120,11 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             ("ul", "ol"): {
                 "padding-inline-start": theme.sizes.xxl,
             },
-            ("ul > li + li", "ol > li + li", "li > ul", "li > ol"): {
-                "margin-block-start": theme.sizes.xxxxs,
+            ("ul > li + li", "ol > li + li", "li > * + *"): {
+                "margin-block-start": theme.sizes.xs,
+            },
+            "ul > li::marker": {
+                "font-size": theme.fonts.size * 1.2,
             },
             ("img", "svg"): {
                 "width": "100%",

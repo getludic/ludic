@@ -90,6 +90,7 @@ class Code(Component[str, GlobalAttrs]):
                 "background-color": theme.colors.light,
                 "padding": f"{theme.sizes.xxxxs * 0.3} {theme.sizes.xxxs}",
                 "border-radius": theme.rounding.less,
+                "font-size": theme.fonts.size * 0.9,
             }
         }
     )
@@ -118,6 +119,7 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
             ".code-block": {
                 "background-color": theme.colors.light,
                 "padding": theme.sizes.l,
+                "font-size": theme.fonts.size * 0.9,
             },
         }
     )
