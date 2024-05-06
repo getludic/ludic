@@ -221,20 +221,20 @@ class BaseElement(metaclass=ABCMeta):
             classes += dom.classes
 
         element_tag = f"{dom.html_header}\n" if dom.html_header else ""
+        children_str = dom._format_children() if dom.children else ""
 
-        hidden = dom.html_name == "__hidden__"
-        element_tag += "" if hidden else f"<{dom.html_name}"
-
-        if not hidden and (dom.has_attributes() or classes):
+        if dom.html_name == "__hidden__":
+            element_tag += children_str
+            return element_tag
+        
+        element_tag += f"<{dom.html_name}"
+        if (dom.has_attributes() or classes):
             attributes_str = dom._format_attributes(classes, is_html=True)
             element_tag += f" {attributes_str}"
-
+        
         if dom.children or dom.always_pair:
-            children_str = dom._format_children()
-            element_tag += (
-                children_str if hidden else f">{children_str}</{dom.html_name}>"
-            )
-        elif not hidden:
+            element_tag += f">{children_str}</{dom.html_name}>"
+        else:
             element_tag += " />"
 
         return element_tag
