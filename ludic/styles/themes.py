@@ -62,7 +62,7 @@ class Fonts:
     serif: str = "Georgia, serif"
     mono: str = "Space Mono, Roboto Mono, monospace"
 
-    size: Size = Size(1.01, "em")
+    size: Size = Size(1, "em")
 
 
 @dataclass

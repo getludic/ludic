@@ -48,8 +48,7 @@ def pick_readable_color_for(color: str) -> str:
         str: Readable opposite of the given color.
     """
     rgb = color if isinstance(color, tuple) else hex_to_rgb(color)
-    _, luminance, _ = colorsys.rgb_to_hls(*rgb)
-    return "#000" if luminance > 140 else "#fff"
+    return "#000" if sum(rgb) > 400 else "#fff"
 
 
 def scale_color(color: str, factor: float = 0.5) -> str:

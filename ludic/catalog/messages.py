@@ -25,6 +25,8 @@ class Message(Component[AnyChildren, GlobalAttrs]):
             },
             ".message > .title": {
                 "font-weight": "bold",
+                "border-top-left-radius": theme.rounding.less,
+                "border-top-right-radius": theme.rounding.less,
                 "padding-inline": theme.sizes.l,
                 "padding-block": theme.sizes.s,
                 "background-color": theme.colors.primary.lighten(1),

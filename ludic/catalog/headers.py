@@ -19,7 +19,6 @@ class Anchor(Component[str, AnchorAttrs]):
         lambda theme: {
             "a.anchor": {
                 "font-family": theme.fonts.serif,
-                "font-size": theme.fonts.size * 2.5,
                 "color": theme.colors.light.darken(1),
                 "text-decoration": "none",
             },
@@ -38,7 +37,7 @@ class Anchor(Component[str, AnchorAttrs]):
 
 
 class WithAnchorAttrs(GlobalAttrs, total=False):
-    anchor: Anchor
+    anchor: Anchor | bool
 
 
 class WithAnchor(ComponentStrict[h1 | h2 | h3 | h4 | str, WithAnchorAttrs]):
@@ -52,8 +51,21 @@ class WithAnchor(ComponentStrict[h1 | h2 | h3 | h4 | str, WithAnchorAttrs]):
                 "flex-wrap": "wrap",
                 "justify-content": "flex-start",
             },
+            ".with-anchor > h1 + a": {
+                "margin-inline-start": theme.sizes.m,
+                "font-size": theme.headers.h1.size,
+            },
             ".with-anchor > h2 + a": {
                 "margin-inline-start": theme.sizes.s,
+                "font-size": theme.headers.h2.size,
+            },
+            ".with-anchor > h3 + a": {
+                "margin-inline-start": theme.sizes.xs,
+                "font-size": theme.headers.h3.size,
+            },
+            ".with-anchor > h4 + a": {
+                "margin-inline-start": theme.sizes.xxs,
+                "font-size": theme.headers.h4.size,
             },
         }
     )
@@ -71,7 +83,11 @@ class WithAnchor(ComponentStrict[h1 | h2 | h3 | h4 | str, WithAnchorAttrs]):
 
         return div(
             element,
-            (self.attrs["anchor"] if "anchor" in self.attrs else Anchor(target=id)),
+            (
+                self.attrs["anchor"]
+                if isinstance(self.attrs.get("anchor"), Anchor)
+                else Anchor(target=id)
+            ),
         )
 
 
@@ -81,9 +97,10 @@ class H1(ComponentStrict[str, WithAnchorAttrs]):
     @override
     def render(self) -> h1 | WithAnchor:
         header = h1(*self.children, **self.attrs_for(h1))
-        if anchor := self.attrs.get("anchor"):
+        anchor = self.attrs.get("anchor")
+        if anchor:
             return WithAnchor(header, anchor=anchor)
-        elif self.theme.headers.h1.anchor:
+        elif self.theme.headers.h1.anchor and anchor is not False:
             return WithAnchor(header)
         else:
             return header
@@ -95,9 +112,10 @@ class H2(ComponentStrict[str, WithAnchorAttrs]):
     @override
     def render(self) -> h2 | WithAnchor:
         header = h2(*self.children, **self.attrs_for(h2))
-        if anchor := self.attrs.get("anchor"):
+        anchor = self.attrs.get("anchor")
+        if anchor:
             return WithAnchor(header, anchor=anchor)
-        elif self.theme.headers.h2.anchor:
+        elif self.theme.headers.h2.anchor and anchor is not False:
             return WithAnchor(header)
         else:
             return header
@@ -109,9 +127,10 @@ class H3(ComponentStrict[str, WithAnchorAttrs]):
     @override
     def render(self) -> h3 | WithAnchor:
         header = h3(*self.children, **self.attrs_for(h3))
-        if anchor := self.attrs.get("anchor"):
+        anchor = self.attrs.get("anchor")
+        if anchor:
             return WithAnchor(header, anchor=anchor)
-        elif self.theme.headers.h3.anchor:
+        elif self.theme.headers.h3.anchor and anchor is not False:
             return WithAnchor(header)
         else:
             return header
@@ -123,9 +142,10 @@ class H4(ComponentStrict[str, WithAnchorAttrs]):
     @override
     def render(self) -> h4 | WithAnchor:
         header = h4(*self.children, **self.attrs_for(h4))
-        if anchor := self.attrs.get("anchor"):
+        anchor = self.attrs.get("anchor")
+        if anchor:
             return WithAnchor(header, anchor=anchor)
-        elif self.theme.headers.h4.anchor:
+        elif self.theme.headers.h4.anchor and anchor is not False:
             return WithAnchor(header)
         else:
             return header
