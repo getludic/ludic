@@ -226,12 +226,12 @@ class BaseElement(metaclass=ABCMeta):
         if dom.html_name == "__hidden__":
             element_tag += children_str
             return element_tag
-        
+
         element_tag += f"<{dom.html_name}"
-        if (dom.has_attributes() or classes):
+        if dom.has_attributes() or classes:
             attributes_str = dom._format_attributes(classes, is_html=True)
             element_tag += f" {attributes_str}"
-        
+
         if dom.children or dom.always_pair:
             element_tag += f">{children_str}</{dom.html_name}>"
         else:
