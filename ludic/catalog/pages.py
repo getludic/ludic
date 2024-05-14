@@ -105,11 +105,11 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             "dl": {
                 "margin-block": "0",
             },
-            "dl dt": {
-                "margin-block-start": theme.sizes.xxs,
+            "dl dd + dt": {
+                "margin-block-start": theme.sizes.xs,
             },
-            "dl dd": {
-                "margin-block-start": theme.sizes.xxxs,
+            "dl dt + dd": {
+                "margin-block-start": theme.sizes.xxxxs,
             },
             "dt": {
                 "font-weight": "bold",

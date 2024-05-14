@@ -106,7 +106,7 @@ class FormField(Component[TChildren, TAttrs]):
                 "label": {
                     "display": "block",
                     "font-weight": "bold",
-                    "margin": f"{theme.sizes.xxxs} 0 {theme.sizes.xxs}",
+                    "margin-block-end": theme.sizes.xxs,
                 },
                 "input": {
                     "inline-size": "100%",
