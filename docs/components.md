@@ -186,7 +186,7 @@ The `ludic.attrs` module contains many attribute definition that you can reuse i
 
 - `HtmlAttrs` - Global HTML attributes available in all elements
     - The `class` and `for` attributes have the aliases `class_` and `for_`
-- `EventAttrs` - Event HTML attributes like `onclick`, `onkey`, and so on.
+- `EventAttrs` - Event HTML attributes like `on_click`, `on_key`, and so on.
 - `HtmxAttrs` - All [HTMX attributes](https://htmx.org/reference/) available.
     - All HTMX attributes have aliases with underscore, e.g. `hx_target`
 - `GlobalAttrs` subclasses `HtmlAttrs`, `EventAttrs` and `HtmxAttrs`

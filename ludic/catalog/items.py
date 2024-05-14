@@ -2,7 +2,7 @@ from collections.abc import Iterable
 from typing import override
 
 from ludic.attrs import GlobalAttrs
-from ludic.html import dd, dl, dt, style
+from ludic.html import dd, dl, dt
 from ludic.types import Component, PrimitiveChildren
 
 from .utils import attr_to_camel
@@ -54,15 +54,6 @@ class Pairs(Component[Key | Value, PairsAttrs]):
             items={"name": "John", "age": 42}.items(),
         )
     """
-
-    classes = ["stack", "small"]
-    styles = style.use(
-        lambda theme: {
-            ".stack.small > dt + dd": {
-                "margin-block-start": theme.sizes.xxxxs,
-            },
-        }
-    )
 
     @override
     def render(self) -> dl:

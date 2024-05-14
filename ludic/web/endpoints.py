@@ -1,6 +1,6 @@
 import inspect
 from collections.abc import Callable
-from typing import Any, ClassVar, Protocol, cast
+from typing import Any, ClassVar, Protocol
 
 from starlette.datastructures import URL
 from starlette.endpoints import HTTPEndpoint as BaseEndpoint
@@ -51,6 +51,11 @@ class Endpoint(Component[NoChildren, TAttrs]):
 
     route: ClassVar[Route]
 
+    @property
+    def request(self) -> Request | None:
+        """The current request."""
+        return self.context.get("request")
+
     def lazy_load(
         self,
         endpoint: type[RoutedProtocol],
@@ -79,9 +84,7 @@ class Endpoint(Component[NoChildren, TAttrs]):
         Returns:
             The URL.
         """
-        request = self.context.get("request")
-
-        if request is None or not isinstance(request, Request):
+        if self.request is None or not isinstance(self.request, Request):
             raise RuntimeError(
                 f"{type(self).__name__} is not bound to a request, you can only use "
                 f"the {type(self).__name__}.url_for method in the context of a request."
@@ -102,4 +105,4 @@ class Endpoint(Component[NoChildren, TAttrs]):
                     if key in endpoint.route.param_convertors
                 }
 
-        return cast(URL, request.url_for(endpoint, **path_params))
+        return self.request.url_for(endpoint, **path_params)

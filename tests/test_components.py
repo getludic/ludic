@@ -72,7 +72,7 @@ def test_pairs() -> None:
         Value(42),
     )
     assert pairs.to_html() == (
-        '<dl class="stack small">'
+        '<dl>'
             '<dt>Name</dt>'
             '<dd>John</dd>'
             '<dt>Age</dt>'
