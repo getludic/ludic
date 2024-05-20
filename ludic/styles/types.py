@@ -203,6 +203,7 @@ CSSProperties = TypedDict(
         "animation-name": str,
         "animation-play-state": Literal["paused", "running"],
         "animation-timing-function": str,
+        "aspect-ratio": str,
         # B
         "backdrop-filter": str,
         "backface-visibility": Literal["visible", "hidden"],

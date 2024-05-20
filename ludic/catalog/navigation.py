@@ -1,7 +1,7 @@
 from typing import NotRequired, override
 
 from ludic.attrs import GlobalAttrs
-from ludic.html import a, h2, li, nav, style, ul
+from ludic.html import h2, li, nav, style, ul
 from ludic.types import Component, ComponentStrict, PrimitiveChildren
 
 from .buttons import ButtonLink
@@ -49,7 +49,7 @@ class NavItem(Component[PrimitiveChildren, NavItemAttrs]):
             self.attrs["classes"].append("active")
 
         return li(
-            ButtonLink(self.children[0], href=self.attrs["to"], **self.attrs_for(a)),
+            ButtonLink(self.children[0], external=False, **self.attrs_for(ButtonLink)),
         )
 
 

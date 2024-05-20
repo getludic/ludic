@@ -15,7 +15,7 @@ class Colors:
     """Colors for a theme."""
 
     primary: Color = ColorRange(["#276662", "#4ecdc4", "#dbf5f3"])
-    secondary: Color = ColorRange(["#f1f1f1", "#fefefe", "#fff"])
+    secondary: Color = ColorRange(["#212529", "#414549", "#616569"])
     success: Color = ColorRange(["#637a32", "#c7f464", "#eefbd0"])
     info: Color = ColorRange(["#978801", "#fce303", "#fef9cc"])
     warning: Color = ColorRange(["#7e4801", "#fc9003", "#fee8cc"])
@@ -124,11 +124,44 @@ class Switcher:
 
 
 @dataclass
+class Cover:
+    """Cover layout config for a theme."""
+
+    # The minimum height of the cover
+    min_height: Size = Size(100, "vh")
+
+    # The minimum space between and around the child elements
+    element: str = "h1"
+
+
+@dataclass
+class Grid:
+    """Grid layout config for a theme."""
+
+    # The size of the grid cells
+    cell_size: Size = Size(250, "px")
+
+
+@dataclass
+class Frame:
+    """Frame layout config for a theme."""
+
+    # The width of the frame
+    numerator: int = 16
+
+    # The height of the frame
+    denominator: int = 9
+
+
+@dataclass
 class Layouts:
     """Layout configuration for a theme."""
 
     sidebar: Sidebar = field(default_factory=Sidebar)
     switcher: Switcher = field(default_factory=Switcher)
+    cover: Cover = field(default_factory=Cover)
+    grid: Grid = field(default_factory=Grid)
+    frame: Frame = field(default_factory=Frame)
 
 
 @dataclass

@@ -1,8 +1,10 @@
 from typing import override
 
 from ludic.attrs import ButtonAttrs
-from ludic.html import a, button, style
+from ludic.html import button, style
 from ludic.types import ComponentStrict, PrimitiveChildren
+
+from .typography import Link
 
 
 class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
@@ -15,6 +17,8 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
     styles = style.use(
         lambda theme: {
             ".btn": {
+                "display": "inline-block",
+                "text-decoration": "none",
                 "background-color": theme.colors.light,
                 "color": theme.colors.black,
                 "padding": f"{theme.sizes.xxs} {theme.sizes.s}",
@@ -22,20 +26,25 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
                 "border-radius": theme.rounding.normal,
                 "cursor": "pointer",
                 "font-size": theme.fonts.size,
+                "line-height": 1,
                 "transition": "0.1s filter linear, 0.1s -webkit-filter linear",
+            },
+            ":not(a).btn": {
+                "background-color": theme.colors.light.darken(2),
             },
             ".btn:hover": {
                 "filter": "brightness(85%)",
+                "text-decoration": "none",
             },
             ".btn.small": {
                 "font-size": theme.fonts.size * 0.9,
-                "padding": f"{theme.sizes.xxxs} {theme.sizes.xs}",
+                "padding": f"{theme.sizes.xxxs} {theme.sizes.xxs}",
             },
             ".btn.large": {
                 "font-size": theme.fonts.size * 1.2,
                 "padding": f"{theme.sizes.xs} {theme.sizes.m}",
             },
-            ".box .btn": {
+            (".invert .btn", ".btn.active"): {
                 "background-color": theme.colors.dark,
                 "color": theme.colors.light,
                 "border-color": theme.colors.dark,
@@ -44,7 +53,7 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
     )
 
     @override
-    def render(self) -> button | a:
+    def render(self) -> button:
         return button(self.children[0], **self.attrs)
 
 
@@ -82,41 +91,13 @@ class ButtonSecondary(Button):
     )
 
 
-class ButtonLink(Button):
+class ButtonLink(Link):
     """Simple component creating an HTML button.
 
     The component creates a button with the ``secondary`` class.
     """
 
-    classes = ["btn", "link"]
-    styles = style.use(
-        lambda theme: {
-            (".btn.link", ".box .btn.link"): {
-                "color": theme.colors.dark,
-                "background": "none",
-                "border": "none",
-                "text-decoration": "none",
-                "display": "inline-block",
-                "line-height": 1,
-            },
-            (".btn.link.active", ".btn.link.active:hover"): {
-                "background-color": theme.colors.light,
-            },
-            (".box .btn.link.active", ".box .btn.link.active:hover"): {
-                "color": theme.colors.light,
-                "background-color": theme.colors.dark,
-            },
-            (".btn.link:hover", ".box .btn.link:hover"): {
-                "color": theme.colors.dark,
-                "background-color": theme.colors.light,
-                "text-decoration": "none",
-            },
-        }
-    )
-
-    @override
-    def render(self) -> a:
-        return a(self.children[0], **self.attrs)
+    classes = ["btn"]
 
 
 class ButtonSuccess(Button):

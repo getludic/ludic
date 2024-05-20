@@ -75,7 +75,7 @@ class PeopleTable(Endpoint[PeopleAttrs]):
 
     @override
     def render(self) -> Table[TableHead, PersonRow]:
-        return Table[TableHead, PersonRow](
+        return Table(
             TableHead("Name", "Email", "Active", ""),
             *(PersonRow(**person) for person in self.attrs["people"]),
             body_attrs=HtmxAttrs(

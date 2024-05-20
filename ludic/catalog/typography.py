@@ -9,7 +9,7 @@ try:
 except ImportError:
     pygments_loaded = False
 
-from ludic.attrs import GlobalAttrs
+from ludic.attrs import GlobalAttrs, HyperlinkAttrs
 from ludic.html import a, code, p, pre, style
 from ludic.types import (
     AnyChildren,
@@ -26,6 +26,7 @@ from .utils import remove_whitespaces
 class LinkAttrs(Attrs):
     to: str
     external: NotRequired[bool]
+    classes: NotRequired[list[str]]
 
 
 class Link(ComponentStrict[PrimitiveChildren, LinkAttrs]):
@@ -46,7 +47,9 @@ class Link(ComponentStrict[PrimitiveChildren, LinkAttrs]):
 
     @override
     def render(self) -> a:
-        attrs = {"href": self.attrs["to"]}
+        attrs: HyperlinkAttrs = {"href": self.attrs.get("to", "#")}
+        if "classes" in self.attrs:
+            attrs["classes"] = self.attrs["classes"]
 
         match self.attrs.get("external", "auto"):
             case True:
@@ -54,7 +57,7 @@ class Link(ComponentStrict[PrimitiveChildren, LinkAttrs]):
             case False:
                 pass
             case "auto":
-                if self.attrs["to"].startswith("http"):
+                if str(attrs["href"]).startswith("http"):
                     attrs["target"] = "_blank"
 
         return a(self.children[0], **attrs)
