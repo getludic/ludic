@@ -55,9 +55,9 @@ def test_navigation() -> None:
     assert navigation.to_html() == (
         '<nav id="nav" class="navigation">'
             '<ul class="stack small">'
-                '<li class="nav-item"><a href="/" class="small btn link">Home</a></li>'
+                '<li class="nav-item"><a href="/" class="small btn">Home</a></li>'
                 '<li class="nav-item">'
-                    '<a href="/about" class="small btn link">About</a>'
+                    '<a href="/about" class="small btn">About</a>'
                 '</li>'
             "</ul>"
         "</nav>"

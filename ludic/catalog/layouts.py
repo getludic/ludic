@@ -252,3 +252,102 @@ class Switcher(div):
             },
         }
     )
+
+
+class Cover(div):
+    """A component which covers the whole viewport.
+
+    Example usage:
+
+        Cover(
+            div(...),
+        )
+    """
+
+    classes = ["cover"]
+    styles = style.use(
+        lambda theme: {
+            ".cover": {
+                "display": "flex",
+                "flex-direction": "column",
+                "min-block-size": theme.layouts.cover.min_height,
+                "padding": theme.sizes.xxl,
+            },
+            ".cover > *": {
+                "margin-block": theme.sizes.xxl,
+            },
+            f".cover > :first-child:not({theme.layouts.cover.element})": {
+                "margin-block-start": "0",
+            },
+            f".cover > :last-child:not({theme.layouts.cover.element})": {
+                "margin-block-end": "0",
+            },
+            f".cover > {theme.layouts.cover.element}": {
+                "margin-block": "auto",
+            },
+        }
+    )
+
+
+class Grid(div):
+    """A component which creates a grid layout.
+
+    Example usage:
+
+        Grid(
+            div(...),
+            div(...),
+        )
+    """
+
+    classes = ["grid"]
+    styles = style.use(
+        lambda theme: {
+            ".grid": {
+                "display": "grid",
+                "grid-gap": theme.sizes.xxl,
+            },
+            f"@supports (width: min({theme.layouts.grid.cell_size}, 100%))": {
+                ".grid": {
+                    "grid-template-columns": (
+                        "repeat("
+                        "auto-fit,"
+                        f"minmax(min({theme.layouts.grid.cell_size},"
+                        "100%"
+                        "), 1fr))"
+                    ),
+                },
+            },
+        }
+    )
+
+
+class Frame(div):
+    """A component which creates a frame layout.
+
+    Example usage:
+
+        Frame(
+            div(...),
+        )
+    """
+
+    classes = ["frame"]
+    styles = style.use(
+        lambda theme: {
+            ".frame": {
+                "aspect-ratio": (
+                    f"{theme.layouts.frame.numerator}/{theme.layouts.frame.denominator}"
+                ),
+                "overflow": "hidden",
+                "display": "flex",
+                "justify-content": "center",
+                "align-items": "center",
+            },
+            (".frame > img", ".frame > video"): {
+                "inline-size": "100%",
+                "block-size": "100%",
+                "object-fit": "cover",
+            },
+        }
+    )
