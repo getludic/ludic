@@ -514,6 +514,7 @@ class IframeAttrs(GlobalAttrs, total=False):
     allowfullscreen: bool
     allowpaymentrequest: bool
     height: int
+    frameborder: str
     loading: Literal["eager", "lazy"]
     name: str
     referrerpolicy: Literal[
@@ -535,6 +536,7 @@ class IframeAttrs(GlobalAttrs, total=False):
     ]
     src: str
     srcdoc: str
+    scrolling: str
     width: int
 
 
