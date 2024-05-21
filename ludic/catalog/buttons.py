@@ -21,12 +21,11 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
                 "text-decoration": "none",
                 "background-color": theme.colors.light,
                 "color": theme.colors.black,
-                "padding": f"{theme.sizes.xxs} {theme.sizes.s}",
+                "padding": f"{theme.sizes.xxxxs * 0.8} {theme.sizes.s}",
                 "border": "none",
                 "border-radius": theme.rounding.normal,
                 "cursor": "pointer",
                 "font-size": theme.fonts.size,
-                "line-height": 1,
                 "transition": "0.1s filter linear, 0.1s -webkit-filter linear",
             },
             ":not(a).btn": {
@@ -38,11 +37,11 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
             },
             ".btn.small": {
                 "font-size": theme.fonts.size * 0.9,
-                "padding": f"{theme.sizes.xxxs} {theme.sizes.xxs}",
+                "padding": f"{theme.sizes.xxxxs * 0.6} {theme.sizes.xxs}",
             },
             ".btn.large": {
                 "font-size": theme.fonts.size * 1.2,
-                "padding": f"{theme.sizes.xs} {theme.sizes.m}",
+                "padding": f"{theme.sizes.xxxxs} {theme.sizes.m}",
             },
             (".invert .btn", ".btn.active"): {
                 "background-color": theme.colors.dark,
