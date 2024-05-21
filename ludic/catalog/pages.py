@@ -129,9 +129,6 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             ("img", "svg"): {
                 "width": "100%",
             },
-            "button": {
-                "line-height": 1,
-            },
             # utilities
             ".text-align-center": {
                 "text-align": "center",
