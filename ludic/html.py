@@ -432,6 +432,7 @@ class html(ElementStrict[head, body, HtmlTagAttrs]):
 
 
 class iframe(Element[NoChildren, IframeAttrs]):
+    always_pair = True
     html_name = "iframe"
 
 
