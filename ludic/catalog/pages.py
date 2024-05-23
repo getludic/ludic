@@ -131,17 +131,40 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             },
             # utilities
             ".text-align-center": {
-                "text-align": "center",
+                "text-align": "center !important",  # type: ignore[typeddict-item]
             },
             ".text-align-right": {
-                "text-align": "right",
+                "text-align": "right !important",  # type: ignore[typeddict-item]
             },
             ".text-align-left": {
-                "text-align": "left",
+                "text-align": "left !important",  # type: ignore[typeddict-item]
             },
-            ".no-border": {
-                "border": "none !important",
-                "border-radius": "0 !important",
+            ".justify-space-between": {
+                "justify-content": "space-between !important",  # type: ignore[typeddict-item]
+            },
+            ".justify-space-around": {
+                "justify-content": "space-around !important",  # type: ignore[typeddict-item]
+            },
+            ".justify-space-evenly": {
+                "justify-content": "space-evenly !important",  # type: ignore[typeddict-item]
+            },
+            ".justify-center": {
+                "justify-content": "center !important",  # type: ignore[typeddict-item]
+            },
+            ".justify-end": {
+                "justify-content": "end !important",  # type: ignore[typeddict-item]
+            },
+            ".justify-start": {
+                "justify-content": "start !important",  # type: ignore[typeddict-item]
+            },
+            ".align-center": {
+                "align-items": "center !important",  # type: ignore[typeddict-item]
+            },
+            ".align-end": {
+                "align-items": "end !important",  # type: ignore[typeddict-item]
+            },
+            ".align-start": {
+                "align-items": "start !important",  # type: ignore[typeddict-item]
             },
             ".no-padding": {
                 "padding": "0 !important",
@@ -154,6 +177,19 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             },
             ".no-inline-margin": {
                 "margin-inline": "0 !important",
+            },
+            ".no-block-margin": {
+                "margin-block": "0 !important",
+            },
+            ".no-block-padding": {
+                "padding-block": "0 !important",
+            },
+            ".no-border": {
+                "border": "none !important",
+                "border-radius": "0 !important",
+            },
+            ".no-border-radius": {
+                "border-radius": "0 !important",
             },
         }
     )

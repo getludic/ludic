@@ -73,8 +73,14 @@ class Box(div):
     styles = style.use(
         lambda theme: {
             ".box": {
-                "padding": theme.sizes.xl,
+                "padding": theme.sizes.l,
                 "color": theme.colors.dark,
+            },
+            ".box.small": {
+                "padding": theme.sizes.s,
+            },
+            ".box.large": {
+                "padding": theme.sizes.xxl,
             },
             ".box:not(.transparent)": {
                 "border": (
