@@ -121,7 +121,8 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
         lambda theme: {
             ".code-block": {
                 "background-color": theme.colors.light,
-                "padding": theme.sizes.l,
+                "padding-block": theme.sizes.l,
+                "padding-inline": theme.sizes.xxl,
                 "font-size": theme.fonts.size * 0.9,
             },
         }

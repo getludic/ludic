@@ -10,6 +10,7 @@ from .buttons import ButtonLink
 class NavItemAttrs(GlobalAttrs):
     to: str
     active: NotRequired[bool]
+    active_subsection: NotRequired[bool]
 
 
 class NavHeader(ComponentStrict[str, GlobalAttrs]):
@@ -30,7 +31,7 @@ class NavHeader(ComponentStrict[str, GlobalAttrs]):
 
     @override
     def render(self) -> h2:
-        return h2(self.children[0])
+        return h2(self.children[0], **self.attrs_for(h2))
 
 
 class NavItem(Component[PrimitiveChildren, NavItemAttrs]):
@@ -41,15 +42,36 @@ class NavItem(Component[PrimitiveChildren, NavItemAttrs]):
     """
 
     classes = ["nav-item"]
+    styles = style.use(
+        lambda theme: {
+            "li.nav-item.section.active-subsection .btn": {
+                "font-weight": "bold",
+                "background": "none",
+            },
+            "li.nav-item.subsection": {
+                "padding-inline-start": theme.sizes.m,
+            },
+        }
+    )
 
     @override
     def render(self) -> li:
-        self.attrs.setdefault("classes", ["small"])
+        self.attrs.setdefault("classes", [])
+
+        if self.attrs.pop("active_subsection", False):
+            self.attrs["classes"].append("active-subsection")
+
         if self.attrs.pop("active", False):
             self.attrs["classes"].append("active")
 
         return li(
-            ButtonLink(self.children[0], external=False, **self.attrs_for(ButtonLink)),
+            ButtonLink(
+                self.children[0],
+                to=self.attrs["to"],
+                external=False,
+                classes=["small"] if "subsection" in self.attrs["classes"] else [],
+            ),
+            **self.attrs_for(li),
         )
 
 

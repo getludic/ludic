@@ -31,7 +31,7 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
             ":not(a).btn": {
                 "background-color": theme.colors.light.darken(2),
             },
-            ".btn:hover": {
+            (".btn:hover", ".btn:focus"): {
                 "filter": "brightness(85%)",
                 "text-decoration": "none",
             },
@@ -43,7 +43,7 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
                 "font-size": theme.fonts.size * 1.2,
                 "padding": f"{theme.sizes.xxxxs} {theme.sizes.m}",
             },
-            (".invert .btn", ".btn.active"): {
+            (".invert .btn", ".active .btn"): {
                 "background-color": theme.colors.dark,
                 "color": theme.colors.light,
                 "border-color": theme.colors.dark,
