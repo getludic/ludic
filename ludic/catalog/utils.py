@@ -31,6 +31,9 @@ def remove_whitespaces(text: str) -> str:
     Returns:
         str: The text without leading whitespaces.
     """
-    by_line = text.split("\n")
+    if not text:
+        return text
+
+    by_line = text.splitlines()
     min_whitespaces = min(len(line) - len(line.lstrip()) for line in by_line if line)
     return "\n".join(line[min_whitespaces:].rstrip() for line in by_line).strip()

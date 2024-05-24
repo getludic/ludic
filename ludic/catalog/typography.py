@@ -120,7 +120,7 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
     styles = style.use(
         lambda theme: {
             ".code-block": {
-                "background-color": theme.colors.light,
+                "background-color": theme.code.background_color,
                 "padding-block": theme.sizes.l,
                 "padding-inline": theme.sizes.xxl,
                 "font-size": theme.fonts.size * 0.9,
@@ -137,7 +137,12 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
 
         if pygments_loaded and (language := self.attrs.get("language")):
             lexer = get_lexer_by_name(language)
-            formatter = HtmlFormatter(noclasses=True, nobackground=True, nowrap=True)
+            formatter = HtmlFormatter(
+                noclasses=True,
+                nobackground=True,
+                nowrap=True,
+                style=self.theme.code.style,
+            )
             block = Safe(highlight(content, lexer, formatter))
             return pre(block, **self.attrs_for(pre))
         else:

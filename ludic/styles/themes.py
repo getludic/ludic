@@ -165,10 +165,18 @@ class Layouts:
 
 
 @dataclass
+class CodeBlock:
+    """Code block config for a theme."""
+
+    background_color: Color = Color("#f8f8f8")
+    style: str | type = "default"
+
+
+@dataclass
 class Theme(metaclass=ABCMeta):
     """An abstract base class for theme configuration."""
 
-    measure: Size = Size(110, "ch")
+    measure: Size = Size(70, "ch")
     line_height: float = 1.5
 
     fonts: Fonts = field(default_factory=Fonts)
@@ -180,6 +188,7 @@ class Theme(metaclass=ABCMeta):
     headers: Headers = field(default_factory=Headers)
 
     layouts: Layouts = field(default_factory=Layouts)
+    code: CodeBlock = field(default_factory=CodeBlock)
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Theme) and self.name == other.name
