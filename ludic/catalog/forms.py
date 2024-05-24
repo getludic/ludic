@@ -4,8 +4,15 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Any, Literal, get_type_hints, override
 
-from ludic.attrs import Attrs, FormAttrs, InputAttrs, TextAreaAttrs
-from ludic.html import div, form, input, label, style, textarea
+from ludic.attrs import (
+    Attrs,
+    FormAttrs,
+    InputAttrs,
+    OptionAttrs,
+    SelectAttrs,
+    TextAreaAttrs,
+)
+from ludic.html import div, form, input, label, option, select, style, textarea
 from ludic.types import (
     BaseElement,
     ComplexChildren,
@@ -22,6 +29,10 @@ from .utils import attr_to_camel
 DEFAULT_FIELD_PARSERS: Mapping[str, Callable[[Any], PrimitiveChildren]] = {
     "checkbox": lambda value: True if value == "on" else False,
 }
+
+
+class SelectMetaAttrs(SelectAttrs):
+    options: list[OptionAttrs]
 
 
 @dataclass
@@ -44,25 +55,33 @@ class FieldMeta:
     """
 
     label: str | Literal["auto"] | None = "auto"
-    kind: Literal["input", "textarea", "checkbox"] = "input"
+    kind: Literal["input", "textarea", "checkbox", "select"] = "input"
     type: Literal["text", "email", "password", "hidden"] = "text"
-    attrs: InputAttrs | TextAreaAttrs | None = None
+    attrs: InputAttrs | TextAreaAttrs | SelectMetaAttrs | None = None
     parser: Callable[[Any], PrimitiveChildren] | None = None
 
     def format(self, key: str, value: Any) -> BaseElement:
         attrs = {} if self.attrs is None else dict(self.attrs)
         attrs["name"] = key
 
-        if self.label:
-            attrs["label"] = self.label
-        elif self.label == "auto":
+        if self.label == "auto":
             attrs["label"] = attr_to_camel(key)
+        elif self.label:
+            attrs["label"] = self.label
 
         match self.kind:
             case "input":
                 return InputField(value=value, type=self.type, **attrs)
             case "checkbox":
                 return InputField(checked=value, type="checkbox", **attrs)
+            case "select":
+                options: list[Option] = []
+
+                for option_dict in attrs.pop("options", []):  # type: ignore
+                    text = option_dict.pop("label", attr_to_camel(option_dict["value"]))
+                    options.append(Option(text, **option_dict))
+
+                return SelectField(*options, **attrs)
             case "textarea":
                 return TextAreaField(value=value, **attrs)
 
@@ -89,6 +108,13 @@ class InputFieldAttrs(FieldAttrs, InputAttrs):
     """
 
 
+class SelectFieldAttrs(FieldAttrs, SelectAttrs):
+    """Attributes of the component ``SelectField``.
+
+    The attributes are subclassed from :class:`FieldAttrs` and :class:`SelectAttrs`.
+    """
+
+
 class TextAreaFieldAttrs(FieldAttrs, TextAreaAttrs):
     """Attributes of the component ``TextAreaField``.
 
@@ -102,21 +128,40 @@ class FormField(Component[TChildren, TAttrs]):
     classes = ["form-field"]
     styles = style.use(
         lambda theme: {
-            ".form-field": {
-                "label": {
-                    "display": "block",
-                    "font-weight": "bold",
-                    "margin-block-end": theme.sizes.xxs,
-                },
-                "input": {
-                    "inline-size": "100%",
-                    "padding": f"{theme.sizes.xxxs} {theme.sizes.xs}",
-                    "border": f"1px solid {theme.colors.light.darken(2)}",
-                    "border-radius": theme.rounding.normal,
-                    "box-sizing": "border-box",
-                    "font-size": theme.fonts.size * 0.9,
-                },
-            }
+            ".form-field label": {
+                "display": "block",
+                "font-weight": "bold",
+                "margin-block-end": theme.sizes.xxs,
+            },
+            (".form-field input", ".form-field textarea", ".form-field select"): {
+                "inline-size": "100%",
+                "padding": f"{theme.sizes.xxxs} {theme.sizes.xs}",
+                "border": (
+                    f"{theme.borders.thin} solid {theme.colors.light.darken(2)}"
+                ),
+                "border-radius": theme.rounding.normal,
+                "box-sizing": "border-box",
+                "font-size": theme.fonts.size * 0.9,
+                "transition": "all 0.3s ease-in-out",
+                "resize": "vertical",
+                "background-color": theme.colors.white,
+            },
+            (".form-field input", ".form-field select"): {
+                "height": theme.sizes.xxxxl,
+            },
+            ".form-field input[type=checkbox]": {
+                "height": theme.sizes.m,
+                "width": theme.sizes.m,
+            },
+            (
+                ".form-field input:focus",
+                ".form-field textarea:focus",
+                ".form-field select:focus",
+            ): {
+                "outline": "none",
+                "border-color": theme.colors.light.darken(7),
+                "border-width": theme.borders.thin,
+            },
         }
     )
 
@@ -144,6 +189,31 @@ class InputField(FormField[NoChildren, InputFieldAttrs]):
         return div(*elements)
 
 
+class Option(Component[PrimitiveChildren, OptionAttrs]):
+    """Represents the HTML ``option`` element."""
+
+    @override
+    def render(self) -> option:
+        return option(*self.children, **self.attrs)
+
+
+class SelectField(FormField[Option, SelectFieldAttrs]):
+    """Represents the HTML ``input`` element with an optional ``label`` element."""
+
+    @override
+    def render(self) -> div:
+        attrs = self.attrs_for(select)
+        if "name" in self.attrs:
+            attrs["id"] = self.attrs["name"]
+
+        elements: list[ComplexChildren] = []
+        if text := self.attrs.get("label"):
+            elements.append(self.create_label(text=text, for_=attrs.get("id", "")))
+        elements.append(select(*self.children, **attrs))
+
+        return div(*elements)
+
+
 class TextAreaField(FormField[PrimitiveChildren, TextAreaFieldAttrs]):
     """Represents the HTML ``textarea`` element with an optional ``label`` element."""
 
@@ -156,7 +226,7 @@ class TextAreaField(FormField[PrimitiveChildren, TextAreaFieldAttrs]):
         elements: list[ComplexChildren] = []
         if text := self.attrs.get("label"):
             elements.append(self.create_label(text=text, for_=attrs.get("id", "")))
-        elements.append(textarea(self.children[0], **attrs))
+        elements.append(textarea(*self.children, **attrs))
 
         return div(*elements)
 

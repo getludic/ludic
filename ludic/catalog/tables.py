@@ -180,7 +180,7 @@ class Table(ComponentStrict[THead, *tuple[TRow, ...], TableAttrs]):
 
 
 def create_rows(
-    attrs_list: list[TAttrs], spec: type[TAttrs], include_id_column: bool = False
+    attrs_list: list[TAttrs], spec: type[TAttrs], include_id_column: bool = True
 ) -> tuple[TableHead, *tuple[TableRow, ...]]:
     """Create table rows from the given attributes.
 

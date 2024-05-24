@@ -1,11 +1,11 @@
 from typing import NotRequired, override
 
-from ludic.attrs import GlobalAttrs, NoAttrs
+from ludic.attrs import GlobalAttrs
 from ludic.html import div, style
 from ludic.types import AnyChildren, Component
 
 
-class Loading(Component[AnyChildren, NoAttrs]):
+class Loading(Component[AnyChildren, GlobalAttrs]):
     classes = ["loader"]
     styles = style.use(
         lambda theme: {
@@ -74,6 +74,7 @@ class Loading(Component[AnyChildren, NoAttrs]):
     def render(self) -> div:
         return div(
             div(div(""), div(""), div(""), div(""), classes=["lds-ellipsis"]),
+            **self.attrs_for(div),
         )
 
 

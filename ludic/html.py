@@ -187,6 +187,7 @@ class select(Element[AnyChildren, SelectAttrs]):
 
 
 class textarea(Element[PrimitiveChildren, TextAreaAttrs]):
+    always_pair = True
     html_name = "textarea"
 
 
