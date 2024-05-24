@@ -8,6 +8,8 @@ from starlette.responses import PlainTextResponse, Response
 from starlette.routing import Host
 from starlette.types import Receive, Scope, Send
 
+from ludic.attrs import Attrs
+
 from .endpoints import Endpoint
 from .requests import Request
 from .responses import prepare_response
@@ -44,7 +46,7 @@ class _FunctionHandler:
 
 
 class _EndpointHandler:
-    def __init__(self, handler: type[Endpoint]) -> None:
+    def __init__(self, handler: type[Endpoint[Attrs]]) -> None:
         self.handler = handler
         self._allowed_methods = [
             method
