@@ -12,6 +12,7 @@ from starlette.routing import BaseRoute
 from starlette.types import Lifespan
 from starlette.websockets import WebSocket
 
+from ludic.attrs import Attrs
 from ludic.types import BaseElement
 
 from .datastructures import URLPath
@@ -20,7 +21,7 @@ from .responses import LudicResponse, run_in_threadpool_safe
 from .routing import Router
 
 TCallable = TypeVar("TCallable", bound=Callable[..., Any])
-TEndpoint = TypeVar("TEndpoint", bound=Endpoint)
+TEndpoint = TypeVar("TEndpoint", bound=Endpoint[Attrs])
 
 
 class LudicApp(Starlette):

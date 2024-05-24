@@ -7,11 +7,11 @@ from typing import (
     Never,
     TypeAlias,
     TypedDict,
+    TypeVar,
+    TypeVarTuple,
     Unpack,
     cast,
 )
-
-from typing_extensions import TypeVar, TypeVarTuple
 
 from .format import FormatContext, format_attrs, format_element
 from .styles import GlobalStyles, Theme, get_default_theme
@@ -274,19 +274,19 @@ ComplexChildren: TypeAlias = BaseElement
 AnyChildren: TypeAlias = PrimitiveChildren | ComplexChildren | Safe
 """Type alias for elements that are allowed to have any children."""
 
-TChildren = TypeVar("TChildren", bound=AnyChildren, default=AnyChildren, covariant=True)
+TChildren = TypeVar("TChildren", bound=AnyChildren, covariant=True)
 """Type variable for elements representing type of children (the type of *args).
 
 See also: :class:`ludic.types.Component`.
 """
 
-TChildrenArgs = TypeVarTuple("TChildrenArgs", default=Unpack[tuple[AnyChildren, ...]])
+TChildrenArgs = TypeVarTuple("TChildrenArgs")
 """Type variable for strict elements representing type of children (the type of *args).
 
 See also: :class:`ludic.types.ComponentStrict`.
 """
 
-TAttrs = TypeVar("TAttrs", bound=Attrs | NoAttrs, default=Attrs, covariant=True)
+TAttrs = TypeVar("TAttrs", bound=Attrs | NoAttrs, covariant=True)
 """Type variable for elements representing type of attributes (the type of **kwargs)."""
 
 
