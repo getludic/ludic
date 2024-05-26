@@ -162,3 +162,10 @@ def test_repr_and_str() -> None:
         "  <p>3</p>\n"
         "</div>"
     )  # fmt: skip
+
+
+def test_data_attributes() -> None:
+    dom = div("content", data_foo="1", data_bar="test")
+
+    assert dom.attrs == {"data_foo": "1", "data_bar": "test"}
+    assert dom.to_html() == '<div data-foo="1" data-bar="test">content</div>'
