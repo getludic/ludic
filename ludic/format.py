@@ -68,10 +68,12 @@ def format_attrs(
     hints = get_element_attrs_annotations(attrs_type, include_extras=True)
 
     def _get_key(key: str) -> str:
-        if get_origin(hints[key]) is Annotated:
+        if key in hints and get_origin(hints[key]) is Annotated:
             args = get_args(hints[key])
             if len(args) > 1 and isinstance(args[1], str):
                 return args[1]
+        elif key.startswith("data_"):
+            return f"data-{key[5:]}"
         return key
 
     result: dict[str, str] = {}
