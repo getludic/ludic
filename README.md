@@ -17,9 +17,24 @@ Ludic is a lightweight framework for building HTML pages with a component approa
 - **Type-Guided components** utilizing Python's typing system
 - Uses the power of **Starlette** and **Async** for high-performance web development
 - Build HTML with the ease and power of Python **f-strings**
-- Add CSS styling to your components with **themes**
+- Add CSS styling to your components with **Themes**
+- Create simple, responsive layouts adopted from the **Every Layout Book**
 
-## Ideals
+## Comparison
+
+Here is a table comparing Ludic to other similar tools:
+
+| Feature                     | Ludic       | FastUI      | Reflex      |
+|-----------------------------|-------------|-------------|-------------|
+| HTML rendering              | Server Side | Client Side | Client Side |
+| Uses a template engine      | No          | No          | No          |
+| UI interactivity            | [</> htmx](https://htmx.org)* | [React](https://react.dev/) | [React](https://react.dev/) |
+| Backend framework           | [Starlette](https://www.starlette.io)*  | [FastAPI](https://fastapi.tiangolo.com) | [FastAPI](https://fastapi.tiangolo.com) |
+| Client-Server Communication | [HTML + REST](https://htmx.org/essays/how-did-rest-come-to-mean-the-opposite-of-rest/) | [JSON + REST](https://github.com/pydantic/FastUI?tab=readme-ov-file#the-principle-long-version) | [WebSockets](https://reflex.dev/blog/2024-03-21-reflex-architecture/) |
+
+<sup>(*) HTMX as well as Starlette are optional dependencies for Ludic, it does not enforce any frontend or backend frameworks. At it's core, Ludic only generates HTML and allows registering CSS.</sup>
+
+## Motivation
 
 This framework allows HTML generation in Python while utilizing Python's typing system. Our goal is to enable the creation of dynamic web applications with reusable components, all while offering a greater level of type safety than raw HTML.
 
@@ -72,6 +87,12 @@ Similar to Starlette, you'll also want to install an [ASGI](https://asgi.readthe
 
 ```
 pip install uvicorn
+```
+
+You can also use a basic cookiecutter template to get quickly started:
+
+```
+cookiecutter gh:paveldedik/ludic-template
 ```
 
 ## Full Example
