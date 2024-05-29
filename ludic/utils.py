@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import (
     Annotated,
     Any,
@@ -33,6 +34,7 @@ def get_element_generic_args(cls_or_obj: Any) -> tuple[type, ...] | None:
     return None
 
 
+@lru_cache
 def get_element_attrs_annotations(
     cls_or_obj: Any, include_extras: bool = False
 ) -> dict[str, Any]:
