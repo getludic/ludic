@@ -196,6 +196,7 @@ class MetaAttrs(HtmlAttrs, total=False):
     name: str
     content: str
     charset: str
+    property: str
 
 
 class StyleAttrs(HtmlAndEventAttrs, total=False):
