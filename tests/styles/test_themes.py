@@ -5,10 +5,11 @@ from ludic.html import a, b, div, style
 from ludic.styles.themes import (
     Colors,
     Fonts,
+    Sizes,
     get_default_theme,
     set_default_theme,
 )
-from ludic.styles.types import Color, Size
+from ludic.styles.types import Color, Size, SizeClamp
 from ludic.types import Component
 
 from . import BarTheme, FooTheme
@@ -54,6 +55,19 @@ def test_theme_font_sizes() -> None:
 
     assert theme.fonts.size + "2" == "10px"
     assert theme.fonts.size - "ab" == "10px"
+
+
+def test_theme_sizes() -> None:
+    theme = FooTheme(sizes=Sizes(m=SizeClamp(1, 1.2, 3)))
+
+    assert theme.sizes.m == "clamp(1rem, 1rem + 1.2vw, 3rem)"
+
+    assert theme.sizes.m - 0.1 == "clamp(0.9rem, 0.9rem + 1.1vw, 2.9rem)"
+    assert theme.sizes.m + 0.5 == "clamp(1.5rem, 1.5rem + 1.7vw, 3.5rem)"
+    assert theme.sizes.m * 0.2 == "clamp(0.2rem, 0.2rem + 0.24vw, 0.6rem)"
+
+    assert theme.sizes.m + "2" == "clamp(1rem, 1rem + 1.2vw, 3rem)"
+    assert theme.sizes.m - "ab" == "clamp(1rem, 1rem + 1.2vw, 3rem)"
 
 
 def test_themes_switching() -> None:
