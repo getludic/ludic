@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypeVar
 
-from .types import Color, ColorRange, Size
+from .types import BaseSize, Color, ColorRange, Size, SizeClamp
 
 if TYPE_CHECKING:
     from ludic.types import BaseElement
@@ -32,7 +32,7 @@ class Colors:
 class Header:
     """Header for a theme."""
 
-    size: Size = Size(1.5, "em")
+    size: BaseSize = SizeClamp(1.5, 2, 2.5)
     anchor: bool = True
 
 
@@ -40,18 +40,24 @@ class Header:
 class Headers:
     """Headers for a theme."""
 
-    h1: Header = field(default_factory=lambda: Header(size=Size(3, "em"), anchor=False))
-    h2: Header = field(
-        default_factory=lambda: Header(size=Size(2.5, "em"), anchor=False)
+    h1: Header = field(
+        default_factory=lambda: Header(size=SizeClamp(2, 1.5, 3.3), anchor=False)
     )
-    h3: Header = field(default_factory=lambda: Header(size=Size(2, "em"), anchor=False))
+    h2: Header = field(
+        default_factory=lambda: Header(size=SizeClamp(1.5, 1.3, 2.8), anchor=False)
+    )
+    h3: Header = field(
+        default_factory=lambda: Header(size=SizeClamp(1.2, 0.8, 2.2), anchor=False)
+    )
     h4: Header = field(
-        default_factory=lambda: Header(size=Size(1.5, "em"), anchor=False)
+        default_factory=lambda: Header(size=SizeClamp(1, 0.6, 1.8), anchor=False)
     )
     h5: Header = field(
-        default_factory=lambda: Header(size=Size(1.25, "em"), anchor=False)
+        default_factory=lambda: Header(size=SizeClamp(0.7, 0.5, 1.3), anchor=False)
     )
-    h6: Header = field(default_factory=lambda: Header(size=Size(1, "em"), anchor=False))
+    h6: Header = field(
+        default_factory=lambda: Header(size=SizeClamp(0.5, 0.4, 1.1), anchor=False)
+    )
 
 
 @dataclass
@@ -62,42 +68,42 @@ class Fonts:
     serif: str = "Georgia, serif"
     mono: str = "Space Mono, Roboto Mono, monospace"
 
-    size: Size = Size(1, "em")
+    size: BaseSize = Size(1, "em")
 
 
 @dataclass
 class Sizes:
     """Size for a theme."""
 
-    xxxxs: Size = Size(0.39)
-    xxxs: Size = Size(0.47)
-    xxs: Size = Size(0.57)
-    xs: Size = Size(0.69)
-    s: Size = Size(0.84)
-    m: Size = Size(1)
-    l: Size = Size(1.16)  # noqa
-    xl: Size = Size(1.4)
-    xxl: Size = Size(1.68)
-    xxxl: Size = Size(2.01)
-    xxxxl: Size = Size(2.41)
+    xxxxs: BaseSize = SizeClamp(0.39, -0.5, 0.57)
+    xxxs: BaseSize = SizeClamp(0.47, -0.4, 0.84)
+    xxs: BaseSize = SizeClamp(0.57, -0.3, 1)
+    xs: BaseSize = SizeClamp(0.69, -0.2, 1.16)
+    s: BaseSize = SizeClamp(0.84, -0.1, 1.4)
+    m: BaseSize = SizeClamp(1, 0.01, 1.68)
+    l: BaseSize = SizeClamp(1.16, 0.1, 2.01)  # noqa
+    xl: BaseSize = SizeClamp(1.4, 0.2, 2.41)
+    xxl: BaseSize = SizeClamp(1.68, 0.3, 2.81)
+    xxxl: BaseSize = SizeClamp(2.01, 0.4, 3.41)
+    xxxxl: BaseSize = SizeClamp(2.41, 0.5, 4.01)
 
 
 @dataclass
 class Borders:
     """Border sizes for a theme."""
 
-    thin: Size = Size(0.1)
-    normal: Size = Size(0.23)
-    thick: Size = Size(0.42)
+    thin: BaseSize = Size(0.1)
+    normal: BaseSize = Size(0.23)
+    thick: BaseSize = Size(0.42)
 
 
 @dataclass
 class Rounding:
     """Border rounding for a theme."""
 
-    less: Size = Size(0.20)
-    normal: Size = Size(0.25)
-    more: Size = Size(0.35)
+    less: BaseSize = Size(0.20)
+    normal: BaseSize = Size(0.25)
+    more: BaseSize = Size(0.35)
 
 
 @dataclass
@@ -105,7 +111,7 @@ class Sidebar:
     """Sidebar layout config for a theme."""
 
     # The width of the sidebar (empty means not set; defaults to the content width)
-    side_width: Size | None = None
+    side_width: str | None = None
 
     # The narrowest the content element can be before wrapping. Should be a percentage.
     content_min_width: str = "60%"
@@ -117,7 +123,7 @@ class Switcher:
 
     # The container width at which the component switches between a horizontal and
     # vertical layout
-    threshold: Size = Size(40, "rem")
+    threshold: BaseSize = Size(40, "rem")
 
     # The maximum number of elements allowed to appear in the horizontal configuration
     limit: int = 4
@@ -128,7 +134,7 @@ class Cover:
     """Cover layout config for a theme."""
 
     # The minimum height of the cover
-    min_height: Size = Size(100, "vh")
+    min_height: BaseSize = Size(100, "vh")
 
     # The minimum space between and around the child elements
     element: str = "h1"
@@ -139,7 +145,7 @@ class Grid:
     """Grid layout config for a theme."""
 
     # The size of the grid cells
-    cell_size: Size = Size(250, "px")
+    cell_size: BaseSize = Size(250, "px")
 
 
 @dataclass
@@ -176,7 +182,7 @@ class CodeBlock:
 class Theme(metaclass=ABCMeta):
     """An abstract base class for theme configuration."""
 
-    measure: Size = Size(70, "ch")
+    measure: BaseSize = Size(70, "ch")
     line_height: float = 1.5
 
     fonts: Fonts = field(default_factory=Fonts)

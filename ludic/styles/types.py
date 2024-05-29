@@ -1,7 +1,9 @@
+from abc import ABCMeta, abstractmethod
 from collections.abc import Mapping
 from typing import Literal, LiteralString, Self, SupportsIndex, TypedDict
 
 from .utils import (
+    clamp,
     darken_color,
     hex_to_rgb,
     lighten_color,
@@ -9,6 +11,19 @@ from .utils import (
 )
 
 SizeUnit = Literal["px", "ex", "em", "ch", "rem", "vw", "vh", "vmin", "vmax", "%"]
+
+
+def format_unit(value: float, unit: SizeUnit = "rem") -> str:
+    match unit:
+        case "px" | "ch":
+            formatted = f"{value:.0f}{unit}"
+        case _:
+            formatted = f"{value:.2f}".rstrip("0").rstrip(".")
+            if not formatted or formatted == "0":
+                formatted = f"0{unit}"
+            else:
+                formatted = f"{formatted}{unit}"
+    return formatted
 
 
 class Color(str):
@@ -101,24 +116,30 @@ class ColorRange(Color):
             return type(self)(self.variants, len(self.variants) - 1)
 
 
-class Size(str):
+class BaseSize(str, metaclass=ABCMeta):
+    """Base size class."""
+
+    @abstractmethod
+    def __mul__(self, factor: float | int | LiteralString | SupportsIndex) -> Self:
+        pass
+
+    @abstractmethod
+    def __add__(self, value: float | int | LiteralString | SupportsIndex) -> Self:
+        pass
+
+    @abstractmethod
+    def __sub__(self, value: float | int | LiteralString | SupportsIndex) -> Self:
+        pass
+
+
+class Size(BaseSize):
     """Size class."""
 
     value: float
     unit: SizeUnit = "rem"
 
     def __new__(cls, value: float, unit: SizeUnit = "rem") -> "Size":
-        match unit:
-            case "px" | "ch":
-                self = super().__new__(cls, f"{value:.0f}{unit}")
-            case _:
-                formatted = f"{value:.2f}".rstrip("0").rstrip(".")
-                if not formatted or formatted == "0":
-                    formatted = "0"
-                else:
-                    formatted = f"{formatted}{unit}"
-                self = super().__new__(cls, formatted)
-
+        self = super().__new__(cls, format_unit(value, unit))
         self.value = value
         self.unit = unit
         return self
@@ -162,6 +183,91 @@ class Size(str):
         """
         if isinstance(value, float | int):
             return type(self)(self.value - value, self.unit)
+        else:
+            return self
+
+
+class SizeClamp(BaseSize):
+    """Size clamp class."""
+
+    minimum: float
+    value: float
+    maximum: float
+    base_unit: SizeUnit = "rem"
+    viewport_unit: SizeUnit = "vw"
+
+    def __new__(
+        cls,
+        minimum: float,
+        value: float,
+        maximum: float,
+        base_unit: SizeUnit = "rem",
+        viewport_unit: SizeUnit = "vw",
+    ) -> "SizeClamp":
+        self = super().__new__(
+            cls,
+            clamp(
+                format_unit(minimum, base_unit),
+                (
+                    f"{format_unit(minimum, base_unit)} + "
+                    f"{format_unit(value, viewport_unit)}"
+                ),
+                format_unit(maximum, base_unit),
+            ),
+        )
+
+        self.minimum = minimum
+        self.value = value
+        self.maximum = maximum
+        self.base_unit = base_unit
+        self.viewport_unit = viewport_unit
+        return self
+
+    def __mul__(self, factor: float | int | LiteralString | SupportsIndex) -> Self:
+        """Scale size by a given factor.
+
+        Args:
+            factor (float): Scaling factor.
+
+        Returns:
+            str: Scaled size.
+        """
+        if isinstance(factor, float | int):
+            return type(self)(
+                self.minimum * factor, self.value * factor, self.maximum * factor
+            )
+        else:
+            return self
+
+    def __add__(self, value: float | int | LiteralString | SupportsIndex) -> Self:
+        """Increment size by a given factor.
+
+        Args:
+            value (float, optional): Increment value.
+
+        Returns:
+            str: Incremented size.
+        """
+        if isinstance(value, float | int):
+            return type(self)(
+                self.minimum + value, self.value + value, self.maximum + value
+            )
+        else:
+            return self
+
+    def __sub__(self, value: float | int | LiteralString | SupportsIndex) -> Self:
+        """Decrement size by a given factor.
+
+        Args:
+            value (float, optional): Decrement value.
+
+        Returns:
+            str: Decremented size.
+        """
+        if isinstance(value, float | int):
+            return type(self)(
+                self.minimum - value, self.value - value, self.maximum - value
+            )
         else:
             return self
 
