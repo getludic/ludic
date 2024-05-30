@@ -92,7 +92,7 @@ class Endpoint(Component[NoChildren, TAttrs]):
 
         if inspect.isclass(endpoint) and issubclass(endpoint, Endpoint):
             endpoint_generic_args = get_element_generic_args(endpoint)
-            self_generic_args = get_element_generic_args(self)
+            self_generic_args = get_element_generic_args(type(self))
 
             if (
                 endpoint_generic_args

@@ -1,3 +1,4 @@
+from collections.abc import Hashable
 from functools import lru_cache
 from typing import (
     Annotated,
@@ -11,24 +12,25 @@ from typing import (
 _T = TypeVar("_T", covariant=True)
 
 
-def get_element_generic_args(cls_or_obj: Any) -> tuple[type, ...] | None:
+@lru_cache
+def get_element_generic_args(obj_or_type: Hashable) -> tuple[type, ...] | None:
     """Get the generic arguments of the element class.
 
     Args:
-        cls_or_obj (Any): The element to get the generic arguments of.
+        obj_or_type (Any): The element to get the generic arguments of.
 
     Returns:
         dict[str, Any] | None: The generic arguments or :obj:`None`.
     """
     from ludic.base import BaseElement
 
-    if hints := getattr(cls_or_obj, "__annotations__", None):
+    if hints := getattr(obj_or_type, "__annotations__", None):
         children = hints.get("children")
         attrs = hints.get("attrs")
         if attrs and children:
             return (children, attrs)
 
-    for base in getattr(cls_or_obj, "__orig_bases__", []):
+    for base in getattr(obj_or_type, "__orig_bases__", []):
         if issubclass(get_origin(base), BaseElement):
             return get_args(base)
     return None
@@ -36,18 +38,18 @@ def get_element_generic_args(cls_or_obj: Any) -> tuple[type, ...] | None:
 
 @lru_cache
 def get_element_attrs_annotations(
-    cls_or_obj: Any, include_extras: bool = False
+    obj_or_type: Hashable, include_extras: bool = False
 ) -> dict[str, Any]:
     """Get the annotations of the element.
 
     Args:
-        cls_or_obj (type[Any]): The element to get the annotations of.
+        obj_or_type (Hashable): The element to get the annotations of.
         include_extras (bool): Whether to include extra annotation info.
 
     Returns:
         dict[str, Any]: The attributes' annotations of the element.
     """
-    if (args := get_element_generic_args(cls_or_obj)) is not None:
+    if (args := get_element_generic_args(obj_or_type)) is not None:
         return get_type_hints(args[-1], include_extras=include_extras)
     return {}
 
