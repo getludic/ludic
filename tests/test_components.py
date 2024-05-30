@@ -97,15 +97,17 @@ def test_tables() -> None:
     assert table.children[2].get_value(123) is None
 
     assert table.to_html() == (
-        '<table class="table">'
-            "<thead>"
-                '<tr><th>Name</th><th>Age</th></tr>'
-            "</thead>"
-            "<tbody>"
-                '<tr><td>John</td><td>42</td></tr>'
-                '<tr><td>Jane</td><td>43</td></tr>'
-            "</tbody>"
-        "</table>"
+        '<div class="table">'
+            "<table>"
+                "<thead>"
+                    '<tr><th>Name</th><th>Age</th></tr>'
+                "</thead>"
+                "<tbody>"
+                    '<tr><td>John</td><td>42</td></tr>'
+                    '<tr><td>Jane</td><td>43</td></tr>'
+                "</tbody>"
+            "</table>"
+        "</div>"
     )  # fmt: skip
 
 

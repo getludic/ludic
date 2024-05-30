@@ -75,17 +75,17 @@ class Fonts:
 class Sizes:
     """Size for a theme."""
 
-    xxxxs: BaseSize = SizeClamp(0.39, -0.5, 0.57)
-    xxxs: BaseSize = SizeClamp(0.47, -0.4, 0.84)
-    xxs: BaseSize = SizeClamp(0.57, -0.3, 1)
-    xs: BaseSize = SizeClamp(0.69, -0.2, 1.16)
-    s: BaseSize = SizeClamp(0.84, -0.1, 1.4)
-    m: BaseSize = SizeClamp(1, 0.01, 1.68)
-    l: BaseSize = SizeClamp(1.16, 0.1, 2.01)  # noqa
-    xl: BaseSize = SizeClamp(1.4, 0.2, 2.41)
-    xxl: BaseSize = SizeClamp(1.68, 0.3, 2.81)
-    xxxl: BaseSize = SizeClamp(2.01, 0.4, 3.41)
-    xxxxl: BaseSize = SizeClamp(2.41, 0.5, 4.01)
+    xxxxs: BaseSize = SizeClamp(0.39, 0, 0.47)
+    xxxs: BaseSize = SizeClamp(0.47, 0.1, 0.69)
+    xxs: BaseSize = SizeClamp(0.57, 0.15, 0.69)
+    xs: BaseSize = SizeClamp(0.69, 0.2, 0.84)
+    s: BaseSize = SizeClamp(0.84, 0.25, 1)
+    m: BaseSize = SizeClamp(1, 0.3, 1.16)
+    l: BaseSize = SizeClamp(1.16, 0.35, 1.4)  # noqa
+    xl: BaseSize = SizeClamp(1.4, 0.4, 1.68)
+    xxl: BaseSize = SizeClamp(1.68, 0.45, 2.01)
+    xxxl: BaseSize = SizeClamp(2.01, 0.5, 2.41)
+    xxxxl: BaseSize = SizeClamp(2.41, 0.55, 2.88)
 
 
 @dataclass

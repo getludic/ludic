@@ -54,18 +54,22 @@ class WithAnchor(ComponentStrict[h1 | h2 | h3 | h4 | str, WithAnchorAttrs]):
             ".with-anchor > h1 + a": {
                 "margin-inline-start": theme.sizes.m,
                 "font-size": theme.headers.h1.size,
+                "line-height": round(theme.line_height * 0.9, 2),
             },
             ".with-anchor > h2 + a": {
                 "margin-inline-start": theme.sizes.s,
                 "font-size": theme.headers.h2.size,
+                "line-height": round(theme.line_height * 0.9, 2),
             },
             ".with-anchor > h3 + a": {
                 "margin-inline-start": theme.sizes.xs,
                 "font-size": theme.headers.h3.size,
+                "line-height": round(theme.line_height * 0.9, 2),
             },
             ".with-anchor > h4 + a": {
                 "margin-inline-start": theme.sizes.xxs,
                 "font-size": theme.headers.h4.size,
+                "line-height": round(theme.line_height * 0.9, 2),
             },
         }
     )

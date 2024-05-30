@@ -21,7 +21,7 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
                 "text-decoration": "none",
                 "background-color": theme.colors.light,
                 "color": theme.colors.black,
-                "padding": f"{theme.sizes.xxxxs * 0.8} {theme.sizes.s}",
+                "padding": f"{theme.sizes.xxxxs * 0.8} {theme.sizes.xs}",
                 "border": "none",
                 "border-radius": theme.rounding.normal,
                 "cursor": "pointer",

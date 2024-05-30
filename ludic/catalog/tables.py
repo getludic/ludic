@@ -7,7 +7,7 @@ from typing import Any, Literal, cast, get_type_hints, override
 from typing_extensions import TypeVar
 
 from ludic.attrs import GlobalAttrs
-from ludic.html import style, table, tbody, td, th, thead, tr
+from ludic.html import div, style, table, tbody, td, th, thead, tr
 from ludic.types import (
     AnyChildren,
     BaseElement,
@@ -128,7 +128,10 @@ class Table(ComponentStrict[THead, *tuple[TRow, ...], TableAttrs]):
     classes = ["table"]
     styles = style.use(
         lambda theme: {
-            "table.table": {
+            ".table": {
+                "overflow": "auto",
+            },
+            ".table > table": {
                 "inline-size": "100%",  # type: ignore
                 "border-collapse": "collapse",  # type: ignore
                 "thead": {
@@ -171,11 +174,13 @@ class Table(ComponentStrict[THead, *tuple[TRow, ...], TableAttrs]):
         return result
 
     @override
-    def render(self) -> table:
-        return table(
-            thead(self.children[0], **self.attrs.get("head_attrs", {})),
-            tbody(*self.children[1:], **self.attrs.get("body_attrs", {})),
-            **self.attrs_for(table),
+    def render(self) -> div:
+        return div(
+            table(
+                thead(self.children[0], **self.attrs.get("head_attrs", {})),
+                tbody(*self.children[1:], **self.attrs.get("body_attrs", {})),
+                **self.attrs_for(table),
+            ),
         )
 
 

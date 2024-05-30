@@ -41,13 +41,13 @@ class Stack(div):
                 "margin-block-start": theme.sizes.xl,
             },
             ".stack.tiny > * + *": {
-                "margin-block-start": theme.sizes.xxxxs,
+                "margin-block-start": theme.sizes.xxxs,
             },
             ".stack.small > * + *": {
                 "margin-block-start": theme.sizes.s,
             },
             ".stack.large > * + *": {
-                "margin-block-start": theme.sizes.xxxxl,
+                "margin-block-start": theme.sizes.xxxl,
             },
         }
     )
@@ -73,14 +73,14 @@ class Box(div):
     styles = style.use(
         lambda theme: {
             ".box": {
-                "padding": theme.sizes.l,
+                "padding": theme.sizes.m,
                 "color": theme.colors.dark,
             },
             ".box.small": {
-                "padding": theme.sizes.s,
+                "padding": theme.sizes.xs,
             },
             ".box.large": {
-                "padding": theme.sizes.xxl,
+                "padding": theme.sizes.xl,
             },
             ".box:not(.transparent)": {
                 "border": (
@@ -120,8 +120,8 @@ class Center(div):
                 "box-sizing": "content-box",
                 "margin-inline": "auto",
                 "max-inline-size": theme.measure,
-                "padding-inline-start": theme.sizes.xxxl,
-                "padding-inline-end": theme.sizes.xxxl,
+                "padding-inline-start": theme.sizes.xxl,
+                "padding-inline-end": theme.sizes.xxl,
             }
         }
     )
@@ -196,7 +196,7 @@ class WithSidebar(ComponentStrict[AnyChildren, AnyChildren, GlobalAttrs]):
             ".with-sidebar": {
                 "display": "flex",
                 "flex-wrap": "wrap",
-                "gap": theme.sizes.xxxxl,
+                "gap": theme.sizes.xxl,
             },
             ".with-sidebar > .sidebar": (
                 {
@@ -242,7 +242,7 @@ class Switcher(div):
             ".switcher": {
                 "display": "flex",
                 "flex-wrap": "wrap",
-                "gap": theme.sizes.xxl,
+                "gap": theme.sizes.xl,
             },
             ".switcher > *": {
                 "flex-grow": 1,
@@ -277,10 +277,10 @@ class Cover(div):
                 "display": "flex",
                 "flex-direction": "column",
                 "min-block-size": theme.layouts.cover.min_height,
-                "padding": theme.sizes.xxl,
+                "padding": theme.sizes.xl,
             },
             ".cover > *": {
-                "margin-block": theme.sizes.xxl,
+                "margin-block": theme.sizes.xl,
             },
             f".cover > :first-child:not({theme.layouts.cover.element})": {
                 "margin-block-start": "0",
@@ -311,7 +311,7 @@ class Grid(div):
         lambda theme: {
             ".grid": {
                 "display": "grid",
-                "grid-gap": theme.sizes.xxl,
+                "grid-gap": theme.sizes.xl,
             },
             f"@supports (width: min({theme.layouts.grid.cell_size}, 100%))": {
                 ".grid": {
