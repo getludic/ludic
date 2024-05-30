@@ -1,5 +1,5 @@
 from abc import ABCMeta
-from collections.abc import Callable, Iterator, Mapping, MutableMapping, Sequence
+from collections.abc import Iterator, Mapping, MutableMapping, Sequence
 from typing import (
     Any,
     ClassVar,
@@ -121,7 +121,7 @@ class BaseElement(metaclass=ABCMeta):
     ) -> str:
         attrs: dict[str, Any]
         if is_html:
-            attrs = format_attrs(type(self), dict(self.attrs), is_html=True)
+            attrs = format_attrs(type(self), self.attrs, is_html=True)
         else:
             attrs = self.aliased_attrs
 
@@ -136,29 +136,23 @@ class BaseElement(metaclass=ABCMeta):
             for key, value in attrs.items()
         )
 
-    def _format_children(
-        self,
-        format_fun: Callable[[Any], str] = format_element,
-    ) -> str:
-        formatted = []
+    def _format_children(self) -> str:
+        formatted = ""
         for child in self.children:
-            if isinstance(child, BaseElement):
+            if self.context and isinstance(child, BaseElement):
                 child.context.update(self.context)
-            formatted.append(format_fun(child))
-        return "".join(formatted)
+            formatted += format_element(child)
+        return formatted
 
     @property
     def aliased_attrs(self) -> dict[str, Any]:
         """Attributes as a dict with keys renamed to their aliases."""
-        return format_attrs(type(self), dict(self.attrs))
+        return format_attrs(type(self), self.attrs)
 
     @property
     def text(self) -> str:
         """Get the text content of the element."""
-        return "".join(
-            child.text if isinstance(child, BaseElement) else str(child)
-            for child in self.children
-        )
+        return "".join(getattr(child, "text", str(child)) for child in self.children)
 
     @property
     def theme(self) -> Theme:
@@ -215,7 +209,7 @@ class BaseElement(metaclass=ABCMeta):
         dom = self
         classes = list(dom.classes)
 
-        while dom != (rendered_dom := dom.render()):
+        while id(dom) != id(rendered_dom := dom.render()):
             rendered_dom.context.update(dom.context)
             dom = rendered_dom
             classes += dom.classes

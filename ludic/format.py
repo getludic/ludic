@@ -1,6 +1,7 @@
 import html
 import random
 import re
+from collections.abc import Mapping
 from contextvars import ContextVar
 from typing import Annotated, Any, Final, TypeVar, get_args, get_origin
 
@@ -20,25 +21,37 @@ def format_attr_value(key: str, value: Any, is_html: bool = False) -> str:
     Returns:
         str: The formatted HTML attribute.
     """
+
+    def _html_escape(value: Any) -> str:
+        if (
+            is_html
+            and value
+            and isinstance(value, str)
+            and getattr(value, "escape", True)
+        ):
+            return html.escape(value, False)  # type: ignore
+        return str(value)
+
     if isinstance(value, dict):
-        value = ";".join(
-            f"{dict_key}:{html.escape(dict_value, False)}"
+        formatted_value = ";".join(
+            f"{dict_key}:{_html_escape(dict_value)}"
             for dict_key, dict_value in value.items()
         )
     elif isinstance(value, list):
-        value = " ".join(html.escape(v, False) for v in value)
+        formatted_value = " ".join(map(_html_escape, value))
     elif isinstance(value, bool):
         if is_html and not key.startswith("hx"):
-            value = html.escape(key, False) if value else ""
+            formatted_value = html.escape(key, False) if value else ""
         else:
-            value = "true" if value else "false"
-    elif isinstance(value, str) and getattr(value, "escape", True):
-        value = html.escape(value, False)
-    return str(value)
+            formatted_value = "true" if value else "false"
+    else:
+        formatted_value = _html_escape(value)
+
+    return formatted_value
 
 
 def format_attrs(
-    attrs_type: Any, attrs: dict[str, Any], is_html: bool = False
+    attrs_type: Any, attrs: Mapping[str, Any], is_html: bool = False
 ) -> dict[str, Any]:
     """Format the given attributes according to the element's attributes.
 
