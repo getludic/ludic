@@ -68,26 +68,32 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             "h1": {
                 "font-size": theme.headers.h1.size,
                 "font-family": theme.fonts.serif,
+                "line-height": round(theme.line_height * 0.9, 2),
             },
             "h2": {
                 "font-size": theme.headers.h2.size,
                 "font-family": theme.fonts.serif,
+                "line-height": round(theme.line_height * 0.9, 2),
             },
             "h3": {
                 "font-size": theme.headers.h3.size,
                 "font-family": theme.fonts.serif,
+                "line-height": round(theme.line_height * 0.9, 2),
             },
             "h4": {
                 "font-size": theme.headers.h4.size,
                 "font-family": theme.fonts.serif,
+                "line-height": round(theme.line_height * 0.9, 2),
             },
             "h5": {
                 "font-size": theme.headers.h5.size,
                 "font-family": theme.fonts.serif,
+                "line-height": round(theme.line_height * 0.9, 2),
             },
             "h6": {
                 "font-size": theme.headers.h6.size,
                 "font-family": theme.fonts.serif,
+                "line-height": round(theme.line_height * 0.9, 2),
             },
             "a": {
                 "color": theme.colors.primary.darken(2),
@@ -118,10 +124,10 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
                 "margin-left": "0",
             },
             ("ul", "ol"): {
-                "padding-inline-start": theme.sizes.xxl,
+                "padding-inline-start": theme.sizes.xl,
             },
             ("ul > li + li", "ol > li + li", "li > * + *"): {
-                "margin-block-start": theme.sizes.xs,
+                "margin-block-start": theme.sizes.xxs,
             },
             "ul > li::marker": {
                 "font-size": theme.fonts.size * 1.2,

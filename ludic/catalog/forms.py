@@ -135,7 +135,7 @@ class FormField(Component[TChildren, TAttrs]):
             },
             (".form-field input", ".form-field textarea", ".form-field select"): {
                 "inline-size": "100%",
-                "padding": f"{theme.sizes.xxxs} {theme.sizes.xs}",
+                "padding": f"{theme.sizes.xxxxs} {theme.sizes.xs}",
                 "border": (
                     f"{theme.borders.thin} solid {theme.colors.light.darken(2)}"
                 ),
