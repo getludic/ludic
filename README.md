@@ -2,9 +2,9 @@
     <img width="600px" src="./docs/assets/ludic.png" alt="ludic">
 </p>
 
-[![test](https://github.com/paveldedik/ludic/actions/workflows/test.yaml/badge.svg)](https://github.com/paveldedik/ludic/actions) [![codecov](https://codecov.io/gh/paveldedik/ludic/graph/badge.svg?token=BBDNJWHMGX)](https://codecov.io/gh/paveldedik/ludic) [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-312/) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/) [![Documentation Status](https://readthedocs.org/projects/ludic/badge/?version=latest)](https://ludic.readthedocs.io/en/latest/?badge=latest)
+[![test](https://github.com/paveldedik/ludic/actions/workflows/test.yaml/badge.svg)](https://github.com/paveldedik/ludic/actions) [![codecov](https://codecov.io/gh/paveldedik/ludic/graph/badge.svg?token=BBDNJWHMGX)](https://codecov.io/gh/paveldedik/ludic) [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-312/) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/) [![Discord Server](https://img.shields.io/badge/discord-ludic-black)](https://discord.gg/4Y5fSQUS)
 
-**Documentation**: https://ludic.readthedocs.io/
+**Documentation**: https://getludic.dev/docs/
 
 Ludic is a lightweight framework for building HTML pages with a component approach similar to [React](https://react.dev/). It is built to be used together with [htmx.org](https://htmx.org/) so that developers don't need to write almost any JavaScript to create dynamic web services. Its potential can be leveraged together with its web framework which is a wrapper around the powerful [Starlette](https://www.starlette.io/) framework. It is built with the latest Python 3.12 features heavily incorporating typing.
 

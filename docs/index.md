@@ -2,90 +2,9 @@
     <img width="600px" src="./assets/ludic.png" alt="ludic">
 </p>
 
-[![test](https://github.com/paveldedik/ludic/actions/workflows/test.yaml/badge.svg)](https://github.com/paveldedik/ludic/actions) [![codecov](https://codecov.io/gh/paveldedik/ludic/graph/badge.svg?token=BBDNJWHMGX)](https://codecov.io/gh/paveldedik/ludic) [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-312/) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/) [![Documentation Status](https://readthedocs.org/projects/ludic/badge/?version=latest)](https://ludic.readthedocs.io/en/latest/?badge=latest)
+[![test](https://github.com/paveldedik/ludic/actions/workflows/test.yaml/badge.svg)](https://github.com/paveldedik/ludic/actions) [![codecov](https://codecov.io/gh/paveldedik/ludic/graph/badge.svg?token=BBDNJWHMGX)](https://codecov.io/gh/paveldedik/ludic) [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-312/) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/) [![Discord Server](https://img.shields.io/badge/discord-ludic-black)](https://discord.gg/4Y5fSQUS)
 
-Ludic is a lightweight framework for building HTML pages with a component approach similar to [React](https://react.dev/). It is built to be used together with [htmx.org](https://htmx.org/) so that developers don't need to write almost any JavaScript to create dynamic web services. Its potential can be leveraged together with its web framework which is a wrapper around the powerful [Starlette](https://www.starlette.io/) framework. It is built with the latest Python 3.12 features heavily incorporating typing.
 
-!!! warning "Experimental"
+**Documentation moved to:**
 
-    The framework is in a very early development/experimental stage. There are a lot of half-functioning features at the moment. Contributions are welcome to help out with the progress!
-
-## Features
-
-- Seamless **&lt;/&gt; htmx** integration for rapid web development in **pure Python**
-- **Type-Guided components** utilizing Python's typing system
-- Uses the power of **Starlette** and **Async** for high-performance web development
-- Build HTML with the ease and power of Python **f-strings**
-- Add CSS styling to your components with **themes**
-
-## Ideals
-
-This framework allows HTML generation in Python while utilizing Python's typing system. Our goal is to enable the creation of dynamic web applications with reusable components, all while offering a greater level of type safety than raw HTML.
-
-**Key Ideas:**
-
-- **Type-Guided HTML**: Catch potential HTML structural errors at development time thanks to type hints. The framework enforces stricter rules than standard HTML, promoting well-structured and maintainable code.
-- **Composable Components**: Define reusable, dynamic HTML components in pure Python. This aligns with modern web development practices, emphasizing modularity.
-
-### Type-Guided HTML
-
-Here is an example of how Python's type system can be leveraged to enforce HTML structure:
-
-```python
-br("Hello, World!")        # type error (<br> can't have children)
-br()                       # ok
-
-html(body(...))            # type error (first child must be a <head>)
-html(head(...), body(...)) # ok
-
-div("Test", href="test")   # type error (unknown attribute)
-a("Test", href="...")      # ok
-```
-
-### Composable Components
-
-Instead of using only basic HTML elements, it is possible to create modular components with the support of Python's type system. Let's take a look at an example:
-
-```python
-Table(
-    TableHead("Id", "Name"),
-    TableRow("1", "John"),
-    TableRow("2", "Jane"),
-    TableRow("3", "Bob"),
-)
-```
-
-This structure can be type-checked thanks to Python's rich type system. Additionally, this `Table` component could have **dynamic properties** like sorting or filtering.
-
-## Quick Example
-
-```python
-from ludic.html import b, span
-from ludic.web import LudicApp
-
-app = LudicApp()
-
-@app.get("/")
-async def homepage() -> span:
-    return span(f"Hello {b("world")}!", id="greetings")
-```
-
-## Requirements
-
-Python 3.12+
-
-## Installation
-
-```
-pip install "ludic[full]"
-```
-
-As similar for Starlette, you'll also want to install an [ASGI](https://asgi.readthedocs.io/en/latest/) server:
-
-```
-pip install uvicorn
-```
-
-## Contributing
-
-Any contributions to the framework are warmly welcome! Your help will make it a better resource for the community. If you're ready to contribute, read the [contribution guide on GitHub](https://github.com/paveldedik/ludic/tree/master/CONTRIBUTING.md).
+* [https://getludic.dev](https://getludic.dev/docs/)
