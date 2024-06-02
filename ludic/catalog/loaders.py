@@ -73,7 +73,7 @@ class Loading(Component[AnyChildren, GlobalAttrs]):
     @override
     def render(self) -> div:
         return div(
-            div(div(""), div(""), div(""), div(""), classes=["lds-ellipsis"]),
+            div(div(), div(), div(), div(), classes=["lds-ellipsis"]),
             **self.attrs_for(div),
         )
 
