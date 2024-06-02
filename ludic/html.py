@@ -95,6 +95,7 @@ class a(Element[AnyChildren, HyperlinkAttrs]):
 
 
 class br(Element[NoChildren, GlobalAttrs]):
+    void_element = True
     html_name = "br"
 
 
@@ -163,6 +164,7 @@ class section(Element[AnyChildren, GlobalAttrs]):
 
 
 class input(Element[NoChildren, InputAttrs]):
+    void_element = True
     html_name = "input"
 
 
@@ -187,7 +189,6 @@ class select(Element[AnyChildren, SelectAttrs]):
 
 
 class textarea(Element[PrimitiveChildren, TextAreaAttrs]):
-    always_pair = True
     html_name = "textarea"
 
 
@@ -200,6 +201,7 @@ class form(Element[AnyChildren, FormAttrs]):
 
 
 class img(Element[NoChildren, ImgAttrs]):
+    void_element = True
     html_name = "img"
 
 
@@ -319,7 +321,8 @@ class title(Element[PrimitiveChildren, NoAttrs]):
     html_name = "title"
 
 
-class link(Element[PrimitiveChildren, HeadLinkAttrs]):
+class link(Element[NoChildren, HeadLinkAttrs]):
+    void_element = True
     html_name = "link"
 
 
@@ -403,15 +406,14 @@ class style(BaseElement, GlobalStyles):
 
 class script(Element[PrimitiveChildren, ScriptAttrs]):
     html_name = "script"
-    always_pair = True
 
 
 class noscript(Element[AnyChildren, GlobalAttrs]):
     html_name = "noscript"
-    always_pair = True
 
 
-class meta(Element[PrimitiveChildren, MetaAttrs]):
+class meta(Element[NoChildren, MetaAttrs]):
+    void_element = True
     html_name = "meta"
 
 
@@ -433,7 +435,6 @@ class html(ElementStrict[head, body, HtmlTagAttrs]):
 
 
 class iframe(Element[NoChildren, IframeAttrs]):
-    always_pair = True
     html_name = "iframe"
 
 
@@ -450,6 +451,7 @@ class caption(Element[AnyChildren, GlobalAttrs]):
 
 
 class col(Element[NoChildren, ColAttrs]):
+    void_element = True
     html_name = "col"
 
 
@@ -458,6 +460,7 @@ class colgroup(Element[AnyChildren, GlobalAttrs]):
 
 
 class area(Element[NoChildren, AreaAttrs]):
+    void_element = True
     html_name = "area"
 
 
@@ -466,6 +469,7 @@ class aside(Element[AnyChildren, GlobalAttrs]):
 
 
 class source(Element[NoChildren, SourceAttrs]):
+    void_element = True
     html_name = "source"
 
 
@@ -474,6 +478,7 @@ class audio(Element[AnyChildren, AudioAttrs]):
 
 
 class base(Element[NoChildren, BaseAttrs]):
+    void_element = True
     html_name = "base"
 
 
@@ -510,6 +515,7 @@ class dialog(Element[AnyChildren, DialogAttrs]):
 
 
 class embed(Element[NoChildren, EmbedAttrs]):
+    void_element = True
     html_name = "embed"
 
 
@@ -526,6 +532,7 @@ class hrgroup(Element[AnyChildren, GlobalAttrs]):
 
 
 class hr(Element[NoChildren, GlobalAttrs]):
+    void_element = True
     html_name = "hr"
 
 
@@ -554,6 +561,7 @@ class object(Element[AnyChildren, ObjectAttrs]):
 
 
 class param(Element[NoChildren, ParamAttrs]):
+    void_element = True
     html_name = "param"
 
 
@@ -610,6 +618,7 @@ class time(Element[AnyChildren, TimeAttrs]):
 
 
 class track(Element[NoChildren, TrackAttrs]):
+    void_element = True
     html_name = "track"
 
 
@@ -622,4 +631,5 @@ class video(Element[AnyChildren, VideoAttrs]):
 
 
 class wbr(Element[NoChildren, GlobalAttrs]):
+    void_element = True
     html_name = "wbr"

@@ -120,7 +120,7 @@ def test_form_fields() -> None:
     assert form.to_html() == (
         '<form class="form stack">'
             '<div class="form-field">'
-                '<input value="Name" name="name" id="name" />'
+                '<input value="Name" name="name" id="name">'
             "</div>"
             '<div class="form-field">'
                 '<textarea name="description" id="description">Description</textarea>'
@@ -137,7 +137,7 @@ def test_form_fields() -> None:
         '<form class="form stack">'
             '<div class="form-field">'
                 '<label for="name">Foo</label>'
-                '<input value="Name" name="name" id="name" />'
+                '<input value="Name" name="name" id="name">'
             "</div>"
             '<div class="form-field">'
                 '<label for="description">Bar</label>'

@@ -4,6 +4,7 @@ from ludic.html import (
     button,
     div,
     i,
+    input,
     label,
     p,
     script,
@@ -20,16 +21,20 @@ from ludic.styles import CSSProperties
 
 def test_empty_element() -> None:
     dom = div()
-    assert dom.to_html() == "<div />"
+    assert dom.to_html() == "<div></div>"
     assert dom.to_string() == "<div />"
 
-    dom2 = p("")
+    dom2 = p()
     assert dom2.to_html() == "<p></p>"
-    assert dom2.to_string() == "<p></p>"
+    assert dom2.to_string() == "<p />"
 
     dom3 = script()
     assert dom3.to_html() == "<script></script>"
     assert dom3.to_string() == "<script />"
+
+    dom4 = input()
+    assert dom4.to_html() == "<input>"
+    assert dom4.to_string() == "<input />"
 
 
 def test_html_paragraph() -> None:

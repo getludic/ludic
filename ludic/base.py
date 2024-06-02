@@ -74,7 +74,7 @@ class BaseElement(metaclass=ABCMeta):
     html_header: ClassVar[str | None] = None
     html_name: ClassVar[str | None] = None
 
-    always_pair: ClassVar[bool] = False
+    void_element: ClassVar[bool] = False
     formatter: ClassVar[FormatContext] = FormatContext("element_formatter")
 
     classes: ClassVar[Sequence[str]] = []
@@ -226,10 +226,10 @@ class BaseElement(metaclass=ABCMeta):
             attributes_str = dom._format_attributes(classes, is_html=True)
             element_tag += f" {attributes_str}"
 
-        if dom.children or dom.always_pair:
+        if dom.children or not dom.void_element:
             element_tag += f">{children_str}</{dom.html_name}>"
         else:
-            element_tag += " />"
+            element_tag += ">"
 
         return element_tag
 

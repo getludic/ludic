@@ -33,7 +33,7 @@ class Header:
     """Header for a theme."""
 
     size: BaseSize = SizeClamp(1.5, 2, 2.5)
-    anchor: bool = True
+    anchor: bool = False
 
 
 @dataclass
