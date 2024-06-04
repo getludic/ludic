@@ -2,6 +2,12 @@
 
 All the examples currently correspond reimplementation of samples from [htmx.org](https://htmx.org/examples/lazy-load/).
 
+## Documentation
+
+The documentation for some of the examples can be found here:
+
+* [https://getludic.dev/examples/](https://getludic.dev/examples/)
+
 ## Running
 
 Make sure you are using Python 3.12+ and have Ludic and Uvicorn installed:
