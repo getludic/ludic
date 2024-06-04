@@ -149,7 +149,7 @@ uvicorn web:app
 
 ### More Examples
 
-For more complex usage incorporating all capabilities of the framework, please visit the folder with examples [on GitHub](https://github.com/paveldedik/ludic/tree/master/examples/).
+For more complex usage incorporating all capabilities of the framework, please visit the examples on [the web](https://getludic.dev/examples) or go to the folder with examples [on GitHub](https://github.com/paveldedik/ludic/tree/master/examples/).
 
 ## Contributing
 
