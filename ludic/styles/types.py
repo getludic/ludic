@@ -866,6 +866,7 @@ CSSProperties = TypedDict(
             "text-bottom",
             "unset",
         ],
+        "view-transition-name": str,
         "visibility": Literal["visible", "hidden", "collapse"],
         # W
         "white-space": Literal["normal", "nowrap", "pre", "pre-line", "pre-wrap"],
