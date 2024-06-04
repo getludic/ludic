@@ -155,6 +155,6 @@ For more complex usage incorporating all capabilities of the framework, please v
 
 Any contributions to the framework are warmly welcome! Your help will make it a better resource for the community. If you're ready to contribute, read the [contribution guide](https://github.com/paveldedik/ludic/tree/master/CONTRIBUTING.md).
 
-* [Github Issues](https://github.com/paveldedik/ludic/issues) - If you encounter a bug, please report it here.
+* [GitHub Issues](https://github.com/paveldedik/ludic/issues) - If you encounter a bug, please report it here.
 * [GitHub Discussions](https://github.com/paveldedik/ludic/discussions) - To request a new feature, this is the best place to initiate the discussion.
 * [Discord](https://discord.gg/4Y5fSQUS) - Join our Discord server for support, sharing ideas, and receiving assistance.
