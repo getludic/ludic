@@ -39,7 +39,7 @@ class List(Component[Item, ListAttrs]):
             children = tuple(map(Item, items))
         else:
             children = self.children
-        return ul(*children, **self.attrs)
+        return ul(*children, **self.attrs_for(ul))
 
 
 class NumberedList(Component[Item, ListAttrs]):
@@ -59,4 +59,4 @@ class NumberedList(Component[Item, ListAttrs]):
             children = tuple(map(Item, items))
         else:
             children = self.children
-        return ol(*children, **self.attrs)
+        return ol(*children, **self.attrs_for(ol))

@@ -72,7 +72,7 @@ class Contact(Endpoint[ContactAttrs]):
     @override
     def render(self) -> Stack:
         return Stack(
-            Pairs(items=self.attrs.items()),
+            Pairs(items=self.attrs.items()),  # type: ignore
             Cluster(
                 Button(
                     "Click To Edit",

@@ -2,7 +2,7 @@ from typing import Annotated, NotRequired, Self, override
 
 from examples import Page, init_db
 
-from ludic.attrs import Attrs, HtmxAttrs
+from ludic.attrs import Attrs, GlobalAttrs
 from ludic.catalog.buttons import (
     ButtonPrimary,
     ButtonSecondary,
@@ -87,7 +87,7 @@ class PersonRow(Endpoint[PersonAttrs]):
             self.attrs["email"],
             ButtonPrimary(
                 "Edit",
-                hx_get=self.url_for(PersonForm),
+                hx_get=self.url_for(PersonForm).path,
                 hx_trigger="edit",
                 on_click=self.on_click_script,
                 classes=["small"],
@@ -140,6 +140,6 @@ class PeopleTable(Endpoint[PeopleAttrs]):
         return Table[TableHead, PersonRow](
             TableHead("Name", "Email", "Action"),
             *(PersonRow(**person) for person in self.attrs["people"]),
-            body_attrs=HtmxAttrs(hx_target="closest tr", hx_swap="outerHTML"),
+            body_attrs=GlobalAttrs(hx_target="closest tr", hx_swap="outerHTML"),
             classes=["text-align-center"],
         )

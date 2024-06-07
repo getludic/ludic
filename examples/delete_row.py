@@ -2,7 +2,7 @@ from typing import Self, override
 
 from examples import Page, init_db
 
-from ludic.attrs import Attrs, HtmxAttrs
+from ludic.attrs import Attrs, GlobalAttrs
 from ludic.catalog.buttons import ButtonDanger
 from ludic.catalog.headers import H1, H2
 from ludic.catalog.quotes import Quote
@@ -78,7 +78,7 @@ class PeopleTable(Endpoint[PeopleAttrs]):
         return Table(
             TableHead("Name", "Email", "Active", ""),
             *(PersonRow(**person) for person in self.attrs["people"]),
-            body_attrs=HtmxAttrs(
+            body_attrs=GlobalAttrs(
                 hx_confirm="Are you sure?",
                 hx_target="closest tr",
                 hx_swap="outerHTML swap:1s",

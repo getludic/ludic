@@ -1,8 +1,14 @@
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Protocol
 
 from .base import Attrs as Attrs
 from .base import NoAttrs as NoAttrs
 from .styles import CSSProperties
+
+
+class URLType(Protocol):
+    """Protocol for URL-like types."""
+
+    def __str__(self) -> str: ...
 
 
 class Alias(str):
@@ -40,11 +46,11 @@ class HtmxAttrs(Attrs, total=False):
     See: https://htmx.org/
     """
 
-    hx_get: Annotated[str, Alias("hx-get")]
-    hx_post: Annotated[str, Alias("hx-post")]
-    hx_put: Annotated[str, Alias("hx-put")]
-    hx_delete: Annotated[str, Alias("hx-delete")]
-    hx_patch: Annotated[str, Alias("hx-patch")]
+    hx_get: Annotated[URLType, Alias("hx-get")]
+    hx_post: Annotated[URLType, Alias("hx-post")]
+    hx_put: Annotated[URLType, Alias("hx-put")]
+    hx_delete: Annotated[URLType, Alias("hx-delete")]
+    hx_patch: Annotated[URLType, Alias("hx-patch")]
 
     hx_on: Annotated[str, Alias("hx-on")]
     hx_include: Annotated[str, Alias("hx-include")]
@@ -84,7 +90,7 @@ class HtmxAttrs(Attrs, total=False):
     hx_params: Annotated[str, Alias("hx-params")]
     hx_preserve: Annotated[bool, Alias("hx-preserve")]
     hx_prompt: Annotated[str, Alias("hx-prompt")]
-    hx_replace_url: Annotated[str, Alias("hx-replace-url")]
+    hx_replace_url: Annotated[URLType, Alias("hx-replace-url")]
     hx_request: Annotated[str, Alias("hx-request")]
     hx_validate: Annotated[bool, Alias("hx-validate")]
     hx_ws: Annotated[str, Alias("hx-ws")]
@@ -225,7 +231,8 @@ class ScriptAttrs(HtmlAttrs, total=False):
 
 
 class HeadLinkAttrs(HtmlAttrs, total=False):
-    rel: Literal["canonical", "alternate", "stylesheet"]
+    type: str
+    rel: Literal["canonical", "alternate", "stylesheet", "icon", "apple-touch-icon"]
     crossorigin: Literal["anonymous", "use-credentials"]
     hreflang: str
     href: str
