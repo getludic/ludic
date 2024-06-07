@@ -85,7 +85,7 @@ def test_element_theme_switching() -> None:
 
     set_default_theme(bar)
 
-    class C1(Component[str, GlobalAttrs]):
+    class C1(Component[str, GlobalAttrs]):  # type: ignore
         styles = style.use(
             lambda theme: {
                 "#c1 a": {"color": theme.colors.warning},
@@ -100,7 +100,7 @@ def test_element_theme_switching() -> None:
                 id="c1",
             )
 
-    class C2(Component[str, GlobalAttrs]):
+    class C2(Component[str, GlobalAttrs]):  # type: ignore
         styles = style.use(
             lambda theme: {
                 "#c2 a": {"color": theme.colors.danger},

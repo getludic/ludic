@@ -99,7 +99,7 @@ THead = TypeVar("THead", bound=BaseElement, default=TableHead)
 TRow = TypeVar("TRow", bound=BaseElement, default=TableRow)
 
 
-class TableAttrs(GlobalAttrs):
+class TableAttrs(GlobalAttrs, total=False):
     head_attrs: GlobalAttrs
     body_attrs: GlobalAttrs
 

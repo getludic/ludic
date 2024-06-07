@@ -1,6 +1,7 @@
 from collections.abc import Iterable, Mapping
 from typing import TypedDict
 
+from .attrs import URLType as URLType
 from .base import (
     AnyChildren,
     Attrs,
@@ -28,10 +29,10 @@ HXHeaders = TypedDict(
     "HXHeaders",
     {
         "HX-Location": JSONType,
-        "HX-Push-Url": str,
+        "HX-Push-Url": URLType | bool,
         "HX-Redirect": str,
         "HX-Refresh": bool,
-        "HX-Replace-Url": str,
+        "HX-Replace-Url": URLType,
         "HX-Reswap": str,
         "HX-Retarget": str,
         "HX-Reselect": str,

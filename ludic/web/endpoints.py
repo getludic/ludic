@@ -71,7 +71,7 @@ class Endpoint(Component[NoChildren, TAttrs]):
         """
         return LazyLoader(
             placeholder=placeholder,
-            load_url=self.url_for(endpoint, **kwargs),
+            load_url=self.url_for(endpoint, **kwargs).path,
         )
 
     def url_for(self, endpoint: type[RoutedProtocol] | str, **path_params: Any) -> URL:
