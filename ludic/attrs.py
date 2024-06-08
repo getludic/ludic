@@ -232,8 +232,10 @@ class ScriptAttrs(HtmlAttrs, total=False):
 
 class HeadLinkAttrs(HtmlAttrs, total=False):
     type: str
-    rel: Literal["canonical", "alternate", "stylesheet", "icon", "apple-touch-icon"]
-    crossorigin: Literal["anonymous", "use-credentials"]
+    rel: Literal[
+        "canonical", "alternate", "stylesheet", "icon", "apple-touch-icon", "preconnect"
+    ]
+    crossorigin: Literal["anonymous", "use-credentials", True]
     hreflang: str
     href: str
     integrity: str
