@@ -83,7 +83,7 @@ class HtmxAttrs(Attrs, total=False):
     hx_history_elt: Annotated[str, Alias("hx-history-elt")]
     hx_ext: Annotated[str, Alias("hx-ext")]
     hx_disable: Annotated[bool, Alias("hx-disable")]
-    hx_disabled_ext: Annotated[str, Alias("hx-disabled-ext")]
+    hx_disabled_elt: Annotated[str, Alias("hx-disabled-elt")]
     hx_disinherit: Annotated[str, Alias("hx-disinherit")]
     hx_encoding: Annotated[str, Alias("hx-encoding")]
     hx_headers: Annotated[str, Alias("hx-headers")]
