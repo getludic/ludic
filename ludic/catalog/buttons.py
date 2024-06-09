@@ -24,14 +24,19 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
                 "padding": f"{theme.sizes.xxxxs * 0.8} {theme.sizes.xs}",
                 "border": "none",
                 "border-radius": theme.rounding.normal,
-                "cursor": "pointer",
                 "font-size": theme.fonts.size,
                 "transition": "0.1s filter linear, 0.1s -webkit-filter linear",
+            },
+            ".btn:enabled": {
+                "cursor": "pointer",
+            },
+            ".btn:disabled": {
+                "filter": "opacity(50%)",
             },
             ":not(a).btn": {
                 "background-color": theme.colors.light.darken(2),
             },
-            (".btn:hover", ".btn:focus"): {
+            (".btn:hover:enabled", ".btn:focus:enabled"): {
                 "filter": "brightness(85%)",
                 "text-decoration": "none",
             },
@@ -111,7 +116,7 @@ class ButtonSuccess(Button):
             ".btn.success": {
                 "color": theme.colors.success.readable(),
                 "background-color": theme.colors.success,
-            }
+            },
         }
     )
 
@@ -128,7 +133,7 @@ class ButtonDanger(Button):
             ".btn.danger": {
                 "color": theme.colors.danger.readable(),
                 "background-color": theme.colors.danger,
-            }
+            },
         }
     )
 
