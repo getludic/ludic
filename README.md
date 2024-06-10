@@ -6,6 +6,14 @@
 
 **Documentation**: https://getludic.dev/docs/
 
+---
+
+*"I've just composed my first `PageLayout` component and I have no words!"*
+
+– Igor Davydenko
+
+---
+
 Ludic is a lightweight framework for building HTML pages with a component approach similar to [React](https://react.dev/). It is built to be used together with [htmx.org](https://htmx.org/) so that developers don't need to write almost any JavaScript to create dynamic web services. Its potential can be leveraged together with its web framework which is a wrapper around the powerful [Starlette](https://www.starlette.io/) framework. It is built with the latest Python 3.12 features heavily incorporating typing.
 
 > [!IMPORTANT]
