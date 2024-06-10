@@ -1,5 +1,5 @@
 <p align="center">
-    <img width="600px" src="https://raw.githubusercontent.com/paveldedik/ludic/main/docs/assets/ludic.png" alt="ludic">
+    <img width="600px" src="https://raw.githubusercontent.com/paveldedik/ludic/main/docs/assets/ludic.png" alt="Ludic Logo">
 </p>
 
 [![test](https://github.com/paveldedik/ludic/actions/workflows/test.yaml/badge.svg)](https://github.com/paveldedik/ludic/actions) [![codecov](https://codecov.io/gh/paveldedik/ludic/graph/badge.svg?token=BBDNJWHMGX)](https://codecov.io/gh/paveldedik/ludic) [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-312/) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/) [![Discord Server](https://img.shields.io/badge/discord-ludic-black)](https://discord.gg/4Y5fSQUS)
@@ -33,6 +33,12 @@ Here is a table comparing Ludic to other similar tools:
 | Client-Server Communication | [HTML + REST](https://htmx.org/essays/how-did-rest-come-to-mean-the-opposite-of-rest/) | [JSON + REST](https://github.com/pydantic/FastUI?tab=readme-ov-file#the-principle-long-version) | [WebSockets](https://reflex.dev/blog/2024-03-21-reflex-architecture/) |
 
 <sup>(*) HTMX as well as Starlette are optional dependencies for Ludic, it does not enforce any frontend or backend frameworks. At it's core, Ludic only generates HTML and allows registering CSS.</sup>
+
+## Quick Demo
+
+<p align="center">
+    <img width="600px" src="https://raw.githubusercontent.com/paveldedik/ludic/main/docs/assets/quick-demo.gif" alt="Quick Demo">
+</p>
 
 ## Motivation
 
