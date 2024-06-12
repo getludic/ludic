@@ -64,9 +64,9 @@ class Headers:
 class Fonts:
     """Font sizes for a theme."""
 
-    plain: str = "Helvetica Neue, Helvetica, Arial, sans-serif"
-    serif: str = "Georgia, serif"
-    mono: str = "Space Mono, Roboto Mono, monospace"
+    primary: str = "Helvetica Neue, Helvetica, Arial, sans-serif"
+    secondary: str = "Georgia, serif"
+    monospace: str = "Space Mono, Roboto Mono, monospace"
 
     size: BaseSize = Size(1, "em")
 

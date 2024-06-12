@@ -18,7 +18,7 @@ class Anchor(Component[str, AnchorAttrs]):
     styles = style.use(
         lambda theme: {
             "a.anchor": {
-                "font-family": theme.fonts.serif,
+                "font-family": theme.fonts.secondary,
                 "color": theme.colors.light.darken(1),
                 "text-decoration": "none",
             },
