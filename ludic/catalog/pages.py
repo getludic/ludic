@@ -53,7 +53,7 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             "*": {
                 "box-sizing": "border-box",
                 "max-inline-size": theme.measure,
-                "font-family": theme.fonts.plain,
+                "font-family": theme.fonts.primary,
                 "font-size": theme.fonts.size,
                 "color": theme.colors.dark,
                 "overflow-wrap": "break-word",
@@ -67,32 +67,32 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             # elements styling
             "h1": {
                 "font-size": theme.headers.h1.size,
-                "font-family": theme.fonts.serif,
+                "font-family": theme.fonts.secondary,
                 "line-height": round(theme.line_height * 0.9, 2),
             },
             "h2": {
                 "font-size": theme.headers.h2.size,
-                "font-family": theme.fonts.serif,
+                "font-family": theme.fonts.secondary,
                 "line-height": round(theme.line_height * 0.9, 2),
             },
             "h3": {
                 "font-size": theme.headers.h3.size,
-                "font-family": theme.fonts.serif,
+                "font-family": theme.fonts.secondary,
                 "line-height": round(theme.line_height * 0.9, 2),
             },
             "h4": {
                 "font-size": theme.headers.h4.size,
-                "font-family": theme.fonts.serif,
+                "font-family": theme.fonts.secondary,
                 "line-height": round(theme.line_height * 0.9, 2),
             },
             "h5": {
                 "font-size": theme.headers.h5.size,
-                "font-family": theme.fonts.serif,
+                "font-family": theme.fonts.secondary,
                 "line-height": round(theme.line_height * 0.9, 2),
             },
             "h6": {
                 "font-size": theme.headers.h6.size,
-                "font-family": theme.fonts.serif,
+                "font-family": theme.fonts.secondary,
                 "line-height": round(theme.line_height * 0.9, 2),
             },
             "a": {
@@ -106,7 +106,7 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
                 "overflow": "auto",
             },
             ("code", "pre", "pre *"): {
-                "font-family": theme.fonts.mono,
+                "font-family": theme.fonts.monospace,
             },
             "dl": {
                 "margin-block": "0",

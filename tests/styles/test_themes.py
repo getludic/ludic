@@ -47,7 +47,7 @@ def test_theme_font_sizes() -> None:
     theme = FooTheme(fonts=Fonts(size=Size(10, "px")))
 
     assert theme.fonts.size == "10px"
-    assert theme.fonts.plain == "Helvetica Neue, Helvetica, Arial, sans-serif"
+    assert theme.fonts.primary == "Helvetica Neue, Helvetica, Arial, sans-serif"
 
     assert theme.fonts.size - 1 == "9px"
     assert theme.fonts.size + 5 == "15px"
