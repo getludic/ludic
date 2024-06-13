@@ -218,7 +218,7 @@ class WithSidebar(ComponentStrict[AnyChildren, AnyChildren, GlobalAttrs]):
 
     @override
     def render(self) -> div:
-        return div(self.children[0], self.children[1])
+        return div(self.children[0], self.children[1], **self.attrs)
 
 
 class Switcher(div):
