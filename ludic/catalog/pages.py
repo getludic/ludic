@@ -9,6 +9,7 @@ from ludic.types import AnyChildren, BaseElement, Component, ComponentStrict
 class HtmlHeadAttrs(Attrs, total=False):
     title: str
     favicon: str
+    charset: str
     load_styles: bool
     htmx_config: dict[str, str]
 
@@ -26,6 +27,8 @@ class Head(Component[AnyChildren, HtmlHeadAttrs]):
 
         if favicon := self.attrs.get("favicon"):
             elements.append(link(rel="icon", href=favicon, type="image/x-icon"))
+        if charset := self.attrs.get("charset", "utf-8"):
+            elements.append(meta(charset=charset))
         if config := self.attrs.get("htmx_config", {"defaultSwapStyle": "outerHTML"}):
             elements.append(meta(name="htmx-config", content=json.dumps(config)))
         if self.attrs.get("load_styles", True):
