@@ -30,15 +30,15 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
             ".btn:enabled": {
                 "cursor": "pointer",
             },
-            ".btn:disabled": {
-                "filter": "opacity(50%)",
-            },
             ":not(a).btn": {
                 "background-color": theme.colors.light.darken(2),
             },
-            (".btn:hover:enabled", ".btn:focus:enabled"): {
+            (".btn:hover", ".btn:focus"): {
                 "filter": "brightness(85%)",
                 "text-decoration": "none",
+            },
+            ".btn:disabled": {
+                "filter": "opacity(50%)",
             },
             ".btn.small": {
                 "font-size": theme.fonts.size * 0.9,
