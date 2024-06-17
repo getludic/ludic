@@ -113,8 +113,8 @@ class br(Element[NoChildren, GlobalAttrs]):
     void_element = True
     html_name = "br"
 
-    def __init__(self, **attrs: Unpack[GlobalAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[GlobalAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class button(Element[AnyChildren, ButtonAttrs]):
@@ -247,15 +247,15 @@ class input(Element[NoChildren, InputAttrs]):
     void_element = True
     html_name = "input"
 
-    def __init__(self, **attrs: Unpack[InputAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[InputAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class output(Element[NoChildren, OutputAttrs]):
     html_name = "output"
 
-    def __init__(self, **attrs: Unpack[OutputAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[OutputAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class legend(Element[PrimitiveChildren, GlobalAttrs]):
@@ -317,8 +317,8 @@ class img(Element[NoChildren, ImgAttrs]):
     void_element = True
     html_name = "img"
 
-    def __init__(self, **attrs: Unpack[ImgAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[ImgAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class svg(Element[AnyChildren, SvgAttrs]):
@@ -522,16 +522,16 @@ class h6(Element[AnyChildren, GlobalAttrs]):
 class title(Element[PrimitiveChildren, NoAttrs]):
     html_name = "title"
 
-    def __init__(self, *children: PrimitiveChildren) -> None:
-        super().__init__(*children)
+    def __init__(self, *children: PrimitiveChildren, **attrs: Unpack[NoAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class link(Element[NoChildren, HeadLinkAttrs]):
     void_element = True
     html_name = "link"
 
-    def __init__(self, **attrs: Unpack[HeadLinkAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[HeadLinkAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class style(BaseElement, GlobalStyles):
@@ -632,15 +632,15 @@ class meta(Element[NoChildren, MetaAttrs]):
     void_element = True
     html_name = "meta"
 
-    def __init__(self, **attrs: Unpack[MetaAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[MetaAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class head(Element[AnyChildren, NoAttrs]):
     html_name = "head"
 
-    def __init__(self, *children: AnyChildren) -> None:
-        super().__init__(*children)
+    def __init__(self, *children: AnyChildren, **attrs: Unpack[NoAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class body(Element[AnyChildren, GlobalAttrs]):
@@ -670,8 +670,8 @@ class html(ElementStrict[head, body, HtmlTagAttrs]):
 class iframe(Element[NoChildren, IframeAttrs]):
     html_name = "iframe"
 
-    def __init__(self, **attrs: Unpack[IframeAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[IframeAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class article(Element[AnyChildren, GlobalAttrs]):
@@ -699,8 +699,8 @@ class col(Element[NoChildren, ColAttrs]):
     void_element = True
     html_name = "col"
 
-    def __init__(self, **attrs: Unpack[ColAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[ColAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class colgroup(Element[AnyChildren, GlobalAttrs]):
@@ -714,8 +714,8 @@ class area(Element[NoChildren, AreaAttrs]):
     void_element = True
     html_name = "area"
 
-    def __init__(self, **attrs: Unpack[AreaAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[AreaAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class aside(Element[AnyChildren, GlobalAttrs]):
@@ -729,8 +729,8 @@ class source(Element[NoChildren, SourceAttrs]):
     void_element = True
     html_name = "source"
 
-    def __init__(self, **attrs: Unpack[SourceAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[SourceAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class audio(Element[AnyChildren, AudioAttrs]):
@@ -744,8 +744,8 @@ class base(Element[NoChildren, BaseAttrs]):
     void_element = True
     html_name = "base"
 
-    def __init__(self, **attrs: Unpack[BaseAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[BaseAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class bdi(Element[AnyChildren, GlobalAttrs]):
@@ -808,8 +808,8 @@ class embed(Element[NoChildren, EmbedAttrs]):
     void_element = True
     html_name = "embed"
 
-    def __init__(self, **attrs: Unpack[EmbedAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[EmbedAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class figcaption(Element[AnyChildren, GlobalAttrs]):
@@ -837,8 +837,8 @@ class hr(Element[NoChildren, GlobalAttrs]):
     void_element = True
     html_name = "hr"
 
-    def __init__(self, **attrs: Unpack[GlobalAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[GlobalAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class kbd(Element[AnyChildren, GlobalAttrs]):
@@ -887,8 +887,8 @@ class param(Element[NoChildren, ParamAttrs]):
     void_element = True
     html_name = "param"
 
-    def __init__(self, **attrs: Unpack[ParamAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[ParamAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class picture(Element[AnyChildren, GlobalAttrs]):
@@ -986,8 +986,8 @@ class track(Element[NoChildren, TrackAttrs]):
     void_element = True
     html_name = "track"
 
-    def __init__(self, **attrs: Unpack[TrackAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[TrackAttrs]) -> None:
+        super().__init__(*children, **attrs)
 
 
 class var(Element[AnyChildren, GlobalAttrs]):
@@ -1008,5 +1008,5 @@ class wbr(Element[NoChildren, GlobalAttrs]):
     void_element = True
     html_name = "wbr"
 
-    def __init__(self, **attrs: Unpack[GlobalAttrs]) -> None:
-        super().__init__(**attrs)
+    def __init__(self, *children: NoChildren, **attrs: Unpack[GlobalAttrs]) -> None:
+        super().__init__(*children, **attrs)
