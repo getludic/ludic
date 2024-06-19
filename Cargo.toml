@@ -1,0 +1,16 @@
+[package]
+name = "ludicrous"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "ludicrous"
+path = "core/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.21.2", features = ["extension-module"] }
+
+[features]
+abi3 = ["pyo3/abi3-py37", "generate-import-lib"]
+generate-import-lib = ["pyo3/generate-import-lib"]
