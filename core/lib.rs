@@ -1,130 +1,134 @@
-use std::collections::HashMap;
+use pyo3::{pymodule, types::PyModule, wrap_pyfunction, Bound, PyResult};
 
-use pyo3::prelude::*;
-use pyo3::types::IntoPyDict;
+mod base;
+mod elements;
 
-// #[pyclass]
-// struct BaseElement {
-//     #[pyo3(get)]
-//     children: Py<PyTuple>,
-//     #[pyo3(get)]
-//     attrs: Py<PyDict>,
-//     #[pyo3(get)]
-//     context: Py<PyDict>,
-// }
-
-// #[pymethods]
-// impl BaseElement {
-//     #[new]
-//     #[pyo3(signature = (*children, **attrs))]
-//     fn new<'py>(children: &Bound<'_, PyTuple>, attrs: Option<&Bound<'_, PyDict>>) -> Self {
-//         Python::with_gil(|py| {
-//             BaseElement {
-//                 children: children.into_py(py),
-//                 attrs: attrs.map_or(PyDict::new_bound(py), |dict| dict.clone()).unbind(),
-//                 context: PyDict::new_bound(py).unbind(),
-//             }
-//         })
-//     }
-
-//     fn __str__(&self) -> String {
-//         self.to_string(true)
-//     }
-
-//     fn __repr__(&self) -> String {
-//         self.to_string(false)
-//     }
-
-//     fn __len__(&self) -> usize {
-//         Python::with_gil(|py| {
-//             self.children.into_bound(py).len()
-//         })
-//     }
-
-//     fn __iter__(&self) -> BoundTupleIterator<'_> {
-//         Python::with_gil(|py| {
-//             self.children.into_bound(py).into_iter()
-//         })
-//     }
-
-//     fn is_simple(&self) -> bool {
-//         Python::with_gil(|py| {
-//             let children = self.children.into_bound(py);
-//             children.len() == 1
-//         })
-//     }
-
-//     fn has_attributes(&self) -> bool {
-//         Python::with_gil(|py| {
-//             !self.attrs.into_bound(py).is_empty()
-//         })
-//     }
-
-//     fn to_html(&self) -> String {
-//         Python::with_gil(|py| {
-//             let mut dom = self;
-//             let mut classes = self
-//         })
-//     }
-// }
-
-#[pyfunction]
-fn to_html(obj: &Bound<'_, PyAny>) -> PyResult<String> {
-    let mut dom = obj.clone();
-    let classes = obj.getattr("classes")?;
-
-    loop {
-        let rendered_dom = dom.call_method0("render")?;
-
-        if (dom.as_ptr() as isize) == (rendered_dom.as_ptr() as isize) {
-            break;
-        }
-
-        let context = rendered_dom.getattr("context")?;
-        dom = rendered_dom;
-
-        context.call_method1("update", (dom.getattr("context")?,))?;
-        classes.call_method1("extend", (dom.getattr("classes")?,))?;
-    }
-
-    let mut element_tag = String::new();
-    if let Ok(header) = dom.getattr("html_header")?.extract::<String>() {
-        element_tag.push_str(&format!("{header}\n"));
-    }
-
-    let children_str: String = dom.call_method0("_format_children")?.extract()?;
-    let html_name: String = dom.getattr("html_name")?.extract()?;
-
-    if html_name == "__hidden__" {
-        return Ok(children_str);
-    }
-
-    element_tag.push_str(&format!("<{html_name}"));
-    let has_attributes: bool = dom.call_method0("has_attributes")?.extract()?;
-
-    if has_attributes || classes.call_method0("__len__")?.extract::<usize>()? > 0 {
-        let attrs_str = dom
-            .call_method1("_format_attributes", (classes, true))?
-            .extract::<String>()?;
-
-        element_tag.push(' ');
-        element_tag.push_str(&attrs_str);
-    }
-
-    if children_str.is_empty() && dom.getattr("void_element")?.extract::<bool>()? {
-        element_tag.push('>');
-    } else {
-        element_tag.push_str(&format!(">{children_str}</{html_name}>"));
-    }
-
-    Ok(element_tag)
-}
-
-/// A Python module implemented in Rust. The name of this function must match
-/// the `lib.name` setting in the `Cargo.toml`, else Python will not be able to
-/// import the module.
 #[pymodule]
-fn ludicrous(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(to_html, m)?)?;
+fn ludicrous(root: &Bound<'_, PyModule>) -> PyResult<()> {
+    let base = PyModule::new_bound(root.py(), "base")?;
+    base.add_class::<base::Element>()?;
+    root.add_submodule(&base)?;
+
+    let html = PyModule::new_bound(root.py(), "html")?;
+    html.add_function(wrap_pyfunction!(elements::div, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::span, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::main, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::p, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::a, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::br, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::button, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::label, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::td, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::th, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::tr, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::thead, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::tbody, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::tfoot, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::table, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::li, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::ul, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::ol, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::dt, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::dd, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::dl, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::section, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::input, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::output, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::legend, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::option, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::optgroup, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::select, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::textarea, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::fieldset, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::form, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::img, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::svg, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::circle, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::line, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::path, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::polyline, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::b, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::i, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::s, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::u, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::strong, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::em, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::mark, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::del, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::ins, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::header, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::big, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::small, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::code, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::pre, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::cite, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::blockquote, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::abbr, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::h1, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::h2, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::h3, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::h4, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::h5, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::h6, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::title, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::link, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::style, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::script, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::noscript, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::meta, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::head, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::body, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::footer, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::html, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::iframe, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::article, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::address, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::caption, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::col, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::colgroup, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::area, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::aside, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::source, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::audio, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::base, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::bdi, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::bdo, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::canvas, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::data, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::datalist, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::details, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::dfn, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::dialog, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::embed, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::figcaption, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::figure, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::hrgroup, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::hr, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::kbd, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::map, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::menu, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::meter, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::nav, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::object, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::param, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::picture, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::progress, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::q, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::rp, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::rt, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::ruby, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::samp, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::search, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::sub, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::summary, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::sup, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::template, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::time, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::track, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::var, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::video, &html)?)?;
+    html.add_function(wrap_pyfunction!(elements::wbr, &html)?)?;
+    root.add_submodule(&html)?;
+
     Ok(())
 }
