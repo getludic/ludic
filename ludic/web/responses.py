@@ -17,7 +17,8 @@ from starlette.responses import (
 )
 from starlette.websockets import WebSocket
 
-from ludic.types import BaseElement
+from ludic.base import BaseElement
+from ludic.format import formatter
 from ludic.web import datastructures as ds
 from ludic.web.parsers import BaseParser
 
@@ -40,7 +41,7 @@ async def run_in_threadpool_safe(
     func: Callable[P, T], *args: P.args, **kwargs: P.kwargs
 ) -> T:
     def func_wrapped(*args: P.args, **kwargs: P.kwargs) -> T:
-        with BaseElement.formatter:
+        with formatter:
             return func(*args, **kwargs)
 
     response: T = await run_in_threadpool(func_wrapped, *args, **kwargs)
@@ -68,7 +69,7 @@ async def prepare_response(
     is_async = is_async_callable(handler)
 
     if is_async:
-        with BaseElement.formatter:
+        with formatter:
             raw_response = await handler(**handler_kw)
     else:
         raw_response = await run_in_threadpool_safe(handler, **handler_kw)

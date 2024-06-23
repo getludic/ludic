@@ -7,7 +7,8 @@ from starlette.endpoints import HTTPEndpoint as BaseEndpoint
 from starlette.routing import Route
 
 from ludic.catalog.loaders import LazyLoader
-from ludic.types import AnyChildren, Component, NoChildren, TAttrs
+from ludic.components import Component
+from ludic.types import AnyChildren, NoChildren, TAttrs
 from ludic.utils import get_element_generic_args
 
 from .requests import Request

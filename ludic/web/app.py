@@ -13,7 +13,8 @@ from starlette.types import Lifespan
 from starlette.websockets import WebSocket
 
 from ludic.attrs import Attrs
-from ludic.types import BaseElement
+from ludic.base import BaseElement
+from ludic.format import formatter
 
 from .datastructures import URLPath
 from .endpoints import Endpoint
@@ -205,7 +206,7 @@ class LudicApp(Starlette):
                     handler_kw[name] = request
 
             if is_async:
-                with BaseElement.formatter:
+                with formatter:
                     response = await handler(**handler_kw)
             else:
                 response = await run_in_threadpool_safe(handler, **handler_kw)

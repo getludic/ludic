@@ -1,8 +1,9 @@
 from typing import override
 
 from ludic.attrs import GlobalAttrs
+from ludic.components import Component
 from ludic.html import li, ol, ul
-from ludic.types import AnyChildren, Component
+from ludic.types import AnyChildren
 
 
 class ListAttrs(GlobalAttrs, total=False):

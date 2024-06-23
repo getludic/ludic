@@ -231,3 +231,6 @@ class FormatContext:
 
     def __exit__(self, *_: Any) -> None:
         self.clear()
+
+
+formatter = FormatContext("f-string-container")

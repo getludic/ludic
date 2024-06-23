@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, TypeVar
 from .types import BaseSize, Color, ColorRange, Size, SizeClamp
 
 if TYPE_CHECKING:
-    from ludic.types import BaseElement
+    from ludic.base import BaseElement
 
 _T = TypeVar("_T", bound="BaseElement")
 

@@ -1,8 +1,9 @@
 from typing import override
 
 from ludic.attrs import GlobalAttrs
+from ludic.components import ComponentStrict
 from ludic.html import div, style
-from ludic.types import AnyChildren, ComponentStrict
+from ludic.types import AnyChildren
 
 
 class Stack(div):

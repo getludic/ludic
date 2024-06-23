@@ -117,12 +117,15 @@ pub enum Child {
     Integer(i64),
     Float(f64),
     Boolean(bool),
-    Element(Element),
+    Element(BaseElement),
     Component(Py<PyAny>),
 }
 
 impl Child {
-    fn add_context(&mut self, context: &Option<HashMap<String, Py<PyAny>>>) -> PyResult<()> {
+    fn add_context(&mut self, context: &HashMap<String, Py<PyAny>>) -> PyResult<()> {
+        if context.is_empty() {
+            return Ok(());
+        }
         match self {
             Self::Element(element) => {
                 for child in element.children.iter_mut() {
@@ -130,27 +133,25 @@ impl Child {
                 }
             }
             Self::Component(component) => {
-                if let Some(ctx) = context {
-                    let mut err = None;
-                    Python::with_gil(|py| {
-                        let Ok(component_context) = component.getattr(py, "context") else {
-                            err = Some(PyTypeError::new_err(
-                                "Object has no attribute context".to_string(),
-                            ));
-                            return;
-                        };
-                        let Ok(_) = component_context.call_method1(py, "update", (ctx.clone(),))
-                        else {
-                            err = Some(PyTypeError::new_err(
-                                "Object context has no method update".to_string(),
-                            ));
-                            return;
-                        };
-                    });
-                    if let Some(error) = err {
-                        return Err(error);
-                    }
-                };
+                let mut err = None;
+                Python::with_gil(|py| {
+                    let Ok(component_context) = component.getattr(py, "context") else {
+                        err = Some(PyTypeError::new_err(
+                            "Object has no attribute context".to_string(),
+                        ));
+                        return;
+                    };
+                    let Ok(_) = component_context.call_method1(py, "update", (context.clone(),))
+                    else {
+                        err = Some(PyTypeError::new_err(
+                            "Object context has no method update".to_string(),
+                        ));
+                        return;
+                    };
+                });
+                if let Some(error) = err {
+                    return Err(error);
+                }
             }
             _ => (),
         }
@@ -182,7 +183,7 @@ impl<'py> FromPyObject<'py> for Child {
             Ok(Child::Float(number))
         } else if let Ok(value) = ob.extract::<bool>() {
             Ok(Child::Boolean(value))
-        } else if let Ok(element) = ob.extract::<Element>() {
+        } else if let Ok(element) = ob.extract::<BaseElement>() {
             Ok(Child::Element(element))
         } else {
             Python::with_gil(|py| Ok(Child::Component(ob.into_py(py))))
@@ -206,9 +207,9 @@ impl IntoPy<Py<PyAny>> for Child {
 }
 
 /// Class representing an HTML element
-#[pyclass]
+#[pyclass(subclass)]
 #[derive(Clone)]
-pub struct Element {
+pub struct BaseElement {
     #[pyo3(get)]
     pub html_name: &'static str,
     #[pyo3(get)]
@@ -221,16 +222,16 @@ pub struct Element {
     #[pyo3(get)]
     pub attrs: Attrs,
     #[pyo3(get)]
-    pub context: Option<HashMap<String, Py<PyAny>>>,
+    pub context: HashMap<String, Py<PyAny>>,
 }
 
 #[pymethods]
-impl Element {
-    fn __len__(&self) -> usize {
+impl BaseElement {
+    pub fn __len__(&self) -> usize {
         self.children.len()
     }
 
-    fn __repr__(&self) -> String {
+    pub fn __repr__(&self) -> String {
         let mut tag = format!("<{}", self.html_name);
 
         if self.has_attributes() {
@@ -250,7 +251,11 @@ impl Element {
         tag
     }
 
-    fn is_simple(&self) -> bool {
+    pub fn __str__(&mut self) -> PyResult<String> {
+        return self.to_html()
+    }
+
+    pub fn is_simple(&self) -> bool {
         self.children.len() == 1
             && self
                 .children
@@ -258,11 +263,11 @@ impl Element {
                 .all(|child| !matches!(child, Child::Element(_)))
     }
 
-    fn has_attributes(&self) -> bool {
+    pub fn has_attributes(&self) -> bool {
         !self.attrs.is_empty()
     }
 
-    fn to_html(&mut self) -> PyResult<String> {
+    pub fn to_html(&mut self) -> PyResult<String> {
         let mut tag = String::new();
 
         // HTML header

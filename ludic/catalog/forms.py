@@ -12,11 +12,11 @@ from ludic.attrs import (
     SelectAttrs,
     TextAreaAttrs,
 )
+from ludic.base import BaseElement
+from ludic.components import Component
 from ludic.html import div, form, input, label, option, select, style, textarea
 from ludic.types import (
-    BaseElement,
     ComplexChildren,
-    Component,
     NoChildren,
     PrimitiveChildren,
     TAttrs,

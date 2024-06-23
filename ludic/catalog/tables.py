@@ -7,15 +7,10 @@ from typing import Any, Literal, cast, get_type_hints, override
 from typing_extensions import TypeVar
 
 from ludic.attrs import GlobalAttrs
+from ludic.base import BaseElement
+from ludic.components import Component, ComponentStrict
 from ludic.html import div, style, table, tbody, td, th, thead, tr
-from ludic.types import (
-    AnyChildren,
-    BaseElement,
-    Component,
-    ComponentStrict,
-    PrimitiveChildren,
-    TAttrs,
-)
+from ludic.types import AnyChildren, PrimitiveChildren, TAttrs
 from ludic.utils import get_annotations_metadata_of_type
 
 from .forms import FieldMeta

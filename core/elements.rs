@@ -1,19 +1,31 @@
-use pyo3::pyfunction;
+#![allow(non_camel_case_types)]
 
-use crate::base::{Attrs, Child, Element};
+use pyo3::{pyclass, pymethods};
+use std::collections::HashMap;
+
+use crate::base::{Attrs, BaseElement, Child};
 
 macro_rules! element {
     ($name:ident, $header:expr, $void:expr) => {
-        #[pyfunction]
-        #[pyo3(signature = (*children, **attrs))]
-        pub fn $name(children: Vec<Child>, attrs: Option<Attrs>) -> Element {
-            Element {
-                html_name: stringify!($name),
-                html_header: $header,
-                void_element: $void,
-                children,
-                attrs: attrs.unwrap_or_default(),
-                context: None,
+        #[pyclass(extends=BaseElement, subclass)]
+        pub struct $name;
+
+        #[pymethods]
+        impl $name {
+            #[new]
+            #[pyo3(signature = (*children, **attrs))]
+            pub fn new(children: Vec<Child>, attrs: Option<Attrs>) -> (Self, BaseElement) {
+                (
+                    Self,
+                    BaseElement {
+                        html_name: stringify!($name),
+                        html_header: $header,
+                        void_element: $void,
+                        children,
+                        attrs: attrs.unwrap_or_default(),
+                        context: HashMap::new(),
+                    },
+                )
             }
         }
     };

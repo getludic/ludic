@@ -1,7 +1,7 @@
 from typing import Annotated, Literal, Protocol
 
-from .base import Attrs as Attrs
-from .base import NoAttrs as NoAttrs
+from .types import Attrs as Attrs
+from .types import NoAttrs as NoAttrs
 from .styles import CSSProperties
 
 

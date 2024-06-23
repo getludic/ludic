@@ -9,16 +9,10 @@ try:
 except ImportError:
     pygments_loaded = False
 
-from ludic.attrs import GlobalAttrs, HyperlinkAttrs
+from ludic.attrs import Attrs, GlobalAttrs, HyperlinkAttrs
+from ludic.components import Component, ComponentStrict
 from ludic.html import a, code, p, pre, style
-from ludic.types import (
-    AnyChildren,
-    Attrs,
-    Component,
-    ComponentStrict,
-    PrimitiveChildren,
-    Safe,
-)
+from ludic.types import AnyChildren, PrimitiveChildren, Safe
 
 from .utils import remove_whitespaces
 
