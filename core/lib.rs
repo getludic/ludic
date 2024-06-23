@@ -5,6 +5,7 @@ mod elements;
 
 #[pymodule]
 fn ludicrous(root: &Bound<'_, PyModule>) -> PyResult<()> {
+    root.add_class::<base::BaseElement>()?;
     root.add_class::<elements::div>()?;
     root.add_class::<elements::span>()?;
     root.add_class::<elements::main>()?;
@@ -49,7 +50,7 @@ fn ludicrous(root: &Bound<'_, PyModule>) -> PyResult<()> {
     root.add_class::<elements::strong>()?;
     root.add_class::<elements::em>()?;
     root.add_class::<elements::mark>()?;
-    root.add_class::<elements::del>()?;
+    root.add_class::<elements::del_>()?;
     root.add_class::<elements::ins>()?;
     root.add_class::<elements::header>()?;
     root.add_class::<elements::big>()?;

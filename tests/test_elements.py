@@ -136,7 +136,7 @@ def test_button_get() -> None:
 
 def test_expand_nested() -> None:
     div_dom = html.div(html.p(1), html.p(2), html.p(3))
-    span_dom = html.span(*div_dom)
+    span_dom = html.span(*div_dom.children)
 
     assert div_dom.text == span_dom.text == "123"
     assert span_dom.to_html() == "<span><p>1</p><p>2</p><p>3</p></span>"

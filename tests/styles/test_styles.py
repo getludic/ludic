@@ -1,10 +1,10 @@
+from ludic.components import Block
 from ludic.html import style
-from ludic.types import AnyChildren, Attrs, Component
 
 from . import FooTheme
 
 
-class A(Component[AnyChildren, Attrs]):
+class A(Block):
     styles = {
         "a": {
             "color": "red",
@@ -20,7 +20,7 @@ class A(Component[AnyChildren, Attrs]):
     }
 
 
-class B(Component[AnyChildren, Attrs]):
+class B(Block):
     styles = {
         "a.test": {
             "color": "blue",

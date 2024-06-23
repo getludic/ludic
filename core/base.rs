@@ -167,7 +167,7 @@ impl Child {
             Self::Boolean(value) => Ok(value.to_string()),
             Self::Element(element) => Ok(element.to_html()?),
             Self::Component(component) => {
-                Python::with_gil(|py| component.call_method0(py, "render")?.extract::<String>(py))
+                Python::with_gil(|py| component.call_method0(py, "to_html")?.extract::<String>(py))
             }
         }
     }
@@ -232,6 +232,26 @@ impl BaseElement {
     }
 
     pub fn __repr__(&self) -> String {
+        self.to_string()
+    }
+
+    pub fn __str__(&mut self) -> PyResult<String> {
+        self.to_html()
+    }
+
+    pub fn is_simple(&self) -> bool {
+        self.children.len() == 1
+            && self
+                .children
+                .iter()
+                .all(|child| !matches!(child, Child::Element(_)))
+    }
+
+    pub fn has_attributes(&self) -> bool {
+        !self.attrs.is_empty()
+    }
+
+    pub fn to_string(&self) -> String {
         let mut tag = format!("<{}", self.html_name);
 
         if self.has_attributes() {
@@ -249,22 +269,6 @@ impl BaseElement {
         }
 
         tag
-    }
-
-    pub fn __str__(&mut self) -> PyResult<String> {
-        return self.to_html()
-    }
-
-    pub fn is_simple(&self) -> bool {
-        self.children.len() == 1
-            && self
-                .children
-                .iter()
-                .all(|child| !matches!(child, Child::Element(_)))
-    }
-
-    pub fn has_attributes(&self) -> bool {
-        !self.attrs.is_empty()
     }
 
     pub fn to_html(&mut self) -> PyResult<String> {

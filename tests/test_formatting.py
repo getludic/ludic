@@ -1,7 +1,6 @@
 from ludic.catalog.typography import Link, Paragraph
-from ludic.format import FormatContext, format_attr_value
+from ludic.format import FormatContext, format_attr_value, formatter
 from ludic.html import b, div, i, p, strong
-from ludic.types import BaseElement
 
 
 def test_format_attr_value() -> None:
@@ -39,16 +38,15 @@ def test_format_context() -> None:
 
 
 def test_format_context_in_elements() -> None:
-    context = BaseElement.formatter
-    assert context.get() == {}
+    assert formatter.get() == {}
 
-    with context:
+    with formatter:
         f"test {b("foo")} {i("bar")}"
-        assert list(context.get().values()) == [b("foo"), i("bar")]
+        assert list(formatter.get().values()) == [b("foo"), i("bar")]
 
-    assert context.get() == {}
+    assert formatter.get() == {}
 
-    with context:
+    with formatter:
         text = f"test {b("baz")} {i("foo")}"
         assert div(text) == div("test ", b("baz"), " ", i("foo"))
         assert div(f"test {div(f"foo {b("nested")}, {i("nested2")}")}") == div(
@@ -56,7 +54,7 @@ def test_format_context_in_elements() -> None:
             div("foo ", b("nested"), ", ", i("nested2")),
         )
 
-    assert context.get() == {}
+    assert formatter.get() == {}
 
 
 def test_component_with_f_string() -> None:

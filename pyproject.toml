@@ -1,5 +1,5 @@
 [build-system]
-requires = ["maturin>=1,<2", "hatch-vcs"]
+requires = ["maturin>=1,<2"]
 build-backend = "maturin"
 
 [project]
@@ -43,12 +43,6 @@ test = [
     "pytest-cov",
     "httpx",
 ]
-
-[tool.hatch.version]
-source = "vcs"
-
-[tool.hatch.build.hooks.vcs]
-version-file = "_version.py"
 
 [tool.ruff]
 line-length = 88

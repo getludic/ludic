@@ -1,26 +1,35 @@
 from abc import ABCMeta, abstractmethod
-from collections.abc import MutableMapping
-from typing import Any, Generic
+from collections.abc import MutableMapping, Sequence
+from typing import Any, ClassVar, Generic, Unpack, override
 
+from .attrs import GlobalAttrs, NoAttrs
 from .base import BaseElement
-from .styles import Theme, get_default_theme
-from .utils import get_element_attrs_annotations
 from .format import format_attrs
-from .types import NoAttrs, TAttrs, TChildren, TChildrenArgs
+from .html import div, span
+from .styles import Theme, get_default_theme, types
+from .types import AnyChildren, TAttrs, TChildren, TChildrenArgs
+from .utils import get_element_attrs_annotations
 
-COMPONENT_REGISTRY: MutableMapping[str, list[type["BaseElement"]]] = {}
+COMPONENT_REGISTRY: MutableMapping[str, list[type["BaseComponent"]]] = {}
 
 
 class BaseComponent(BaseElement, metaclass=ABCMeta):
+    classes: ClassVar[Sequence[str]] = []
+    styles: ClassVar[types.GlobalStyles] = {}
+
+    def __init__(self, *children: Any, **attrs: Any) -> None:
+        self.children = children
+        self.attrs = attrs
+
     def __init_subclass__(cls) -> None:
         COMPONENT_REGISTRY.setdefault(cls.__name__, [])
         COMPONENT_REGISTRY[cls.__name__].append(cls)
 
     def __str__(self) -> str:
-        return self.to_string()
+        return self.to_html()
 
     def __repr__(self) -> str:
-        return self.to_string(pretty=False)
+        return self.to_string()
 
     @property
     def text(self) -> str:
@@ -63,6 +72,17 @@ class BaseComponent(BaseElement, metaclass=ABCMeta):
             element += " />"
 
         return element
+
+    def to_html(self) -> str:
+        dom: BaseElement = self
+        classes: list[str] = []
+
+        while isinstance(dom, BaseComponent):
+            classes += dom.classes
+            dom = dom.render()
+            dom.context.update(dom.context)
+
+        return dom.to_html()
 
     def attrs_for(self, cls: type["BaseElement"]) -> dict[str, Any]:
         """Get the attributes of this component that are defined in the given element.
@@ -115,6 +135,14 @@ class Component(Generic[TChildren, TAttrs], BaseComponent):
     children: tuple[TChildren, ...]
     attrs: TAttrs
 
+    def __init__(
+        self,
+        *children: TChildren,
+        # FIXME: https://github.com/python/typing/issues/1399
+        **attrs: Unpack[TAttrs],  # type: ignore
+    ) -> None:
+        super().__init__(*children, **attrs)
+
 
 class ComponentStrict(Generic[*TChildrenArgs, TAttrs], BaseComponent):
     """Base class for strict components.
@@ -152,10 +180,41 @@ class ComponentStrict(Generic[*TChildrenArgs, TAttrs], BaseComponent):
     children: tuple[*TChildrenArgs]
     attrs: TAttrs
 
+    def __init__(
+        self,
+        *children: *TChildrenArgs,
+        # FIXME: https://github.com/python/typing/issues/1399
+        **attrs: Unpack[TAttrs],  # type: ignore
+    ) -> None:
+        super().__init__(*children, **attrs)
+
+
+class Block(Component[AnyChildren, GlobalAttrs]):
+    """Component rendering as a div"""
+
+    @override
+    def render(self) -> div:
+        return div(*self.children, **self.attrs)
+
+
+class Inline(Component[AnyChildren, GlobalAttrs]):
+    """Component rendering as a span"""
+
+    @override
+    def render(self) -> span:
+        return span(*self.children, **self.attrs)
+
 
 class Blank(Component[TChildren, NoAttrs]):
-    """Element representing no element at all, just children.
+    """Component representing no component at all, just children.
 
-    The purpose of this element is to be able to return only children
+    The purpose of this component is to be able to render only children
     when rendering a component.
     """
+
+    def to_html(self) -> str:
+        return "".join(map(str, self.children))
+
+    @override
+    def render(self) -> div:
+        return div()  # workaround, we need to return a base element

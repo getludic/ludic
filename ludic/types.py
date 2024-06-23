@@ -1,6 +1,7 @@
 from collections.abc import Iterable, Mapping
 from typing import Never, TypeAlias, TypedDict, TypeVar, TypeVarTuple
 
+from .attrs import Attrs, NoAttrs
 from .attrs import URLType as URLType
 from .base import BaseElement
 from .styles import GlobalStyles
@@ -53,31 +54,6 @@ class JavaScript(Safe):
     """
 
 
-class Attrs(TypedDict, total=False):
-    """Attributes of an element or component.
-
-    Example usage::
-
-        class PersonAttrs(Attributes):
-            name: str
-            age: NotRequired[int]
-
-        class Person(Component[PersonAttrs]):
-            @override
-            def render(self) -> dl:
-                return dl(
-                    dt("Name"),
-                    dd(self.attrs["name"]),
-                    dt("Age"),
-                    dd(self.attrs.get("age", "N/A")),
-                )
-    """
-
-
-class NoAttrs(TypedDict):
-    """Placeholder for element with no attributes."""
-
-
 NoChildren: TypeAlias = Never
 """Type alias for elements that are not allowed to have children."""
 
@@ -118,6 +94,7 @@ __all__ = (
     "JavaScript",
     "NoChildren",
     "PrimitiveChildren",
+    "URLType",
     "TAttrs",
     "TChildren",
     "TChildrenArgs",

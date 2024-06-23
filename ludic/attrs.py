@@ -1,8 +1,31 @@
-from typing import Annotated, Literal, Protocol
+from typing import Annotated, Literal, Protocol, TypedDict
 
-from .types import Attrs as Attrs
-from .types import NoAttrs as NoAttrs
 from .styles import CSSProperties
+
+
+class Attrs(TypedDict, total=False):
+    """Attributes of an element or component.
+
+    Example usage::
+
+        class PersonAttrs(Attributes):
+            name: str
+            age: NotRequired[int]
+
+        class Person(Component[PersonAttrs]):
+            @override
+            def render(self) -> dl:
+                return dl(
+                    dt("Name"),
+                    dd(self.attrs["name"]),
+                    dt("Age"),
+                    dd(self.attrs.get("age", "N/A")),
+                )
+    """
+
+
+class NoAttrs(TypedDict):
+    """Placeholder for element with no attributes."""
 
 
 class URLType(Protocol):

@@ -75,7 +75,7 @@ element!(u, None, false);
 element!(strong, None, false);
 element!(em, None, false);
 element!(mark, None, false);
-element!(del, None, false);
+element!(del_, None, false);
 element!(ins, None, false);
 element!(header, None, false);
 element!(big, None, false);

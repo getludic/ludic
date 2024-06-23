@@ -103,7 +103,9 @@ def from_loaded(cache: bool = False, theme: Theme | None = None) -> GlobalStyles
     if cache and GLOBAL_STYLES_CACHE.get(theme.name):
         return GLOBAL_STYLES_CACHE[theme.name]
 
-    loaded = (element for elements in COMPONENT_REGISTRY.values() for element in elements)
+    loaded = (
+        element for elements in COMPONENT_REGISTRY.values() for element in elements
+    )
     result = from_components(*loaded, theme=theme)
     if cache:
         GLOBAL_STYLES_CACHE[theme.name] = result
