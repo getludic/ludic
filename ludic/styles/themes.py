@@ -227,15 +227,15 @@ class DarkTheme(Theme):
     colors: Colors = field(
         default_factory=lambda: Colors(
             primary=Color("#0d6efd"),
-            secondary=Color("#6c757d"),
+            secondary=Color("#898989"),
             success=Color("#198754"),
             info=Color("#0dcaf0"),
             warning=Color("#ffc107"),
             danger=Color("#dc3545"),
             light=Color("#414549"),
-            dark=Color("#f8f8f8"),
-            white=Color("#000"),
-            black=Color("#fff"),
+            dark=Color("#d8d8d8"),
+            white=Color("#131313"),
+            black=Color("#e5e5e5"),
         )
     )
 

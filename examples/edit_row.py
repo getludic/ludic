@@ -123,7 +123,7 @@ class PersonForm(Endpoint[PersonAttrs]):
                     hx_include="closest tr",
                     classes=["small"],
                 ),
-                classes=["cluster-small"],
+                classes=["cluster-small", "centered"],
             ),
             classes=["editing"],
         )

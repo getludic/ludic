@@ -64,6 +64,9 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
                 "padding": "0",
                 "line-height": theme.line_height,
             },
+            "body": {
+                "background-color": theme.colors.white,
+            },
             ("html", "body", "div", "header", "nav", "main", "footer"): {
                 "max-inline-size": "none",
             },
