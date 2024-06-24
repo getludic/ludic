@@ -1,9 +1,58 @@
 #![allow(non_camel_case_types)]
 
-use pyo3::{pyclass, pymethods};
+use pyo3::{Py, PyAny, pyclass, pymethods};
 use std::collections::HashMap;
 
 use crate::base::{Attrs, BaseElement, Child};
+
+#[pyclass(extends=BaseElement, subclass)]
+pub struct style;
+
+#[pymethods]
+impl style {
+    #[new]
+    #[pyo3(signature = (styles, theme=None, **attrs))]
+    pub fn new(styles: Child, theme: Option<Py<PyAny>>, attrs: Option<Attrs>) -> (Self, BaseElement) {
+        let mut context = HashMap::new();
+        if let Some(value) = theme {
+            context.insert("theme".to_string(), value);
+        }
+
+        (
+            Self,
+            BaseElement {
+                html_name: "style",
+                html_header: None,
+                void_element: false,
+                children: vec![styles],
+                attrs: attrs.unwrap_or_default(),
+                context,
+            },
+        )
+    }
+}
+
+#[pyclass(name="output", extends=BaseElement, subclass)]
+pub struct output_;
+
+#[pymethods]
+impl output_ {
+    #[new]
+    #[pyo3(signature = (*children, **attrs))]
+    pub fn new(children: Vec<Child>, attrs: Option<Attrs>) -> (Self, BaseElement) {
+        (
+            Self,
+            BaseElement {
+                html_name: "output",
+                html_header: None,
+                void_element: false,
+                children,
+                attrs: attrs.unwrap_or_default(),
+                context: HashMap::new(),
+            },
+        )
+    }
+}
 
 macro_rules! element {
     ($name:ident, $header:expr, $void:expr) => {
@@ -54,7 +103,6 @@ element!(dd, None, false);
 element!(dl, None, false);
 element!(section, None, false);
 element!(input, None, true);
-element!(output, None, false);
 element!(legend, None, false);
 element!(option, None, false);
 element!(optgroup, None, false);
@@ -93,7 +141,6 @@ element!(h5, None, false);
 element!(h6, None, false);
 element!(title, None, false);
 element!(link, None, true);
-element!(style, None, false);
 element!(script, None, false);
 element!(noscript, None, false);
 element!(meta, None, true);

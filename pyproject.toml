@@ -79,7 +79,7 @@ known-third-party = ["examples"]
 python_version = "3.12"
 strict = true
 disallow_subclassing_any = false
-plugins = "ludic/mypy_plugin.py"
+# plugins = "ludic/mypy_plugin.py"
 
 [tool.pytest.ini_options]
 testpaths = "tests"

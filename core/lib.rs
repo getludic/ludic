@@ -29,7 +29,7 @@ fn ludicrous(root: &Bound<'_, PyModule>) -> PyResult<()> {
     root.add_class::<elements::dl>()?;
     root.add_class::<elements::section>()?;
     root.add_class::<elements::input>()?;
-    root.add_class::<elements::output>()?;
+    root.add_class::<elements::output_>()?;
     root.add_class::<elements::legend>()?;
     root.add_class::<elements::option>()?;
     root.add_class::<elements::optgroup>()?;

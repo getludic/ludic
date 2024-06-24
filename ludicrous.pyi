@@ -1,5 +1,64 @@
-from collections.abc import Mapping, MutableMapping, Sequence
-from typing import Any
+from collections.abc import Callable, Mapping, MutableMapping, Sequence
+from typing import Any, Unpack
+
+from ludic.attrs import (
+    AreaAttrs,
+    AudioAttrs,
+    BaseAttrs,
+    BlockquoteAttrs,
+    ButtonAttrs,
+    CanvasAttrs,
+    CircleAttrs,
+    ColAttrs,
+    DataAttrs,
+    DelAttrs,
+    DetailsAttrs,
+    DialogAttrs,
+    EmbedAttrs,
+    FieldsetAttrs,
+    FormAttrs,
+    GlobalAttrs,
+    HeadLinkAttrs,
+    HtmlAttrs,
+    HtmlTagAttrs,
+    HyperlinkAttrs,
+    IframeAttrs,
+    ImgAttrs,
+    InputAttrs,
+    InsAttrs,
+    LabelAttrs,
+    LiAttrs,
+    LineAttrs,
+    MapAttrs,
+    MetaAttrs,
+    MeterAttrs,
+    NoAttrs,
+    ObjectAttrs,
+    OlAttrs,
+    OptgroupAttrs,
+    OptionAttrs,
+    OutputAttrs,
+    ParamAttrs,
+    PathAttrs,
+    PolylineAttrs,
+    ProgressAttrs,
+    QAttrs,
+    ScriptAttrs,
+    SelectAttrs,
+    SourceAttrs,
+    StyleAttrs,
+    SvgAttrs,
+    TdAttrs,
+    TextAreaAttrs,
+    ThAttrs,
+    TimeAttrs,
+    TrackAttrs,
+    VideoAttrs,
+)
+from ludic.styles import Theme
+from ludic.styles.types import GlobalStyles
+from ludic.types import AnyChildren, ComplexChildren, NoChildren, PrimitiveChildren
+
 
 class BaseElement:
     html_header: str | None
@@ -22,352 +81,727 @@ class BaseElement:
     def to_html(self) -> str: ...
 
 class div(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> div: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> div: ...
 
 class span(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> span: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> span: ...
 
 class main(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> main: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> main: ...
 
 class p(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> p: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> p: ...
 
 class a(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> a: ...
+    children: tuple[AnyChildren, ...]
+    attrs: HyperlinkAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[HyperlinkAttrs]) -> a: ...
 
 class br(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> br: ...
+    children: tuple[NoChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[GlobalAttrs]) -> br: ...
 
 class button(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> button: ...
+    children: tuple[AnyChildren, ...]
+    attrs: ButtonAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[ButtonAttrs]) -> button: ...
 
 class label(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> label: ...
+    children: tuple[AnyChildren, ...]
+    attrs: LabelAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[LabelAttrs]) -> label: ...
 
 class td(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> td: ...
+    children: tuple[AnyChildren, ...]
+    attrs: TdAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[TdAttrs]) -> td: ...
 
 class th(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> th: ...
+    children: tuple[AnyChildren, ...]
+    attrs: ThAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[ThAttrs]) -> th: ...
 
 class tr(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> tr: ...
+    children: tuple[ComplexChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: ComplexChildren, **attrs: Unpack[GlobalAttrs]) -> tr: ...
 
 class thead(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> thead: ...
+    children: tuple[ComplexChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: ComplexChildren, **attrs: Unpack[GlobalAttrs]) -> thead: ...
 
 class tbody(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> tbody: ...
+    children: tuple[ComplexChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: ComplexChildren, **attrs: Unpack[GlobalAttrs]) -> tbody: ...
 
 class tfoot(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> tfoot: ...
+    children: tuple[ComplexChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: ComplexChildren, **attrs: Unpack[GlobalAttrs]) -> tfoot: ...
 
 class table(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> table: ...
+    children: tuple[ComplexChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: ComplexChildren, **attrs: Unpack[GlobalAttrs]) -> table: ...
 
 class li(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> li: ...
+    children: tuple[AnyChildren, ...]
+    attrs: LiAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[LiAttrs]) -> li: ...
 
 class ul(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> ul: ...
+    children: tuple[ComplexChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: ComplexChildren, **attrs: Unpack[GlobalAttrs]) -> ul: ...
 
 class ol(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> ol: ...
+    children: tuple[ComplexChildren, ...]
+    attrs: OlAttrs
+
+    def __new__(*children: ComplexChildren, **attrs: Unpack[OlAttrs]) -> ol: ...
 
 class dt(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> dt: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> dt: ...
 
 class dd(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> dd: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> dd: ...
 
 class dl(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> dl: ...
+    children: tuple[ComplexChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: ComplexChildren, **attrs: Unpack[GlobalAttrs]) -> dl: ...
 
 class section(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> section: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> section: ...
 
 class input(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> input: ...
+    children: tuple[NoChildren, ...]
+    attrs: InputAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[InputAttrs]) -> input: ...
 
 class output(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> output: ...
+    children: tuple[NoChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[OutputAttrs]) -> output: ...
 
 class legend(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> legend: ...
+    children: tuple[PrimitiveChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(
+        *children: PrimitiveChildren, **attrs: Unpack[GlobalAttrs]
+    ) -> legend: ...
 
 class option(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> option: ...
+    children: tuple[PrimitiveChildren, ...]
+    attrs: OptionAttrs
+
+    def __new__(
+        *children: PrimitiveChildren, **attrs: Unpack[OptionAttrs]
+    ) -> option: ...
 
 class optgroup(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> optgroup: ...
+    children: tuple[AnyChildren, ...]
+    attrs: OptgroupAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[OptgroupAttrs]) -> optgroup: ...
 
 class select(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> select: ...
+    children: tuple[AnyChildren, ...]
+    attrs: SelectAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[SelectAttrs]) -> select: ...
 
 class textarea(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> textarea: ...
+    children: tuple[PrimitiveChildren, ...]
+    attrs: TextAreaAttrs
+
+    def __new__(
+        *children: PrimitiveChildren, **attrs: Unpack[TextAreaAttrs]
+    ) -> textarea: ...
 
 class fieldset(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> fieldset: ...
+    children: tuple[AnyChildren, ...]
+    attrs: FieldsetAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[FieldsetAttrs]) -> fieldset: ...
 
 class form(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> form: ...
+    children: tuple[AnyChildren, ...]
+    attrs: FormAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[FormAttrs]) -> form: ...
 
 class img(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> img: ...
+    children: tuple[NoChildren, ...]
+    attrs: ImgAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[ImgAttrs]) -> img: ...
 
 class svg(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> svg: ...
+    children: tuple[AnyChildren, ...]
+    attrs: SvgAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[SvgAttrs]) -> svg: ...
 
 class circle(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> circle: ...
+    children: tuple[AnyChildren, ...]
+    attrs: CircleAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[CircleAttrs]) -> circle: ...
 
 class line(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> line: ...
+    children: tuple[AnyChildren, ...]
+    attrs: LineAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[LineAttrs]) -> line: ...
 
 class path(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> path: ...
+    children: tuple[AnyChildren, ...]
+    attrs: PathAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[PathAttrs]) -> path: ...
 
 class polyline(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> polyline: ...
+    children: tuple[AnyChildren, ...]
+    attrs: PolylineAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[PolylineAttrs]) -> polyline: ...
 
 class b(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> b: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> b: ...
 
 class i(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> i: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> i: ...
 
 class s(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> s: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> s: ...
 
 class u(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> u: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> u: ...
 
 class strong(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> strong: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> strong: ...
+
+class style(BaseElement):
+    children: tuple[GlobalStyles | Callable[[Theme], GlobalStyles] | str]
+    attrs: StyleAttrs
+
+    def __init__(
+        self,
+        styles: GlobalStyles | Callable[[Theme], GlobalStyles] | str,
+        theme: Theme | None = None,
+        **attrs: Unpack[StyleAttrs],
+    ) -> None:
+        ...
 
 class em(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> em: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> em: ...
 
 class mark(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> mark: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> mark: ...
 
 class del_(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> del_: ...
+    children: tuple[AnyChildren, ...]
+    attrs: DelAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[DelAttrs]) -> del_: ...
 
 class ins(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> ins: ...
+    children: tuple[AnyChildren, ...]
+    attrs: InsAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[InsAttrs]) -> ins: ...
 
 class header(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> header: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> header: ...
 
 class big(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> big: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> big: ...
 
 class small(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> small: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> small: ...
 
 class code(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> code: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> code: ...
 
 class pre(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> pre: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> pre: ...
 
 class cite(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> cite: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> cite: ...
 
 class blockquote(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> blockquote: ...
+    children: tuple[AnyChildren, ...]
+    attrs: BlockquoteAttrs
+
+    def __new__(
+        *children: AnyChildren, **attrs: Unpack[BlockquoteAttrs]
+    ) -> blockquote: ...
 
 class abbr(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> abbr: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> abbr: ...
 
 class h1(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> h1: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> h1: ...
 
 class h2(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> h2: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> h2: ...
 
 class h3(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> h3: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> h3: ...
 
 class h4(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> h4: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> h4: ...
 
 class h5(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> h5: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> h5: ...
 
 class h6(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> h6: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> h6: ...
 
 class title(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> title: ...
+    children: tuple[PrimitiveChildren, ...]
+    attrs: NoAttrs
+
+    def __new__(*children: PrimitiveChildren, **attrs: Unpack[NoAttrs]) -> title: ...
 
 class link(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> link: ...
+    children: tuple[NoChildren, ...]
+    attrs: HeadLinkAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[HeadLinkAttrs]) -> link: ...
 
 class script(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> script: ...
+    children: tuple[PrimitiveChildren, ...]
+    attrs: ScriptAttrs
+
+    def __new__(
+        *children: PrimitiveChildren, **attrs: Unpack[ScriptAttrs]
+    ) -> script: ...
 
 class noscript(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> noscript: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> noscript: ...
 
 class meta(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> meta: ...
+    children: tuple[NoChildren, ...]
+    attrs: MetaAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[MetaAttrs]) -> meta: ...
 
 class head(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> head: ...
+    children: tuple[AnyChildren, ...]
+    attrs: NoAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[NoAttrs]) -> head: ...
 
 class body(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> body: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> body: ...
 
 class footer(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> footer: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> footer: ...
 
 class html(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> html: ...
+    children: tuple[head, body]
+    attrs: HtmlTagAttrs
+
+    def __new__(
+        *children: *tuple[head, body], **attrs: Unpack[HtmlTagAttrs]
+    ) -> html: ...
 
 class iframe(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> iframe: ...
+    children: tuple[NoChildren, ...]
+    attrs: IframeAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[IframeAttrs]) -> iframe: ...
 
 class article(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> article: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> article: ...
 
 class address(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> address: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> address: ...
 
 class caption(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> caption: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> caption: ...
 
 class col(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> col: ...
+    children: tuple[NoChildren, ...]
+    attrs: ColAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[ColAttrs]) -> col: ...
 
 class colgroup(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> colgroup: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> colgroup: ...
 
 class area(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> area: ...
+    children: tuple[NoChildren, ...]
+    attrs: AreaAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[AreaAttrs]) -> area: ...
 
 class aside(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> aside: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> aside: ...
 
 class source(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> source: ...
+    children: tuple[NoChildren, ...]
+    attrs: SourceAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[SourceAttrs]) -> source: ...
 
 class audio(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> audio: ...
+    children: tuple[AnyChildren, ...]
+    attrs: AudioAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[AudioAttrs]) -> audio: ...
 
 class base(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> base: ...
+    children: tuple[NoChildren, ...]
+    attrs: BaseAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[BaseAttrs]) -> base: ...
 
 class bdi(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> bdi: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> bdi: ...
 
 class bdo(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> bdo: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> bdo: ...
 
 class canvas(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> canvas: ...
+    children: tuple[AnyChildren, ...]
+    attrs: CanvasAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[CanvasAttrs]) -> canvas: ...
 
 class data(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> data: ...
+    children: tuple[AnyChildren, ...]
+    attrs: DataAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[DataAttrs]) -> data: ...
 
 class datalist(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> datalist: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> datalist: ...
 
 class details(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> details: ...
+    children: tuple[AnyChildren, ...]
+    attrs: DetailsAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[DetailsAttrs]) -> details: ...
 
 class dfn(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> dfn: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> dfn: ...
 
 class dialog(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> dialog: ...
+    children: tuple[AnyChildren, ...]
+    attrs: DialogAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[DialogAttrs]) -> dialog: ...
 
 class embed(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> embed: ...
+    children: tuple[AnyChildren, ...]
+    attrs: EmbedAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[EmbedAttrs]) -> embed: ...
 
 class figcaption(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> figcaption: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> figcaption: ...
 
 class figure(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> figure: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> figure: ...
 
 class hrgroup(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> hrgroup: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> hrgroup: ...
 
 class hr(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> hr: ...
+    children: tuple[NoChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[GlobalAttrs]) -> hr: ...
 
 class kbd(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> kbd: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> kbd: ...
 
 class map(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> map: ...
+    children: tuple[AnyChildren, ...]
+    attrs: MapAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[MapAttrs]) -> map: ...
 
 class menu(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> menu: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> menu: ...
 
 class meter(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> meter: ...
+    children: tuple[AnyChildren, ...]
+    attrs: MeterAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[MeterAttrs]) -> meter: ...
 
 class nav(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> nav: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> nav: ...
 
 class object(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> object: ...
+    children: tuple[AnyChildren, ...]
+    attrs: ObjectAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[ObjectAttrs]) -> object: ...
 
 class param(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> param: ...
+    children: tuple[NoChildren, ...]
+    attrs: ParamAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[ParamAttrs]) -> param: ...
 
 class picture(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> picture: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> picture: ...
 
 class progress(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> progress: ...
+    children: tuple[AnyChildren, ...]
+    attrs: ProgressAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[ProgressAttrs]) -> progress: ...
 
 class q(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> q: ...
+    children: tuple[AnyChildren, ...]
+    attrs: QAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[QAttrs]) -> q: ...
 
 class rp(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> rp: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> rp: ...
 
 class rt(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> rt: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> rt: ...
 
 class ruby(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> ruby: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> ruby: ...
 
 class samp(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> samp: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> samp: ...
 
 class search(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> search: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> search: ...
 
 class sub(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> sub: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> sub: ...
 
 class summary(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> summary: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> summary: ...
 
 class sup(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> sup: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> sup: ...
 
 class template(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> template: ...
+    children: tuple[AnyChildren, ...]
+    attrs: HtmlAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[HtmlAttrs]) -> template: ...
 
 class time(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> time: ...
+    children: tuple[AnyChildren, ...]
+    attrs: TimeAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[TimeAttrs]) -> time: ...
 
 class track(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> track: ...
+    children: tuple[NoChildren, ...]
+    attrs: TrackAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[TrackAttrs]) -> track: ...
 
 class var(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> var: ...
+    children: tuple[AnyChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[GlobalAttrs]) -> var: ...
 
 class video(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> video: ...
+    children: tuple[AnyChildren, ...]
+    attrs: VideoAttrs
+
+    def __new__(*children: AnyChildren, **attrs: Unpack[VideoAttrs]) -> video: ...
 
 class wbr(BaseElement):
-    def __new__(*children: Any, **attrs: Any) -> wbr: ...
+    children: tuple[NoChildren, ...]
+    attrs: GlobalAttrs
+
+    def __new__(*children: NoChildren, **attrs: Unpack[GlobalAttrs]) -> wbr: ...

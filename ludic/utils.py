@@ -1,3 +1,4 @@
+import inspect
 from collections.abc import Hashable
 from functools import lru_cache
 from typing import (
@@ -49,7 +50,19 @@ def get_element_attrs_annotations(
     Returns:
         dict[str, Any]: The attributes' annotations of the element.
     """
-    if (args := get_element_generic_args(obj_or_type)) is not None:
+    from ludic.base import BaseElement
+    from ludic.html import _ATTRS_MAPPING
+
+    if not inspect.isclass(obj_or_type):
+        type_ = type(obj_or_type)
+
+    if (
+        issubclass(type_, BaseElement)
+        and getattr(type_, "__module__", "") == "builtins"
+        and (attrs := _ATTRS_MAPPING.get(getattr(type_, "__name__", "")))
+    ):
+        return get_type_hints(attrs, include_extras=include_extras)
+    elif (args := get_element_generic_args(type_)) is not None:
         return get_type_hints(args[-1], include_extras=include_extras)
     return {}
 

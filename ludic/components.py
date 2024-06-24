@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from collections.abc import MutableMapping, Sequence
+from collections.abc import Mapping, MutableMapping, Sequence
 from typing import Any, ClassVar, Generic, Unpack, override
 
 from .attrs import GlobalAttrs, NoAttrs
@@ -13,9 +13,13 @@ from .utils import get_element_attrs_annotations
 COMPONENT_REGISTRY: MutableMapping[str, list[type["BaseComponent"]]] = {}
 
 
-class BaseComponent(BaseElement, metaclass=ABCMeta):
+class BaseComponent(metaclass=ABCMeta):
     classes: ClassVar[Sequence[str]] = []
     styles: ClassVar[types.GlobalStyles] = {}
+
+    children: Sequence[Any]
+    attrs: Mapping[str, Any]
+    context: MutableMapping[str, Any]
 
     def __init__(self, *children: Any, **attrs: Any) -> None:
         self.children = children
@@ -24,6 +28,9 @@ class BaseComponent(BaseElement, metaclass=ABCMeta):
     def __init_subclass__(cls) -> None:
         COMPONENT_REGISTRY.setdefault(cls.__name__, [])
         COMPONENT_REGISTRY[cls.__name__].append(cls)
+
+    def __len__(self) -> int:
+        return len(self.children)
 
     def __str__(self) -> str:
         return self.to_html()
@@ -43,6 +50,14 @@ class BaseComponent(BaseElement, metaclass=ABCMeta):
             if isinstance(context_theme, Theme):
                 return context_theme
         return get_default_theme()
+
+    def has_attributes(self) -> bool:
+        return bool(self.attrs)
+
+    def is_simple(self) -> bool:
+        return len(self) == 1 and all(
+            isinstance(child, str | int | bool | float) for child in self.children
+        )
 
     def to_string(self, pretty: bool = True, _level: int = 0) -> str:
         """Convert the element tree to a string representation.
@@ -74,7 +89,7 @@ class BaseComponent(BaseElement, metaclass=ABCMeta):
         return element
 
     def to_html(self) -> str:
-        dom: BaseElement = self
+        dom: BaseElement | BaseComponent = self
         classes: list[str] = []
 
         while isinstance(dom, BaseComponent):
