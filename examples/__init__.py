@@ -5,10 +5,10 @@ from ludic.attrs import NoAttrs
 from ludic.catalog.layouts import Center, Stack
 from ludic.catalog.pages import Body, Head, HtmlPage
 from ludic.html import meta
-from ludic.types import (
-    AnyChildren,
-    Component,
-)
+from ludic.styles import set_default_theme, themes, types
+from ludic.types import AnyChildren, Component
+
+set_default_theme(themes.LightTheme(measure=types.Size(90, "ch")))
 
 
 @dataclass
