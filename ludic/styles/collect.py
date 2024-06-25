@@ -1,11 +1,10 @@
 from collections.abc import Mapping, MutableMapping
-from typing import TYPE_CHECKING, Any
+from typing import Any
+
+from ludic.base import BaseElement
 
 from .themes import Theme, get_default_theme
 from .types import CSSProperties, GlobalStyles
-
-if TYPE_CHECKING:
-    from ludic.types import BaseElement
 
 GLOBAL_STYLES_CACHE: MutableMapping[str, GlobalStyles] = {}
 
@@ -95,7 +94,7 @@ def from_loaded(cache: bool = False, theme: Theme | None = None) -> GlobalStyles
     Returns:
         GlobalStyles: Collected styles from loaded components.
     """
-    from ludic.base import ELEMENT_REGISTRY
+    from ludic.components import COMPONENT_REGISTRY
 
     global GLOBAL_STYLES_CACHE
     theme = theme or get_default_theme()
@@ -103,7 +102,9 @@ def from_loaded(cache: bool = False, theme: Theme | None = None) -> GlobalStyles
     if cache and GLOBAL_STYLES_CACHE.get(theme.name):
         return GLOBAL_STYLES_CACHE[theme.name]
 
-    loaded = (element for elements in ELEMENT_REGISTRY.values() for element in elements)
+    loaded = (
+        element for elements in COMPONENT_REGISTRY.values() for element in elements
+    )
     result = from_components(*loaded, theme=theme)
     if cache:
         GLOBAL_STYLES_CACHE[theme.name] = result

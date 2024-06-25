@@ -1,9 +1,9 @@
 from typing import override
 
 from ludic.attrs import GlobalAttrs, ImgAttrs
-from ludic.base import AnyChildren
+from ludic.components import Component, ComponentStrict
 from ludic.html import img, span, style
-from ludic.types import Component, ComponentStrict, NoChildren
+from ludic.types import AnyChildren, NoChildren
 
 
 class Icon(Component[NoChildren, ImgAttrs]):

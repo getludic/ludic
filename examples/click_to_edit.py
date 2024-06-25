@@ -2,13 +2,13 @@ from typing import Annotated, NotRequired, Self, override
 
 from examples import Page, init_db
 
+from ludic.attrs import Attrs
 from ludic.catalog.buttons import Button, ButtonDanger, ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form, create_fields
 from ludic.catalog.headers import H1, H2
 from ludic.catalog.items import Pairs
 from ludic.catalog.layouts import Box, Cluster, Stack
 from ludic.catalog.quotes import Quote
-from ludic.types import Attrs
 from ludic.web import Endpoint, LudicApp
 from ludic.web.exceptions import NotFoundError
 from ludic.web.parsers import Parser, ValidationError

@@ -2,8 +2,10 @@ import json
 from typing import override
 
 from ludic.attrs import Attrs, NoAttrs
+from ludic.base import BaseElement
+from ludic.components import Component, ComponentStrict
 from ludic.html import body, head, html, link, meta, script, style, title
-from ludic.types import AnyChildren, BaseElement, Component, ComponentStrict
+from ludic.types import AnyChildren
 
 
 class HtmlHeadAttrs(Attrs, total=False):

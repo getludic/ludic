@@ -1,8 +1,9 @@
 from typing import override
 
 from ludic.attrs import ButtonAttrs
+from ludic.components import ComponentStrict
 from ludic.html import button, style
-from ludic.types import ComponentStrict, PrimitiveChildren
+from ludic.types import PrimitiveChildren
 
 from .typography import Link
 

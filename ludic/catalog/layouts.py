@@ -1,8 +1,9 @@
 from typing import override
 
 from ludic.attrs import GlobalAttrs
+from ludic.components import Block, ComponentStrict, Inline
 from ludic.html import div, style
-from ludic.types import AnyChildren, ComponentStrict
+from ludic.types import AnyChildren
 
 
 class Stack(div):
@@ -53,7 +54,7 @@ class Stack(div):
     )
 
 
-class Box(div):
+class Box(Block):
     """A component which applies padding from all sides.
 
     Thus the inner content of the `Box` is spaced in all directions equally.
@@ -102,7 +103,7 @@ class Box(div):
     )
 
 
-class Center(div):
+class Center(Block):
     """A component which horizontally centers its children.
 
     Example usage:
@@ -127,7 +128,7 @@ class Center(div):
     )
 
 
-class Cluster(div):
+class Cluster(Inline):
     """A component for inline children to be rendered in a row.
 
     All contained children have a space (margin) between them.
@@ -166,7 +167,7 @@ class Cluster(div):
     )
 
 
-class Sidebar(div):
+class Sidebar(Block):
     """The sidebar part of a WithSidebar component."""
 
     classes = ["sidebar"]
@@ -221,7 +222,7 @@ class WithSidebar(ComponentStrict[AnyChildren, AnyChildren, GlobalAttrs]):
         return div(self.children[0], self.children[1], **self.attrs)
 
 
-class Switcher(div):
+class Switcher(Block):
     """A component switching between horizontal and vertical layouts.
 
     All the children are either composed horizontally or vertically
@@ -260,7 +261,7 @@ class Switcher(div):
     )
 
 
-class Cover(div):
+class Cover(Block):
     """A component which covers the whole viewport.
 
     Example usage:
@@ -295,7 +296,7 @@ class Cover(div):
     )
 
 
-class Grid(div):
+class Grid(Block):
     """A component which creates a grid layout.
 
     Example usage:
@@ -328,7 +329,7 @@ class Grid(div):
     )
 
 
-class Frame(div):
+class Frame(Block):
     """A component which creates a frame layout.
 
     Example usage:

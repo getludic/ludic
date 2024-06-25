@@ -1,8 +1,9 @@
 from typing import NotRequired, override
 
 from ludic.attrs import GlobalAttrs
+from ludic.components import Component, ComponentStrict
 from ludic.html import h2, li, nav, style, ul
-from ludic.types import Component, ComponentStrict, PrimitiveChildren
+from ludic.types import PrimitiveChildren
 
 from .buttons import ButtonLink
 

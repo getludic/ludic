@@ -1,8 +1,8 @@
 from typing import override
 
 from ludic.attrs import Attrs, GlobalAttrs
+from ludic.components import Component, ComponentStrict
 from ludic.html import a, div, h1, h2, h3, h4, style
-from ludic.types import Component, ComponentStrict
 
 from .utils import text_to_kebab
 

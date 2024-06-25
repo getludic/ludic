@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterator
-from typing import Self, Unpack, override
+from typing import Self, Unpack
 
 from .attrs import (
     AreaAttrs,
@@ -55,6 +55,8 @@ from .attrs import (
     TrackAttrs,
     VideoAttrs,
 )
+from .base import BaseElement
+from .elements import Element, ElementStrict
 from .styles import (
     Theme,
     format_styles,
@@ -63,11 +65,8 @@ from .styles import (
 )
 from .types import (
     AnyChildren,
-    BaseElement,
     ComplexChildren,
     CSSProperties,
-    Element,
-    ElementStrict,
     GlobalStyles,
     NoChildren,
     PrimitiveChildren,
@@ -579,7 +578,7 @@ class style(BaseElement, GlobalStyles):
         if isinstance(self.children[0], str):
             return {}
         elif callable(self.children[0]):
-            return self.children[0](self.theme)
+            return self.children[0](self.context["theme"])
         else:
             return self.children[0]
 
@@ -588,28 +587,20 @@ class style(BaseElement, GlobalStyles):
         self.children = (value,)
 
     def to_html(self) -> str:
-        dom: BaseElement = self
-        while dom != (rendered_dom := dom.render()):
-            dom = rendered_dom
-
         attributes = ""
-        if formatted_attrs := dom._format_attributes():
+        if formatted_attrs := self._format_attributes():
             attributes = f" {formatted_attrs}"
 
-        if isinstance(dom.children[0], str):
+        if isinstance(self.children[0], str):
             css_styles = self.children[0]
         else:
             css_styles = format_styles(self.styles)
 
         return (
-            f"<{dom.html_name}{attributes}>\n"
+            f"<{self.html_name}{attributes}>\n"
             f"{css_styles}\n"
-            f"</{dom.html_name}>"
+            f"</{self.html_name}>"
         )  # fmt: off
-
-    @override
-    def render(self) -> BaseElement:
-        return self
 
 
 class script(Element[PrimitiveChildren, ScriptAttrs]):
