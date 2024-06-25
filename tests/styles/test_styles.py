@@ -1,5 +1,7 @@
+from ludic.attrs import Attrs
+from ludic.components import Component
 from ludic.html import style
-from ludic.types import AnyChildren, Attrs, Component
+from ludic.types import AnyChildren
 
 from . import FooTheme
 

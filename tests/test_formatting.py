@@ -1,7 +1,7 @@
+from ludic.base import BaseElement
 from ludic.catalog.typography import Link, Paragraph
 from ludic.format import FormatContext, format_attr_value
 from ludic.html import b, div, i, p, strong
-from ludic.types import BaseElement
 
 
 def test_format_attr_value() -> None:

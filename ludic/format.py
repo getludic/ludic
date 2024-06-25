@@ -3,13 +3,14 @@ import random
 import re
 from collections.abc import Mapping
 from contextvars import ContextVar
-from typing import Annotated, Any, Final, TypeVar, get_args, get_origin
-
-from .utils import get_element_attrs_annotations
-
-EXTRACT_NUMBER_RE: Final[re.Pattern[str]] = re.compile(r"\{(\d+:id)\}")
+from typing import Any, Final, TypeVar
 
 T = TypeVar("T")
+
+_EXTRACT_NUMBER_RE: Final[re.Pattern[str]] = re.compile(r"\{(\d+:id)\}")
+_ALIASES: Final[dict[str, str]] = {
+    "classes": "class",
+}
 
 
 def format_attr_value(key: str, value: Any, is_html: bool = False) -> str:
@@ -50,49 +51,30 @@ def format_attr_value(key: str, value: Any, is_html: bool = False) -> str:
     return formatted_value
 
 
-def format_attrs(
-    attrs_type: Any, attrs: Mapping[str, Any], is_html: bool = False
-) -> dict[str, Any]:
-    """Format the given attributes according to the element's attributes.
-
-    Here is an example of TypedDict definition:
-
-        class PersonAttrs(TypedDict):
-            name: str
-            class_: Annotated[str, "class"]
-            is_adult: bool
-
-    And here is the attrs that will be formatted:
+def format_attrs(attrs: Mapping[str, Any], is_html: bool = False) -> dict[str, Any]:
+    """Format the given attributes.
 
         attrs = {"name": "John", "class_": "person", "is_adult": True}
 
     The result will be:
 
-        >>> format_attrs(PersonAttrs, attrs)
+        >>> format_attrs(attrs)
         >>> {"name": "John", "class": "person"}
 
     Args:
-        attrs_type (Any): The element.
         attrs (dict[str, Any]): The attributes to format.
 
     Returns:
         dict[str, Any]: The formatted attributes.
     """
-    hints = get_element_attrs_annotations(attrs_type, include_extras=True)
-
-    def _get_key(key: str) -> str:
-        if key in hints and get_origin(hints[key]) is Annotated:
-            args = get_args(hints[key])
-            if len(args) > 1 and isinstance(args[1], str):
-                return args[1]
-        elif key.startswith("data_"):
-            return f"data-{key[5:]}"
-        return key
-
     result: dict[str, str] = {}
     for key, value in attrs.items():
         if formatted_value := format_attr_value(key, value, is_html=is_html):
-            alias = _get_key(key)
+            if key in _ALIASES:
+                alias = _ALIASES[key]
+            else:
+                alias = key.strip("_").replace("_", "-")
+
             if alias in result:
                 result[alias] += " " + formatted_value
             else:
@@ -129,7 +111,7 @@ def extract_identifiers(text: str) -> list[str | int]:
     Returns:
         Iterable[int]: The extracted numbers.
     """
-    parts = [_extract_match(match) for match in EXTRACT_NUMBER_RE.split(text) if match]
+    parts = [_extract_match(match) for match in _EXTRACT_NUMBER_RE.split(text) if match]
     if any(isinstance(part, int) for part in parts):
         return parts
     else:

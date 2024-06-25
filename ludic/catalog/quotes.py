@@ -1,8 +1,9 @@
 from typing import override
 
 from ludic.attrs import Attrs
+from ludic.base import BaseElement
+from ludic.components import ComponentStrict
 from ludic.html import a, blockquote, div, footer, p, style
-from ludic.types import BaseElement, ComponentStrict
 
 
 class QuoteAttrs(Attrs, total=False):

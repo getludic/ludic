@@ -116,8 +116,8 @@ cookiecutter gh:getludic/template
 ```python
 from typing import override
 
+from ludic import Attrs, Component
 from ludic.html import a
-from ludic.types import Attrs, Component
 
 class LinkAttrs(Attrs):
     to: str

@@ -1,8 +1,9 @@
 from typing import NotRequired, override
 
 from ludic.attrs import GlobalAttrs
+from ludic.components import Component
 from ludic.html import div, style
-from ludic.types import AnyChildren, Component, URLType
+from ludic.types import AnyChildren, URLType
 
 
 class Loading(Component[AnyChildren, GlobalAttrs]):

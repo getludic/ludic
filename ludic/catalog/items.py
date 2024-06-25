@@ -2,8 +2,9 @@ from collections.abc import Iterable
 from typing import override
 
 from ludic.attrs import GlobalAttrs
+from ludic.components import Component
 from ludic.html import dd, dl, dt
-from ludic.types import Component, PrimitiveChildren
+from ludic.types import PrimitiveChildren
 
 from .utils import attr_to_camel
 

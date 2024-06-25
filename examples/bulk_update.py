@@ -2,14 +2,15 @@ from typing import Annotated, Self, override
 
 from examples import Page, init_db
 
+from ludic.attrs import Attrs
 from ludic.catalog.buttons import ButtonPrimary
 from ludic.catalog.forms import FieldMeta, Form
 from ludic.catalog.headers import H1, H2
 from ludic.catalog.layouts import Cluster
 from ludic.catalog.quotes import Quote
 from ludic.catalog.tables import ColumnMeta, Table, create_rows
+from ludic.components import Inline
 from ludic.html import span, style
-from ludic.types import Attrs
 from ludic.web import Endpoint, LudicApp
 from ludic.web.parsers import ListParser
 
@@ -31,7 +32,7 @@ class PeopleAttrs(Attrs):
     people: list[PersonAttrs]
 
 
-class Toast(span):
+class Toast(Inline):
     id: str = "toast"
     target: str = f"#{id}"
     styles = style.use(

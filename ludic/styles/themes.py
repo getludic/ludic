@@ -1,11 +1,10 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, TypeVar
+from typing import TypeVar
+
+from ludic.base import BaseElement
 
 from .types import BaseSize, Color, ColorRange, Size, SizeClamp
-
-if TYPE_CHECKING:
-    from ludic.types import BaseElement
 
 _T = TypeVar("_T", bound="BaseElement")
 

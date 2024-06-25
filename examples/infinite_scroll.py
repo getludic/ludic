@@ -2,10 +2,12 @@ from typing import Self, override
 
 from examples import Page
 
+from ludic.attrs import Attrs
 from ludic.catalog.headers import H1, H2
 from ludic.catalog.quotes import Quote
 from ludic.catalog.tables import Table, TableHead, TableRow
-from ludic.types import Attrs, Blank, Component
+from ludic.components import Component
+from ludic.elements import Blank
 from ludic.web import Endpoint, LudicApp
 from ludic.web.datastructures import QueryParams
 

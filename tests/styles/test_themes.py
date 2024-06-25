@@ -1,6 +1,7 @@
 from typing import override
 
 from ludic.attrs import GlobalAttrs
+from ludic.components import Component
 from ludic.html import a, b, div, style
 from ludic.styles.themes import (
     Colors,
@@ -10,7 +11,6 @@ from ludic.styles.themes import (
     set_default_theme,
 )
 from ludic.styles.types import Color, Size, SizeClamp
-from ludic.types import Component
 
 from . import BarTheme, FooTheme
 

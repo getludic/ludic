@@ -17,7 +17,7 @@ from starlette.responses import (
 )
 from starlette.websockets import WebSocket
 
-from ludic.types import BaseElement
+from ludic.base import BaseElement
 from ludic.web import datastructures as ds
 from ludic.web.parsers import BaseParser
 

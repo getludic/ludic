@@ -13,7 +13,7 @@ from starlette.types import Lifespan
 from starlette.websockets import WebSocket
 
 from ludic.attrs import Attrs
-from ludic.types import BaseElement
+from ludic.base import BaseElement
 
 from .datastructures import URLPath
 from .endpoints import Endpoint

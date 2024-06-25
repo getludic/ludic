@@ -1,93 +1,20 @@
 from abc import ABCMeta
-from collections.abc import Iterator, Mapping, MutableMapping, Sequence
-from typing import (
-    Any,
-    ClassVar,
-    Generic,
-    Never,
-    TypeAlias,
-    TypedDict,
-    TypeVar,
-    TypeVarTuple,
-    Unpack,
-    cast,
-)
+from collections.abc import Iterator, Mapping, Sequence
+from typing import Any, ClassVar
 
 from .format import FormatContext, format_attrs, format_element
-from .styles import GlobalStyles, Theme, get_default_theme
-from .utils import get_element_attrs_annotations
-
-ELEMENT_REGISTRY: MutableMapping[str, list[type["BaseElement"]]] = {}
-
-
-class Safe(str):
-    """Marker for a string that is safe to use as is without HTML escaping.
-
-    That means the content of the string is not escaped when rendered.
-
-    Usage:
-
-        >>> div(Safe("Hello <b>World!</b>")).to_html()
-        '<div>Hello <b>World!</b></div>'
-    """
-
-    escape = False
-
-
-class JavaScript(Safe):
-    """Marker for a JavaScript string.
-
-    The content of this string is not escaped when rendered.
-
-    Usage:
-
-        js = JavaScript("alert('Hello World!')")
-    """
-
-
-class Attrs(TypedDict, total=False):
-    """Attributes of an element or component.
-
-    Example usage::
-
-        class PersonAttrs(Attributes):
-            name: str
-            age: NotRequired[int]
-
-        class Person(Component[PersonAttrs]):
-            @override
-            def render(self) -> dl:
-                return dl(
-                    dt("Name"),
-                    dd(self.attrs["name"]),
-                    dt("Age"),
-                    dd(self.attrs.get("age", "N/A")),
-                )
-    """
-
-
-class NoAttrs(TypedDict):
-    """Placeholder for element with no attributes."""
 
 
 class BaseElement(metaclass=ABCMeta):
     html_header: ClassVar[str | None] = None
     html_name: ClassVar[str | None] = None
-
     void_element: ClassVar[bool] = False
-    formatter: ClassVar[FormatContext] = FormatContext("element_formatter")
 
-    classes: ClassVar[Sequence[str]] = []
-    styles: ClassVar["GlobalStyles"] = {}
+    formatter: ClassVar[FormatContext] = FormatContext("element_formatter")
 
     children: Sequence[Any]
     attrs: Mapping[str, Any]
-
     context: dict[str, Any]
-
-    def __init_subclass__(cls) -> None:
-        ELEMENT_REGISTRY.setdefault(cls.__name__, [])
-        ELEMENT_REGISTRY[cls.__name__].append(cls)
 
     def __init__(self, *children: Any, **attrs: Any) -> None:
         self.context = {}
@@ -116,21 +43,8 @@ class BaseElement(metaclass=ABCMeta):
             and self.attrs == other.attrs
         )
 
-    def _format_attributes(
-        self, classes: list[str] | None = None, is_html: bool = False
-    ) -> str:
-        attrs: dict[str, Any]
-        if is_html:
-            attrs = format_attrs(type(self), self.attrs, is_html=True)
-        else:
-            attrs = self.aliased_attrs
-
-        if classes:
-            if "class" in attrs:
-                attrs["class"] += " " + " ".join(classes)
-            else:
-                attrs["class"] = " ".join(classes)
-
+    def _format_attributes(self, is_html: bool = False) -> str:
+        attrs: dict[str, Any] = format_attrs(self.attrs, is_html=is_html)
         return " ".join(
             f'{key}="{value}"' if '"' not in value else f"{key}='{value}'"
             for key, value in attrs.items()
@@ -147,20 +61,12 @@ class BaseElement(metaclass=ABCMeta):
     @property
     def aliased_attrs(self) -> dict[str, Any]:
         """Attributes as a dict with keys renamed to their aliases."""
-        return format_attrs(type(self), self.attrs)
+        return format_attrs(self.attrs)
 
     @property
     def text(self) -> str:
         """Get the text content of the element."""
         return "".join(getattr(child, "text", str(child)) for child in self.children)
-
-    @property
-    def theme(self) -> Theme:
-        """Get the theme of the element."""
-        if context_theme := self.context.get("theme"):
-            if isinstance(context_theme, Theme):
-                return context_theme
-        return get_default_theme()
 
     def is_simple(self) -> bool:
         """Check if the element is simple (i.e. contains only one primitive type)."""
@@ -206,123 +112,17 @@ class BaseElement(metaclass=ABCMeta):
 
     def to_html(self) -> str:
         """Convert an element tree to an HTML string."""
-        dom = self
-        classes = list(dom.classes)
+        element_tag = f"{self.html_header}\n" if self.html_header else ""
+        children_str = self._format_children() if self.children else ""
 
-        while id(dom) != id(rendered_dom := dom.render()):
-            rendered_dom.context.update(dom.context)
-            dom = rendered_dom
-            classes += dom.classes
-
-        element_tag = f"{dom.html_header}\n" if dom.html_header else ""
-        children_str = dom._format_children() if dom.children else ""
-
-        if dom.html_name == "__hidden__":
-            element_tag += children_str
-            return element_tag
-
-        element_tag += f"<{dom.html_name}"
-        if dom.has_attributes() or classes:
-            attributes_str = dom._format_attributes(classes, is_html=True)
+        element_tag += f"<{self.html_name}"
+        if self.has_attributes():
+            attributes_str = self._format_attributes(is_html=True)
             element_tag += f" {attributes_str}"
 
-        if dom.children or not dom.void_element:
-            element_tag += f">{children_str}</{dom.html_name}>"
+        if not self.void_element:
+            element_tag += f">{children_str}</{self.html_name}>"
         else:
             element_tag += ">"
 
         return element_tag
-
-    def attrs_for(self, cls: type["BaseElement"]) -> dict[str, Any]:
-        """Get the attributes of this component that are defined in the given element.
-
-        This is useful so that you can pass common attributes to an element
-        without having to pass them from a parent one by one.
-
-        Args:
-            cls (type[BaseElement]): The element to get the attributes of.
-
-        """
-        return {
-            key: value
-            for key, value in self.attrs.items()
-            if key in get_element_attrs_annotations(cls)
-        }
-
-    def render(self) -> "BaseElement":
-        return self
-
-
-NoChildren: TypeAlias = Never
-"""Type alias for elements that are not allowed to have children."""
-
-PrimitiveChildren: TypeAlias = str | bool | int | float
-"""Type alias for elements that are allowed to have only primitive children.
-
-Primitive children are ``str``, ``bool``, ``int`` and ``float``.
-"""
-
-ComplexChildren: TypeAlias = BaseElement
-"""Type alias for elements that are allowed to have only non-primitive children."""
-
-AnyChildren: TypeAlias = PrimitiveChildren | ComplexChildren | Safe
-"""Type alias for elements that are allowed to have any children."""
-
-TChildren = TypeVar("TChildren", bound=AnyChildren, covariant=True)
-"""Type variable for elements representing type of children (the type of *args).
-
-See also: :class:`ludic.types.Component`.
-"""
-
-TChildrenArgs = TypeVarTuple("TChildrenArgs")
-"""Type variable for strict elements representing type of children (the type of *args).
-
-See also: :class:`ludic.types.ComponentStrict`.
-"""
-
-TAttrs = TypeVar("TAttrs", bound=Attrs | NoAttrs, covariant=True)
-"""Type variable for elements representing type of attributes (the type of **kwargs)."""
-
-
-class Element(Generic[TChildren, TAttrs], BaseElement):
-    """Base class for Ludic elements.
-
-    Args:
-        *children (TChild): The children of the element.
-        **attrs (Unpack[TAttrs]): The attributes of the element.
-    """
-
-    children: tuple[TChildren, ...]
-    attrs: TAttrs
-
-    def __init__(
-        self,
-        *children: TChildren,
-        # FIXME: https://github.com/python/typing/issues/1399
-        **attributes: Unpack[TAttrs],  # type: ignore
-    ) -> None:
-        super().__init__()
-        self.attrs = cast(TAttrs, attributes)
-        self.children = tuple(self.formatter.extract(*children))
-
-
-class ElementStrict(Generic[*TChildrenArgs, TAttrs], BaseElement):
-    """Base class for strict elements (elements with concrete types of children).
-
-    Args:
-        *children (*TChildTuple): The children of the element.
-        **attrs (Unpack[TAttrs]): The attributes of the element.
-    """
-
-    children: tuple[*TChildrenArgs]
-    attrs: TAttrs
-
-    def __init__(
-        self,
-        *children: *TChildrenArgs,
-        # FIXME: https://github.com/python/typing/issues/1399
-        **attrs: Unpack[TAttrs],  # type: ignore
-    ) -> None:
-        super().__init__()
-        self.attrs = cast(TAttrs, attrs)
-        self.children = tuple(self.formatter.extract(*children))

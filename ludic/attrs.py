@@ -1,8 +1,6 @@
-from typing import Annotated, Literal, Protocol
+from typing import Annotated, Literal, Protocol, TypedDict
 
-from .base import Attrs as Attrs
-from .base import NoAttrs as NoAttrs
-from .styles import CSSProperties
+from .styles.types import CSSProperties
 
 
 class URLType(Protocol):
@@ -13,6 +11,31 @@ class URLType(Protocol):
 
 class Alias(str):
     """Alias type for attributes."""
+
+
+class Attrs(TypedDict, total=False):
+    """Attributes of an element or component.
+
+    Example usage::
+
+        class PersonAttrs(Attributes):
+            name: str
+            age: NotRequired[int]
+
+        class Person(Component[PersonAttrs]):
+            @override
+            def render(self) -> dl:
+                return dl(
+                    dt("Name"),
+                    dd(self.attrs["name"]),
+                    dt("Age"),
+                    dd(self.attrs.get("age", "N/A")),
+                )
+    """
+
+
+class NoAttrs(TypedDict):
+    """Placeholder for element with no attributes."""
 
 
 class HtmlAttrs(Attrs, total=False):
