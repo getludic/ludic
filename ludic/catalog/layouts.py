@@ -6,7 +6,7 @@ from ludic.html import div, style
 from ludic.types import AnyChildren
 
 
-class Stack(div):
+class Stack(Block):
     """Stack is a block component which renders its children with a space between them.
 
     Example usage:

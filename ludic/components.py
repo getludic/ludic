@@ -4,6 +4,7 @@ from typing import Any, ClassVar, override
 
 from .attrs import GlobalAttrs
 from .base import BaseElement
+from .elements import Blank as Blank
 from .elements import Element, ElementStrict
 from .html import div, span
 from .styles import Theme, get_default_theme
