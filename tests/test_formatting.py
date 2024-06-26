@@ -104,3 +104,16 @@ def test_attributes() -> None:
     assert format_attrs({"class_": "a b c", "classes": ["more", "classes"]}) == {
         "class": "a b c more classes"
     }
+
+    assert format_attrs(
+        {
+            "hx_on_htmx_before_request": "alert('test')",
+            "hx_on__after_request": "alert('test2')",
+        }
+    ) == {
+        "hx-on-htmx-before-request": "alert('test')",
+        "hx-on--after-request": "alert('test2')",
+    }
+    assert format_attrs(
+        {"hx-on:htmx:before-request": "alert('Making a request!')"}
+    ) == {"hx-on:htmx:before-request": "alert('Making a request!')"}

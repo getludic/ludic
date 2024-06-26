@@ -119,6 +119,13 @@ class HtmxAttrs(Attrs, total=False):
     hx_ws: Annotated[str, Alias("hx-ws")]
     hx_sse: Annotated[str, Alias("hx-sse")]
 
+    # Extensions
+    ws_connect: Annotated[str, Alias("ws-connect")]
+    ws_send: Annotated[str, Alias("ws-send")]
+    sse_connect: Annotated[str, Alias("sse-connect")]
+    sse_send: Annotated[str, Alias("sse-send")]
+    sse_swap: Annotated[str, Alias("sse-swap")]
+
 
 class WindowEventAttrs(Attrs, total=False):
     """Event Attributes for HTML elements."""

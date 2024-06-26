@@ -161,6 +161,17 @@ def test_data_attributes() -> None:
     assert dom.to_html() == '<div data-foo="1" data-bar="test">content</div>'
 
 
+def test_htmx_attributes() -> None:
+    assert html.button(
+        "Get Info!",
+        hx_get="/info", hx_on__before_request="alert('Making a request!')",
+    ).to_html() == (  # type: ignore
+        '<button hx-get="/info" hx-on--before-request="alert(\'Making a request!\')">'
+            "Get Info!"
+        "</button>"
+    )  # fmt: skip
+
+
 def test_all_elements() -> None:
     assert html.div("test", id="div").to_html() == '<div id="div">test</div>'
     assert html.span("test", id="span").to_html() == '<span id="span">test</span>'
