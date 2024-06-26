@@ -1,6 +1,6 @@
 from ludic.base import BaseElement
 from ludic.catalog.typography import Link, Paragraph
-from ludic.format import FormatContext, format_attr_value
+from ludic.format import FormatContext, format_attr_value, format_attrs
 from ludic.html import b, div, i, p, strong
 
 
@@ -91,3 +91,16 @@ def test_escaping_works() -> None:
 def test_quotes_not_escaped() -> None:
     dom = p("It's alive <3.")
     assert dom.to_html() == "<p>It's alive &lt;3.</p>"
+
+
+def test_attributes() -> None:
+    assert format_attrs({"checked": False}, is_html=True) == {}
+    assert format_attrs({"checked": True}, is_html=True) == {"checked": "checked"}
+
+    assert format_attrs({"on_click": "test"}) == {"onclick": "test"}
+    assert format_attrs({"hx_boost": True}) == {"hx-boost": "true"}
+    assert format_attrs({"for_": "value"}) == {"for": "value"}
+    assert format_attrs({"class_": "a b c"}) == {"class": "a b c"}
+    assert format_attrs({"class_": "a b c", "classes": ["more", "classes"]}) == {
+        "class": "a b c more classes"
+    }

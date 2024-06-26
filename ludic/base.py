@@ -66,7 +66,10 @@ class BaseElement(metaclass=ABCMeta):
     @property
     def text(self) -> str:
         """Get the text content of the element."""
-        return "".join(getattr(child, "text", str(child)) for child in self.children)
+        return "".join(
+            child.text if isinstance(child, BaseElement) else str(child)
+            for child in self.children
+        )
 
     def is_simple(self) -> bool:
         """Check if the element is simple (i.e. contains only one primitive type)."""

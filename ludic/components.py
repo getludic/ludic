@@ -33,10 +33,8 @@ class BaseComponent(BaseElement, metaclass=ABCMeta):
 
     def _add_classes(self, classes: list[str], element: BaseElement) -> None:
         if classes:
-            if "class_" in element.attrs:
-                element.attrs["class_"] += " " + " ".join(classes)  # type: ignore
-            else:
-                element.attrs["class_"] = " ".join(classes)  # type: ignore
+            element.attrs.setdefault("classes", [])  # type: ignore
+            element.attrs["classes"].extend(classes)
 
     def attrs_for(self, cls: type["BaseElement"]) -> dict[str, Any]:
         """Get the attributes of this component that are defined in the given element.

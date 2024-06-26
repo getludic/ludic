@@ -72,6 +72,8 @@ def format_attrs(attrs: Mapping[str, Any], is_html: bool = False) -> dict[str, A
         if formatted_value := format_attr_value(key, value, is_html=is_html):
             if key in _ALIASES:
                 alias = _ALIASES[key]
+            elif key.startswith("on_"):
+                alias = key.replace("on_", "on")
             else:
                 alias = key.strip("_").replace("_", "-")
 
