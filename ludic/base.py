@@ -22,7 +22,7 @@ class BaseElement(metaclass=ABCMeta):
         self.attrs = attrs
 
     def __str__(self) -> str:
-        return self.to_string()
+        return self.to_html()
 
     def __format__(self, _: str) -> str:
         return self.formatter.append(self)
