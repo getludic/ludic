@@ -142,10 +142,10 @@ def test_expand_nested() -> None:
     assert span_dom.to_html() == "<span><p>1</p><p>2</p><p>3</p></span>"
 
 
-def test_repr_and_str() -> None:
+def test_repr_and_str_and_to_string() -> None:
     dom = html.div(html.p(1), html.p(2), html.p(3), id="test")
-    assert repr(dom) == '<div id="test"><p>1</p><p>2</p><p>3</p></div>'
-    assert str(dom) == (
+    assert repr(dom) == str(dom) == '<div id="test"><p>1</p><p>2</p><p>3</p></div>'
+    assert dom.to_string() == (
         '<div id="test">\n'
         "  <p>1</p>\n"
         "  <p>2</p>\n"
