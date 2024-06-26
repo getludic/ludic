@@ -1,16 +1,34 @@
 import html
+import inspect
 import random
 import re
 from collections.abc import Mapping
 from contextvars import ContextVar
-from typing import Any, Final, TypeVar
+from functools import lru_cache
+from typing import Any, Final, TypeVar, get_type_hints
 
 T = TypeVar("T")
 
 _EXTRACT_NUMBER_RE: Final[re.Pattern[str]] = re.compile(r"\{(\d+:id)\}")
-_ALIASES: Final[dict[str, str]] = {
-    "classes": "class",
-}
+
+
+@lru_cache
+def _load_attrs_aliases() -> Mapping[str, str]:
+    from ludic import attrs
+
+    result = {}
+    for name, cls in inspect.getmembers(attrs, inspect.isclass):
+        if not name.endswith("Attrs"):
+            continue
+
+        hints = get_type_hints(cls, include_extras=True)
+        for key, value in hints.items():
+            if metadata := getattr(value, "__metadata__", None):
+                for meta in metadata:
+                    if isinstance(meta, attrs.Alias):
+                        result[key] = str(meta)
+
+    return result
 
 
 def format_attr_value(key: str, value: Any, is_html: bool = False) -> str:
@@ -67,13 +85,13 @@ def format_attrs(attrs: Mapping[str, Any], is_html: bool = False) -> dict[str, A
     Returns:
         dict[str, Any]: The formatted attributes.
     """
+    aliases = _load_attrs_aliases()
     result: dict[str, str] = {}
+
     for key, value in attrs.items():
         if formatted_value := format_attr_value(key, value, is_html=is_html):
-            if key in _ALIASES:
-                alias = _ALIASES[key]
-            elif key.startswith("on_"):
-                alias = key.replace("on_", "on")
+            if key in aliases:
+                alias = aliases[key]
             else:
                 alias = key.strip("_").replace("_", "-")
 
