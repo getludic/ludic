@@ -24,6 +24,9 @@ class BaseElement(metaclass=ABCMeta):
     def __str__(self) -> str:
         return self.to_html()
 
+    def __bytes__(self) -> bytes:
+        return self.to_html().encode("utf-8")
+
     def __format__(self, _: str) -> str:
         return self.formatter.append(self)
 
