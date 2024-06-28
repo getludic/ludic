@@ -2,6 +2,11 @@ from ludic import html
 from ludic.styles import CSSProperties
 
 
+def test_str_and_bytes() -> None:
+    assert str(html.a("str")) == "<a>str</a>"
+    assert bytes(html.p("str")) == b"<p>str</p>"
+
+
 def test_empty_element() -> None:
     dom = html.div()
     assert dom.to_html() == "<div></div>"
@@ -155,7 +160,7 @@ def test_repr_and_str_and_to_string() -> None:
 
 
 def test_data_attributes() -> None:
-    dom = html.div("content", data_foo="1", data_bar="test")  # type: ignore
+    dom = html.div("content", data_foo="1", data_bar="test")  # type: ignore[call-arg]
 
     assert dom.attrs == {"data_foo": "1", "data_bar": "test"}
     assert dom.to_html() == '<div data-foo="1" data-bar="test">content</div>'
@@ -165,7 +170,7 @@ def test_htmx_attributes() -> None:
     assert html.button(
         "Get Info!",
         hx_get="/info", hx_on__before_request="alert('Making a request!')",
-    ).to_html() == (  # type: ignore
+    ).to_html() == (  # type: ignore[call-arg]
         '<button hx-get="/info" hx-on--before-request="alert(\'Making a request!\')">'
             "Get Info!"
         "</button>"

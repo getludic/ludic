@@ -45,9 +45,10 @@ class Message(Component[AnyChildren, GlobalAttrs]):
             return div(
                 self.children[0],
                 div(*self.children[1:], classes=["content"]),
+                **self.attrs,
             )
         else:
-            return div(div(*self.children, classes=["content"]))
+            return div(div(*self.children, classes=["content"]), **self.attrs)
 
 
 class MessageSuccess(Message):

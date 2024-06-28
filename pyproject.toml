@@ -34,9 +34,13 @@ full = [
     "typeguard>=4.1.5",
     "pygments",
 ]
+django = [
+    "django",
+]
 dev = [
     "mypy",
     "types-pygments",
+    "django-stubs",
 ]
 test = [
     "pytest",
