@@ -110,11 +110,17 @@ class Parser(BaseParser[TAttrs]):
         Returns:
             dict[str, Any]: The parsed attributes.
         """
-        return {
-            key: self.parsers[key](value)
-            for key, value in self.form_data.items()
-            if key in self.parsers
-        }
+        result = {}
+        for key, value in self.form_data.items():
+            if key in self.parsers:
+                try:
+                    result[key] = self.parsers[key](value)
+                except Exception as e:
+                    raise ValidationError(
+                        f"Could not parse value {value!r} with parser "
+                        f"{self.parsers[key]!r}."
+                    ) from e
+        return result
 
     @override
     def validate(self) -> TAttrs:
@@ -158,7 +164,13 @@ class ListParser(BaseParser[TAttrs]):
                 if not id_name.startswith("_")
                 else {},
             )
-            result[id_value][key] = self.parsers[key](value)
+            try:
+                result[id_value][key] = self.parsers[key](value)
+            except Exception as e:
+                raise ValidationError(
+                    f"Could not parse value {value!r} with parser "
+                    f"{self.parsers[key]!r}."
+                ) from e
         return list(result.values())
 
     @override
