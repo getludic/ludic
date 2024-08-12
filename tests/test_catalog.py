@@ -1,4 +1,4 @@
-from ludic.catalog.forms import Form, InputField, TextAreaField
+from ludic.catalog.forms import ChoiceField, Form, InputField, TextAreaField
 from ludic.catalog.headers import H1, H2, H3, H4, Anchor
 from ludic.catalog.items import Key, Pairs, Value
 from ludic.catalog.messages import (
@@ -217,3 +217,26 @@ def test_messages() -> None:
     assert MessageDanger("test").to_html() == (
         '<div class="message danger"><div class="content">test</div></div>'
     )
+
+
+def test_choice_field() -> None:
+    assert ChoiceField(
+        choices=[("yes", "Yes"), ("no", "No")],
+        selected="yes",
+        name="yes_no",
+        label="Test",
+    ).to_html() == (
+        '<div class="form-field">'
+            '<p class="form-label">Test</p>'
+            '<div class="choice-field">'
+                '<input '
+                    'id="yes" value="yes" checked="checked" name="yes_no" type="radio"'
+                '>'
+                '<label for="yes">Yes</label>'
+            '</div>'
+            '<div class="choice-field">'
+                '<input id="no" value="no" name="yes_no" type="radio">'
+                '<label for="no">No</label>'
+            '</div>'
+        '</div>'
+    )  # fmt: skip
