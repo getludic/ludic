@@ -2,7 +2,7 @@
 
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
-from typing import Any, Literal, get_type_hints, override
+from typing import Any, Literal, NotRequired, get_type_hints, override
 
 from ludic.attrs import (
     Attrs,
@@ -13,6 +13,7 @@ from ludic.attrs import (
     TextAreaAttrs,
 )
 from ludic.base import BaseElement
+from ludic.catalog.typography import Paragraph
 from ludic.components import Component
 from ludic.html import div, form, input, label, option, select, style, textarea
 from ludic.types import (
@@ -210,6 +211,70 @@ class SelectField(FormField[Option, SelectFieldAttrs]):
         if text := self.attrs.get("label"):
             elements.append(self.create_label(text=text, for_=attrs.get("id", "")))
         elements.append(select(*self.children, **attrs))
+
+        return div(*elements)
+
+
+class ChoiceFieldAttrs(FieldAttrs, InputAttrs):
+    """Attributes of the component ``InputField``.
+
+    The attributes are subclassed from :class:`FieldAttrs` and :class:`InputAttrs`.
+    """
+
+    choices: list[tuple[str, str]]
+    selected: NotRequired[str]
+
+
+class ChoiceField(FormField[NoChildren, ChoiceFieldAttrs]):
+    """Represents the HTML ``input`` element with an optional ``label`` element."""
+
+    styles = style.use(
+        lambda theme: {
+            ".form-field p.form-label": {
+                "margin-block-end": theme.sizes.xxs,
+                "font-weight": "bold",
+            },
+            ".form-field * + *": {
+                "margin-block-start": theme.sizes.xxxxs,
+            },
+            ".form-field input[type=radio]": {
+                "inline-size": "auto",
+                "vertical-align": "middle",
+                "height": theme.sizes.m,
+                "margin-inline": theme.sizes.m,
+            },
+            ".form-field input[type=radio] + label": {
+                "display": "inline-block",
+                "height": theme.sizes.m,
+                "font-weight": "normal",
+                "margin-block": "0",
+            },
+        }
+    )
+
+    @override
+    def render(self) -> div:
+        attrs = self.attrs_for(input)
+        attrs.setdefault("type", "radio")
+
+        elements: list[ComplexChildren] = []
+
+        if text := self.attrs.get("label"):
+            elements.append(Paragraph(text, classes=["form-label"]))
+
+        for value, text in self.attrs["choices"]:
+            elements.append(
+                div(
+                    input(
+                        id=value,
+                        value=value,
+                        checked=bool(value and value == self.attrs.get("selected")),
+                        **attrs,
+                    ),
+                    label(text, for_=value),
+                    classes=["choice-field"],
+                )
+            )
 
         return div(*elements)
 
