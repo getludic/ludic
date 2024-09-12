@@ -93,6 +93,6 @@ class Page(Component[AnyChildren, NoAttrs]):
                     Stack(*self.children, id="content"),
                     style={"padding": self.theme.sizes.xxl},
                 ),
-                htmx_version="1.9.10",
+                htmx_version="2.0.2",
             ),
         )
