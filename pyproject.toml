@@ -48,6 +48,12 @@ test = [
     "httpx",
 ]
 
+[tool.hatch.envs.default]
+python = "3.12"
+platforms = ["linux", "macos"]
+description = "Default environment with Python 3.12 for maximum compatibility"
+features = ["dev", "full", "django", "test"]
+
 [tool.hatch.version]
 source = "vcs"
 

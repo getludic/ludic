@@ -15,10 +15,16 @@ pre-commit install --install-hooks
 
 If you're adding new features or fixing bugs, please include tests that cover your changes. Run `pytest` to execute the test suite.
 
-You need to install test dependencies to be able to run pytest:
+You need to install test dependencies to be able to run `pytest`:
 
 ```bash
-python -m pip install -e ".[test]"
+python -m pip install -e ".[full,test]"
+```
+
+You can also use `hatch` which automatically creates virtual environment with all the optional dependencies:
+
+```bash
+hatch shell
 ```
 
 ### Documentation Updates
