@@ -10,7 +10,7 @@ default_stages:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -21,18 +21,14 @@ repos:
       - id: detect-private-key
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.10
+    rev: v0.8.1
     hooks:
       - id: ruff-format
-
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.10
-    hooks:
       - id: ruff
         args: ["--fix", "--exit-non-zero-on-fix", "--config", "pyproject.toml"]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.1
+    rev: v1.13.0
     hooks:
       - id: mypy
         args: ["--ignore-missing-imports"]
@@ -42,7 +38,7 @@ repos:
           - django
 
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v3.2.0
+    rev: v3.6.0
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
