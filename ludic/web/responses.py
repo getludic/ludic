@@ -1,6 +1,7 @@
 import inspect
 from collections.abc import Callable
-from typing import Any, ParamSpec, TypeVar, get_origin
+from types import NoneType, UnionType
+from typing import Any, ParamSpec, TypeVar, get_args, get_origin
 
 from starlette._utils import is_async_callable
 from starlette.concurrency import run_in_threadpool
@@ -107,7 +108,7 @@ async def prepare_response(
     return response
 
 
-async def extract_from_request(
+async def extract_from_request(  # noqa
     handler: Callable[..., Any],
     request: Request | WebSocket,
 ) -> dict[str, Any]:
@@ -132,6 +133,14 @@ async def extract_from_request(
         ):
             async with request.form() as form:
                 handler_kwargs[name] = param.annotation(form)
+        elif isinstance(param.annotation, UnionType):
+            if (args := get_args(param.annotation)) and (
+                len(args) != 2 or args[1] is not NoneType
+            ):
+                raise TypeError(
+                    f"Request handler has an invalid signature: {param.annotation!r}"
+                )
+            handler_kwargs[name] = request.query_params.get(name)
         elif issubclass(param.annotation, FormData):
             async with request.form() as form:
                 handler_kwargs[name] = form
