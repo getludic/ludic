@@ -1,6 +1,15 @@
 from abc import ABCMeta, abstractmethod
 from collections.abc import Mapping
-from typing import Literal, LiteralString, Self, SupportsIndex, TypedDict
+from typing import (
+    TYPE_CHECKING,
+    Literal,
+    LiteralString,
+    Self,
+    SupportsIndex,
+    TypedDict,
+)
+
+from typing_extensions import TypeVar
 
 from .utils import (
     clamp,
@@ -10,6 +19,10 @@ from .utils import (
     pick_readable_color_for,
 )
 
+if TYPE_CHECKING:
+    from .themes import Theme
+
+TTheme = TypeVar("TTheme", bound="Theme", default="Theme")
 SizeUnit = Literal["px", "ex", "em", "ch", "rem", "vw", "vh", "vmin", "vmax", "%"]
 
 
@@ -589,6 +602,7 @@ CSSProperties = TypedDict(
         "height": str,
         "hyphens": Literal["none", "manual", "auto"],
         # I
+        "inset": str | int,
         "inline-size": str,
         # J
         "justify-content": Literal[

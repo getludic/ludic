@@ -151,10 +151,10 @@ class Grid:
 class Frame:
     """Frame layout config for a theme."""
 
-    # The width of the frame
+    # The width of the frame as fraction
     numerator: int = 16
 
-    # The height of the frame
+    # The height of the frame as fraction
     denominator: int = 9
 
 

@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterator
-from typing import Self, Unpack
+from typing import Generic, Self, Unpack
 
 from .attrs import (
     AreaAttrs,
@@ -58,11 +58,11 @@ from .attrs import (
 from .base import BaseElement
 from .elements import Element, ElementStrict
 from .styles import (
-    Theme,
     format_styles,
     from_components,
     from_loaded,
 )
+from .styles.types import TTheme
 from .types import (
     AnyChildren,
     ComplexChildren,
@@ -533,16 +533,16 @@ class link(Element[NoChildren, HeadLinkAttrs]):
         super().__init__(*children, **attrs)
 
 
-class style(BaseElement, GlobalStyles):
+class style(Generic[TTheme], BaseElement, GlobalStyles):
     html_name = "style"
 
-    children: tuple[GlobalStyles | Callable[[Theme], GlobalStyles] | str]
+    children: tuple[GlobalStyles | Callable[[TTheme], GlobalStyles] | str]
     attrs: StyleAttrs
 
     def __init__(
         self,
-        styles: GlobalStyles | Callable[[Theme], GlobalStyles] | str,
-        theme: Theme | None = None,
+        styles: GlobalStyles | Callable[[TTheme], GlobalStyles] | str,
+        theme: TTheme | None = None,
         **attrs: Unpack[StyleAttrs],
     ) -> None:
         super().__init__(styles, **attrs)
@@ -551,17 +551,17 @@ class style(BaseElement, GlobalStyles):
             self.context["theme"] = theme
 
     @classmethod
-    def use(cls, styles: GlobalStyles | Callable[[Theme], GlobalStyles]) -> Self:
+    def use(cls, styles: GlobalStyles | Callable[[TTheme], GlobalStyles]) -> Self:
         return cls(styles)
 
     @classmethod
     def from_components(
-        cls, *components: type[BaseElement], theme: Theme | None = None
+        cls, *components: type[BaseElement], theme: TTheme | None = None
     ) -> Self:
         return cls(from_components(*components, theme=theme), type="text/css")
 
     @classmethod
-    def load(cls, cache: bool = False, theme: Theme | None = None) -> Self:
+    def load(cls, cache: bool = False, theme: TTheme | None = None) -> Self:
         return cls(from_loaded(cache=cache, theme=theme), type="text/css")
 
     def __getitem__(self, key: str | tuple[str, ...]) -> CSSProperties | GlobalStyles:
