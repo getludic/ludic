@@ -123,6 +123,9 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
                 "padding-inline": theme.sizes.xxl,
                 "font-size": theme.fonts.size * 0.9,
             },
+            ".code-block *": {
+                "font-size": theme.fonts.size * 0.9,
+            },
         }
     )
 
