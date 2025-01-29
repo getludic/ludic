@@ -35,7 +35,7 @@ def test_format_context() -> None:
         second = ctx.append({"bar": "baz"})
         extracts = ctx.extract(f"test {first} {second}")
 
-    assert extracts == ["test ", "foo", " ", {"bar": "baz"}]
+    assert extracts == ("test ", "foo", " ", {"bar": "baz"})
 
 
 def test_format_context_in_elements() -> None:
@@ -63,6 +63,7 @@ def test_component_with_f_string() -> None:
     paragraph = Paragraph(
         f"Hello, how {strong("are you")}? Click {Link("here", to="https://example.com")}.",
     )
+    assert len(paragraph.children) == 5
     assert isinstance(paragraph.children[3], Link)
     assert paragraph.children[3].attrs["to"] == "https://example.com"
     assert paragraph.to_string(pretty=False) == (

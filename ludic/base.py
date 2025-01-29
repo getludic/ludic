@@ -11,6 +11,7 @@ class BaseElement(metaclass=ABCMeta):
     void_element: ClassVar[bool] = False
 
     formatter: ClassVar[FormatContext] = FormatContext("element_formatter")
+    formatter_fstring_wrap_in: ClassVar[type["BaseElement"] | None] = None
 
     children: Sequence[Any]
     attrs: Mapping[str, Any]
@@ -18,7 +19,9 @@ class BaseElement(metaclass=ABCMeta):
 
     def __init__(self, *children: Any, **attrs: Any) -> None:
         self.context = {}
-        self.children = children
+        self.children = self.formatter.extract(
+            *children, WrapIn=self.formatter_fstring_wrap_in
+        )
         self.attrs = attrs
 
     def __str__(self) -> str:
