@@ -1,4 +1,4 @@
-from typing import Generic, Unpack, cast
+from typing import ClassVar, Generic, Unpack
 
 from .attrs import NoAttrs
 from .base import BaseElement
@@ -16,15 +16,15 @@ class Element(Generic[TChildren, TAttrs], BaseElement):
     children: tuple[TChildren, ...]
     attrs: TAttrs
 
+    formatter_wrap_in: ClassVar[type[BaseElement] | None] = None
+
     def __init__(
         self,
         *children: TChildren,
         # FIXME: https://github.com/python/typing/issues/1399
-        **attributes: Unpack[TAttrs],  # type: ignore
+        **attrs: Unpack[TAttrs],  # type: ignore
     ) -> None:
-        super().__init__()
-        self.attrs = cast(TAttrs, attributes)
-        self.children = tuple(self.formatter.extract(*children))
+        super().__init__(*children, **attrs)
 
 
 class ElementStrict(Generic[*TChildrenArgs, TAttrs], BaseElement):
@@ -38,15 +38,15 @@ class ElementStrict(Generic[*TChildrenArgs, TAttrs], BaseElement):
     children: tuple[*TChildrenArgs]
     attrs: TAttrs
 
+    formatter_wrap_in: ClassVar[type[BaseElement] | None] = None
+
     def __init__(
         self,
         *children: *TChildrenArgs,
         # FIXME: https://github.com/python/typing/issues/1399
         **attrs: Unpack[TAttrs],  # type: ignore
     ) -> None:
-        super().__init__()
-        self.attrs = cast(TAttrs, attrs)
-        self.children = tuple(self.formatter.extract(*children))
+        super().__init__(*children, **attrs)
 
 
 class Blank(Element[TChildren, NoAttrs]):
@@ -57,7 +57,7 @@ class Blank(Element[TChildren, NoAttrs]):
     """
 
     def __init__(self, *children: TChildren) -> None:
-        super().__init__(*self.formatter.extract(*children))
+        super().__init__(*children)
 
     def to_html(self) -> str:
         return "".join(map(str, self.children))

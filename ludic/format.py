@@ -192,7 +192,7 @@ class FormatContext:
 
         return f"{{{random_id}:id}}"
 
-    def extract(self, *args: Any) -> list[Any]:
+    def extract(self, *args: Any, WrapIn: type | None = None) -> tuple[Any, ...]:
         """Extract identifiers from the given arguments.
 
         Example:
@@ -205,24 +205,29 @@ class FormatContext:
             ["test ", "foo", " ", {"bar": "baz"}]
 
         Args:
+            WrapIn
             args (Any): The arguments to extract identifiers from.
 
         Returns:
             Any: The extracted arguments.
         """
-        extracted_args: list[Any] = []
+        arguments: list[Any] = []
         for arg in args:
             if isinstance(arg, str) and (parts := extract_identifiers(arg)):
                 cache = self.get()
-                extracted_args.extend(
+                extracted_args = (
                     cache.pop(part) if isinstance(part, int) else part
                     for part in parts
                     if not isinstance(part, int) or part in cache
                 )
+                if WrapIn is not None:
+                    arguments.append(WrapIn(*extracted_args))
+                else:
+                    arguments.extend(extracted_args)
                 self._context.set(cache)
             else:
-                extracted_args.append(arg)
-        return extracted_args
+                arguments.append(arg)
+        return tuple(arguments)
 
     def clear(self) -> None:
         """Clear the context memory."""
