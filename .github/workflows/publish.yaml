@@ -24,10 +24,10 @@ jobs:
           cache: pip
           cache-dependency-path: "**/pyproject.toml"
 
-      - run: pip install hatch
+      - run: pip install uv
 
       - name: Build Package
-        run: hatch build
+        run: uv build
 
       - name: Publish Release Notes
         id: release
