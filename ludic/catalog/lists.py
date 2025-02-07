@@ -41,7 +41,7 @@ class List(Component[Item | str, GlobalAttrs]):
         return ul(*children, **self.attrs_for(ul))
 
 
-class NumberedList(Component[Item | str, OlAttrs]):
+class NumberedList(Component[AnyChildren, OlAttrs]):
     """Simple component simulating a numbered list.
 
     There is basically just an alias for the :class:`ol` element
