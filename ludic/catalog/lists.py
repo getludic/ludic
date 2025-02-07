@@ -19,7 +19,7 @@ class Item(Component[AnyChildren, GlobalAttrs]):
         return li(*self.children, **self.attrs)
 
 
-class List(Component[Item | str, GlobalAttrs]):
+class List(Component[AnyChildren, GlobalAttrs]):
     """Simple component simulating a list.
 
     There is basically just an alias for the :class:`ul` element
