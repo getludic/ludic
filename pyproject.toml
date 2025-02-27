@@ -38,12 +38,18 @@ full = [
 django = [
     "django",
 ]
+fastapi = [
+    "fastapi",
+]
 dev = [
+    "ludic[full,django,fastapi]",
     "mypy",
     "types-pygments",
     "django-stubs",
+    "fastapi"
 ]
 test = [
+    "ludic[dev,full,django,fastapi]",
     "pytest",
     "pytest-cov",
     "httpx",

@@ -55,7 +55,7 @@ def test_delete_row() -> None:
     with TestClient(app) as client:
         assert client.get("/").status_code == 200
         assert client.get("/people/").status_code == 200
-        assert client.delete("/people/1").status_code == 200
+        assert client.delete("/people/1").status_code == 204
         assert client.delete("/people/123").status_code == 404
         assert db.people.get("1") is None
 

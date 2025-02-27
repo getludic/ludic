@@ -48,6 +48,26 @@ async def run_in_threadpool_safe(
     return response
 
 
+def extract_response_status_headers(
+    raw_response: T, status_code: int | None = None, headers: Headers | None = None
+) -> tuple[T, int | None, Headers | None]:
+    """Extracts status code and headers from response if it is a tuple."""
+    if isinstance(raw_response, tuple):
+        if len(raw_response) == 2:
+            raw_response, status_or_headers = raw_response
+            if isinstance(status_or_headers, dict):
+                headers = ds.Headers(status_or_headers)
+            else:
+                status_code = status_or_headers
+        elif len(raw_response) == 3:
+            raw_response, status_code, headers = raw_response
+            headers = ds.Headers(headers)
+        else:
+            raise ValueError(f"Invalid response tuple: {raw_response}")
+
+    return raw_response, status_code, headers
+
+
 async def prepare_response(
     handler: Callable[..., Any],
     request: Request,
@@ -74,21 +94,9 @@ async def prepare_response(
     else:
         raw_response = await run_in_threadpool_safe(handler, **handler_kw)
 
-    if isinstance(raw_response, tuple):
-        if len(raw_response) == 2:
-            raw_response, status_or_headers = raw_response
-            if isinstance(status_or_headers, dict):
-                headers = ds.Headers(status_or_headers)
-            else:
-                status_code = status_or_headers
-        elif len(raw_response) == 3:
-            raw_response, status_code, headers = raw_response
-            headers = ds.Headers(headers)
-        else:
-            raise ValueError(f"Invalid response tuple: {raw_response}")
-
-    if raw_response is None:
-        raw_response = ""
+    raw_response, status_code, headers = extract_response_status_headers(
+        raw_response, status_code, headers
+    )
 
     response: Response
     if isinstance(raw_response, BaseElement):
@@ -102,6 +110,8 @@ async def prepare_response(
         )
     elif isinstance(raw_response, Response):
         response = raw_response
+    elif raw_response is None:
+        response = Response(status_code=204, headers=headers)
     else:
         raise ValueError(f"Invalid response type: {type(raw_response)}")
 
