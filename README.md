@@ -34,10 +34,10 @@ Here is a table comparing Ludic to other similar tools:
 | HTML rendering              | Server Side | Client Side | Client Side |
 | Uses a template engine      | No          | No          | No          |
 | UI interactivity            | [</> htmx](https://htmx.org)* | [React](https://react.dev/) | [React](https://react.dev/) |
-| Backend framework           | [Starlette](https://www.starlette.io), [Django](https://www.djangoproject.com/)*  | [FastAPI](https://fastapi.tiangolo.com) | [FastAPI](https://fastapi.tiangolo.com) |
+| Backend framework           | [Starlette](https://www.starlette.io), [FastAPI](https://fastapi.tiangolo.com/), [Django](https://www.djangoproject.com/)*  | [FastAPI](https://fastapi.tiangolo.com) | [FastAPI](https://fastapi.tiangolo.com) |
 | Client-Server Communication | [HTML + REST](https://htmx.org/essays/how-did-rest-come-to-mean-the-opposite-of-rest/) | [JSON + REST](https://github.com/pydantic/FastUI?tab=readme-ov-file#the-principle-long-version) | [WebSockets](https://reflex.dev/blog/2024-03-21-reflex-architecture/) |
 
-<sup>(*) HTMX as well as Starlette or Django are optional dependencies for Ludic, it does not enforce any frontend or backend frameworks. At it's core, Ludic only generates HTML and allows registering CSS.</sup>
+<sup>(*) HTMX as well as Starlette, FastAPI and Django are optional dependencies for Ludic, it does not enforce any frontend or backend frameworks. At it's core, Ludic only generates HTML and allows registering CSS.</sup>
 
 ## Motivation
 
@@ -157,6 +157,7 @@ uvicorn web:app
 Here is a list of integrations and a link to the guide on how to get started:
 
 * [Starlette](https://getludic.dev/docs/web-framework)
+* [FastAPI](https://getludic.dev/docs/integrations#fastapi)
 * [Django](https://getludic.dev/docs/integrations#django)
 
 ### More Examples
