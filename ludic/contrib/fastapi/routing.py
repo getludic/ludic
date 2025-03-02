@@ -1,8 +1,9 @@
 import functools
 import inspect
-from collections.abc import Callable
-from typing import Any, ParamSpec
+from collections.abc import Callable, Coroutine
+from typing import Any, ParamSpec, get_args, get_origin
 
+from fastapi import Request
 from fastapi._compat import lenient_issubclass
 from fastapi.datastructures import Default, DefaultPlaceholder
 from fastapi.dependencies.utils import get_typed_return_annotation
@@ -12,9 +13,17 @@ from starlette.responses import Response
 from starlette.routing import get_name
 
 from ludic.base import BaseElement
+from ludic.web.requests import Request as LudicRequest
 from ludic.web.responses import LudicResponse, run_in_threadpool_safe
 
 P = ParamSpec("P")
+
+
+def is_base_element(type_: type[Any]) -> bool:
+    """Check if type is ludic's BaseElement"""
+    if get_args(type_) and lenient_issubclass(get_origin(type_), BaseElement):
+        return True
+    return lenient_issubclass(type_, BaseElement)
 
 
 def function_wrapper(
@@ -79,7 +88,7 @@ class LudicRoute(APIRoute):
     ) -> None:
         if isinstance(response_model, DefaultPlaceholder):
             return_annotation = get_typed_return_annotation(endpoint)
-            if lenient_issubclass(return_annotation, BaseElement) or lenient_issubclass(
+            if is_base_element(return_annotation) or lenient_issubclass(
                 return_annotation, Response
             ):
                 response_model = None
@@ -88,9 +97,21 @@ class LudicRoute(APIRoute):
 
         name = get_name(endpoint) if name is None else name
         wrapped_route = endpoint
+
         if inspect.isfunction(endpoint) or inspect.ismethod(endpoint):
             wrapped_route = function_wrapper(endpoint, status_code=status_code or 200)
+        if getattr(endpoint, "route", None) is None:
+            endpoint.route = self  # type: ignore
 
         super().__init__(
             path, wrapped_route, response_model=response_model, name=name, **kwargs
         )
+
+    def get_route_handler(self) -> Callable[[Request], Coroutine[Any, Any, Response]]:
+        original_route_handler = super().get_route_handler()
+
+        async def custom_route_handler(request: Request) -> Response:
+            request = LudicRequest(request.scope, request.receive)
+            return await original_route_handler(request)
+
+        return custom_route_handler
