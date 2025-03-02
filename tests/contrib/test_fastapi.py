@@ -2,8 +2,10 @@ from fastapi import FastAPI, Response
 from fastapi.testclient import TestClient
 
 from ludic.base import BaseElement
+from ludic.components import Blank
 from ludic.contrib.fastapi import LudicRoute
 from ludic.html import div, p, span
+from ludic.web import Request
 
 app = FastAPI()
 app.router.route_class = LudicRoute
@@ -37,6 +39,16 @@ async def f_string_test() -> span:
 @app.get("/status-code", status_code=202)
 async def status_code_test() -> span:
     return span("this is a test")
+
+
+@app.get("/blank-component")
+async def blank_component() -> Blank[span]:
+    return Blank(span("this is a test"))
+
+
+@app.get("/url-for-call")
+async def url_for_call(request: Request) -> span:
+    return span(str(request.url_for(blank_component)))
 
 
 def test_auto_component_conversion() -> None:
@@ -86,3 +98,17 @@ def test_return_different_status_code() -> None:
     response = client.get("/status-code")
 
     assert response.status_code == 202
+
+
+def test_blank_component() -> None:
+    client = TestClient(app)
+    response = client.get("/blank-component")
+
+    assert response.status_code == 200
+
+
+def test_url_for_call() -> None:
+    client = TestClient(app)
+    response = client.get("/url-for-call")
+
+    assert response.status_code == 200
