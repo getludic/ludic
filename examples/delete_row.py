@@ -71,7 +71,7 @@ class PeopleTable(Endpoint[PeopleAttrs]):
 
     @classmethod
     def get(cls) -> Self:
-        return cls(people=[person.dict() for person in db.people.values()])
+        return cls(people=[person.to_dict() for person in db.people.values()])
 
     @override
     def render(self) -> Table[TableHead, PersonRow]:

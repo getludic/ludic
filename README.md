@@ -162,7 +162,13 @@ Here is a list of integrations and a link to the guide on how to get started:
 
 ### More Examples
 
-For more complex usage incorporating all capabilities of the framework, please visit the examples on [the web](https://getludic.dev/examples) or go to the folder with examples [on GitHub](https://github.com/getludic/ludic/tree/master/examples/).
+For more complex usage incorporating all capabilities of the framework:
+
+- visit the examples on [getludic.dev](https://getludic.dev/examples)
+- check the folder with examples [on GitHub](https://github.com/getludic/ludic/tree/master/examples/)
+- check the source code of the [Ludic Catalog](https://github.com/getludic/ludic/tree/main/ludic/catalog)
+- inspect the [source of getludic.dev](https://github.com/getludic/web/blob/main/web/endpoints/docs/htmx.py) which is written with Ludic
+- check [this small repository](https://github.com/getludic/ludic-slides/blob/main/ludic_slides/components.py) rendering slides in the browser
 
 ## Contributing
 

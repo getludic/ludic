@@ -69,7 +69,7 @@ class PersonRow(Endpoint[PersonAttrs]):
         for attr, value in data.validate().items():
             setattr(person, attr, value)
 
-        return cls(**person.dict())
+        return cls(**person.to_dict())
 
     @classmethod
     async def get(cls, id: str) -> Self:
@@ -78,7 +78,7 @@ class PersonRow(Endpoint[PersonAttrs]):
         if person is None:
             raise NotFoundError("Person not found")
 
-        return cls(**person.dict())
+        return cls(**person.to_dict())
 
     @override
     def render(self) -> TableRow:
@@ -104,7 +104,7 @@ class PersonForm(Endpoint[PersonAttrs]):
         if person is None:
             raise NotFoundError("Person not found")
 
-        return cls(**person.dict())
+        return cls(**person.to_dict())
 
     @override
     def render(self) -> TableRow:
@@ -133,7 +133,7 @@ class PersonForm(Endpoint[PersonAttrs]):
 class PeopleTable(Endpoint[PeopleAttrs]):
     @classmethod
     async def get(cls) -> Self:
-        return cls(people=[person.dict() for person in db.people.values()])
+        return cls(people=[person.to_dict() for person in db.people.values()])
 
     @override
     def render(self) -> Table[TableHead, PersonRow]:

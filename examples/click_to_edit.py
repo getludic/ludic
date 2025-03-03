@@ -42,7 +42,7 @@ async def index() -> Page:
             source_url="https://htmx.org/examples/click-to-edit/",
         ),
         H2("Demo"),
-        Box(*[Contact(**contact.dict()) for contact in db.contacts.values()]),
+        Box(*[Contact(**contact.to_dict()) for contact in db.contacts.values()]),
     )
 
 
@@ -55,7 +55,7 @@ class Contact(Endpoint[ContactAttrs]):
         if contact is None:
             raise NotFoundError("Contact not found")
 
-        return cls(**contact.dict())
+        return cls(**contact.to_dict())
 
     @classmethod
     async def put(cls, id: str, attrs: Parser[ContactAttrs]) -> Self:
@@ -67,7 +67,7 @@ class Contact(Endpoint[ContactAttrs]):
         for key, value in attrs.validate().items():
             setattr(contact, key, value)
 
-        return cls(**contact.dict())
+        return cls(**contact.to_dict())
 
     @override
     def render(self) -> Stack:
@@ -93,7 +93,7 @@ class ContactForm(Endpoint[ContactAttrs]):
         if contact is None:
             raise NotFoundError("Contact not found")
 
-        return cls(**contact.dict())
+        return cls(**contact.to_dict())
 
     @override
     def render(self) -> Form:

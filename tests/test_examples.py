@@ -95,3 +95,13 @@ def test_infinite_scroll() -> None:
         assert client.get("/").status_code == 200
         assert client.get("/contacts/").status_code == 200
         assert client.get("/contacts/?page=2").status_code == 200
+
+
+def test_fastapi_example() -> None:
+    from examples.fastapi_example import app
+
+    with TestClient(app) as client:
+        assert client.get("/").status_code == 200
+        assert client.get("/cars/").status_code == 200
+        assert client.get("/models/?manufacturer=audi").status_code == 200
+        assert client.get("/models/").status_code == 404
