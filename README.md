@@ -2,7 +2,7 @@
     <img width="600px" src="https://raw.githubusercontent.com/getludic/ludic/main/docs/assets/ludic.png" alt="Ludic Logo">
 </p>
 
-[![test](https://github.com/getludic/ludic/actions/workflows/test.yaml/badge.svg)](https://github.com/getludic/ludic/actions) [![codecov](https://codecov.io/gh/getludic/ludic/graph/badge.svg?token=BBDNJWHMGX)](https://codecov.io/gh/getludic/ludic) [![Python 3.12 and 3.13](https://img.shields.io/badge/Python-3.12%20%7C%203.13-blue)](https://www.python.org/downloads/release/python-3130/) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/) [![Discord Server](https://img.shields.io/badge/discord-ludic-black)](https://discord.gg/4Y5fSQUS)
+[![test](https://github.com/getludic/ludic/actions/workflows/test.yaml/badge.svg)](https://github.com/getludic/ludic/actions) [![codecov](https://codecov.io/gh/getludic/ludic/graph/badge.svg?token=BBDNJWHMGX)](https://codecov.io/gh/getludic/ludic) [![Python 3.12 and 3.13](https://img.shields.io/badge/Python-3.12%20%7C%203.13-blue)](https://www.python.org/downloads/release/python-3130/) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/) [![Discord Server](https://img.shields.io/badge/discord-ludic-black)](https://discord.gg/Scbh3yxN)
 
 **Documentation**: https://getludic.dev/docs/
 
