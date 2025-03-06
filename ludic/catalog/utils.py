@@ -1,3 +1,6 @@
+from collections.abc import Callable
+
+
 def attr_to_camel(name: str) -> str:
     """Convert an attribute name to camel case.
 
@@ -37,3 +40,22 @@ def remove_whitespaces(text: str) -> str:
     by_line = text.splitlines()
     min_whitespaces = min(len(line) - len(line.lstrip()) for line in by_line if line)
     return "\n".join(line[min_whitespaces:].rstrip() for line in by_line).strip()
+
+
+def add_line_numbers(text: str, apply_fun: Callable[[str], str] = str) -> str:
+    """Add line number at the beginning of each line.
+
+    Args:
+        text (str): Content to append line number.
+        apply_fun (Callable[[int], str]): Call this function on each number.
+
+    Returns:
+        str: Text with number appended to each line.
+    """
+    lines = text.splitlines()
+    max_digits = len(str(len(lines)))
+
+    return "\n".join(
+        f"{apply_fun(f'{number + 1:>{max_digits}}   ')}{line}"
+        for number, line in enumerate(lines)
+    )

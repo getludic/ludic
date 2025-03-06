@@ -185,6 +185,8 @@ class CodeBlock:
 
     color: Color = Color("#414549")
     background_color: Color = Color("#f2f2f2")
+    line_number_color: Color = Color("#c2c2c2")
+    line_numbers: bool = True
     font_size: BaseSize = Size(0.9)
     style: str | type = highlight_light
 
@@ -251,8 +253,9 @@ class DarkTheme(Theme):
     )
     code: CodeBlock = field(
         default_factory=lambda: CodeBlock(
-            color=Color("#cfc5b6"),
-            background_color=Color("#302a22"),
+            color=ColorRange(["#ebe4da", "#cfc5b6", "#cab8a5"]),
+            background_color=ColorRange(["#52473a", "#302a22", "#231f1a"]),
+            line_number_color=Color("#a69685"),
             style=highlight_dark,
         )
     )

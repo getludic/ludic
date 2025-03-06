@@ -93,11 +93,12 @@ class ColorRange(Color):
         if isinstance(variants, str):
             variants = [variants]
 
-        new_position = position or (len(variants) // 2)
+        if position is None:
+            position = len(variants) // 2
 
-        self = super().__new__(cls, variants[new_position])
+        self = super().__new__(cls, variants[position])
         self.variants = variants
-        self.position = new_position
+        self.position = position
         return self
 
     def darken(self, shift: int = 1) -> Self:

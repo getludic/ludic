@@ -11,14 +11,14 @@ except ImportError:
 
 from ludic.attrs import Attrs, GlobalAttrs, HyperlinkAttrs
 from ludic.components import Component, ComponentStrict
-from ludic.html import a, code, p, pre, style
+from ludic.html import a, code, p, pre, span, style
 from ludic.types import (
     AnyChildren,
     PrimitiveChildren,
     Safe,
 )
 
-from .utils import remove_whitespaces
+from .utils import add_line_numbers, remove_whitespaces
 
 
 class LinkAttrs(Attrs):
@@ -103,6 +103,7 @@ class Code(Component[str, GlobalAttrs]):
 
 class CodeBlockAttrs(GlobalAttrs, total=False):
     language: str
+    line_numbers: bool
     remove_whitespaces: bool
 
 
@@ -119,6 +120,11 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
         lambda theme: {
             ".code-block": {
                 "color": theme.code.color,
+                "border": (
+                    f"{theme.borders.thin} solid "
+                    f"{theme.code.background_color.darken(1)}"
+                ),
+                "border-radius": theme.rounding.normal,
                 "background-color": theme.code.background_color,
                 "padding-block": theme.sizes.l,
                 "padding-inline": theme.sizes.xxl,
@@ -127,9 +133,23 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
         }
     )
 
+    def _get_line_number_span(self, line: str) -> str:
+        return str(
+            span(
+                line,
+                style={
+                    "color": self.theme.code.line_number_color,
+                    "user-select": "none",
+                },
+            )
+        )
+
     @override
     def render(self) -> pre:
         content = "".join(self.children)
+        append_line_numbers = self.attrs.get(
+            "line_numbers", self.theme.code.line_numbers
+        )
 
         if self.attrs.get("remove_whitespaces", True):
             content = remove_whitespaces(content)
@@ -142,7 +162,13 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
                 nowrap=True,
                 style=self.theme.code.style,
             )
-            block = Safe(highlight(content, lexer, formatter))
-            return pre(block, **self.attrs_for(pre))
+            highlighted_content = highlight(content, lexer, formatter)
+
+            if append_line_numbers:
+                highlighted_content = add_line_numbers(
+                    highlighted_content, apply_fun=self._get_line_number_span
+                )
+
+            return pre(Safe(highlighted_content), **self.attrs_for(pre))
         else:
             return pre(content, **self.attrs_for(pre))

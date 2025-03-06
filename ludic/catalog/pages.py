@@ -104,7 +104,7 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
                 "line-height": round(theme.line_height * 0.9, 2),
             },
             "a": {
-                "color": theme.colors.primary.darken(2),
+                "color": theme.colors.primary,
                 "text-decoration": "none",
             },
             "a:hover": {
