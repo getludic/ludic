@@ -35,6 +35,9 @@ full = [
     "typeguard>=4.1.5",
     "pygments",
 ]
+starlette = [
+    "starlette",
+]
 django = [
     "django",
 ]
