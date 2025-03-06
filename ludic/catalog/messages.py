@@ -20,17 +20,17 @@ class Message(Component[AnyChildren, GlobalAttrs]):
         lambda theme: {
             ".message": {
                 "background-color": theme.colors.white,
-                "border": (f"{theme.borders.thin} solid {theme.colors.primary}"),
+                "border": (
+                    f"{theme.borders.thin} solid {theme.colors.light.darken(1)}"
+                ),
                 "border-radius": theme.rounding.less,
                 "font-size": theme.fonts.size * 0.9,
             },
             ".message > .title": {
-                "font-weight": "bold",
-                "border-top-left-radius": theme.rounding.less,
-                "border-top-right-radius": theme.rounding.less,
                 "padding-inline": theme.sizes.l,
                 "padding-block": theme.sizes.s,
-                "background-color": theme.colors.primary.lighten(1),
+                "color": theme.colors.light.readable(),
+                "background-color": theme.colors.light,
             },
             ".message > .content": {
                 "padding-inline": theme.sizes.l,
@@ -56,6 +56,7 @@ class MessageSuccess(Message):
     styles = style.use(
         lambda theme: {
             ".message.success > .title": {
+                "color": theme.colors.success.lighten(1).readable(),
                 "background-color": theme.colors.success.lighten(1),
             },
             ".message.success": {
@@ -70,6 +71,7 @@ class MessageInfo(Message):
     styles = style.use(
         lambda theme: {
             ".message.info > .title": {
+                "color": theme.colors.info.lighten(1).readable(),
                 "background-color": theme.colors.info.lighten(1),
             },
             ".message.info": {
@@ -84,6 +86,7 @@ class MessageWarning(Message):
     styles = style.use(
         lambda theme: {
             ".message.warning > .title": {
+                "color": theme.colors.warning.lighten(1).readable(),
                 "background-color": theme.colors.warning.lighten(1),
             },
             ".message.warning": {
@@ -98,6 +101,7 @@ class MessageDanger(Message):
     styles = style.use(
         lambda theme: {
             ".message.danger > .title": {
+                "color": theme.colors.danger.lighten(1).readable(),
                 "background-color": theme.colors.danger.lighten(1),
             },
             ".message.danger": {

@@ -6,6 +6,16 @@ from ludic.base import BaseElement
 
 from .types import BaseSize, Color, ColorRange, Size, SizeClamp
 
+highlight_light: str | type = "default"
+highlight_dark: str | type = "default"
+try:
+    from .highlight import LudicDark, LudicLight
+
+    highlight_light = LudicLight
+    highlight_dark = LudicDark
+except ImportError:
+    pass
+
 _T = TypeVar("_T", bound="BaseElement")
 
 
@@ -20,7 +30,7 @@ class Colors:
     warning: Color = ColorRange(["#7e4801", "#fc9003", "#fee8cc"])
     danger: Color = ColorRange(["#711414", "#e32929", "#f9d4d4"])
 
-    light: Color = Color("#f8f8f8")
+    light: Color = Color("#f2f2f2")
     dark: Color = Color("#414549")
 
     white: Color = Color("#fff")
@@ -173,8 +183,10 @@ class Layouts:
 class CodeBlock:
     """Code block config for a theme."""
 
-    background_color: Color = Color("#f8f8f8")
-    style: str | type = "default"
+    color: Color = Color("#414549")
+    background_color: Color = Color("#f2f2f2")
+    font_size: BaseSize = Size(0.9)
+    style: str | type = highlight_light
 
 
 @dataclass
@@ -225,16 +237,23 @@ class DarkTheme(Theme):
 
     colors: Colors = field(
         default_factory=lambda: Colors(
-            primary=Color("#0d6efd"),
-            secondary=Color("#898989"),
-            success=Color("#198754"),
-            info=Color("#0dcaf0"),
-            warning=Color("#ffc107"),
-            danger=Color("#dc3545"),
-            light=Color("#414549"),
-            dark=Color("#d8d8d8"),
-            white=Color("#131313"),
-            black=Color("#e5e5e5"),
+            primary=ColorRange(["#de946f", "#bd7b5b", "#9e674c"]),
+            secondary=Color("#a79272"),
+            success=Color("#56A677"),
+            info=Color("#518eb5"),
+            warning=Color("#d09d3c"),
+            danger=Color("#e15c4d"),
+            light=ColorRange(["#665949", "#52473a", "#302a22"]),
+            dark=ColorRange(["#cfc5b6", "#cab8a5", "#a69685"]),
+            white=ColorRange(["#302a22", "#231f1a", "#12100e"]),
+            black=ColorRange(["#f2ebe1", "#ebe4da", "#cfc5b6"]),
+        ),
+    )
+    code: CodeBlock = field(
+        default_factory=lambda: CodeBlock(
+            color=Color("#cfc5b6"),
+            background_color=Color("#302a22"),
+            style=highlight_dark,
         )
     )
 
