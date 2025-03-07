@@ -233,6 +233,9 @@ full = [
     { name = "starlette" },
     { name = "typeguard" },
 ]
+starlette = [
+    { name = "starlette" },
+]
 test = [
     { name = "django" },
     { name = "django-stubs" },
@@ -271,6 +274,7 @@ requires-dist = [
     { name = "python-multipart", marker = "extra == 'test'", specifier = ">=0.0.9" },
     { name = "starlette", marker = "extra == 'dev'" },
     { name = "starlette", marker = "extra == 'full'" },
+    { name = "starlette", marker = "extra == 'starlette'" },
     { name = "starlette", marker = "extra == 'test'" },
     { name = "typeguard", marker = "extra == 'dev'", specifier = ">=4.1.5" },
     { name = "typeguard", marker = "extra == 'full'", specifier = ">=4.1.5" },

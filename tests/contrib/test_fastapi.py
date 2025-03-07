@@ -1,14 +1,28 @@
 from fastapi import FastAPI, Response
 from fastapi.testclient import TestClient
 
+from ludic.attrs import GlobalAttrs
 from ludic.base import BaseElement
-from ludic.components import Blank
+from ludic.catalog.layouts import Center, Stack
+from ludic.components import Blank, Component
 from ludic.contrib.fastapi import LudicRoute
 from ludic.html import div, p, span
+from ludic.types import AnyChildren
 from ludic.web import Request
 
 app = FastAPI()
 app.router.route_class = LudicRoute
+
+
+class MyTestComponent(Component[AnyChildren, GlobalAttrs]):
+    classes = ["test"]
+    styles = {".test": {"display": "block"}}
+
+    def render(self) -> Center:
+        return Center(
+            Stack(*self.children, **self.attrs),
+            style={"padding-block": self.theme.sizes.l},
+        )
 
 
 @app.get("/component")
@@ -49,6 +63,11 @@ async def blank_component() -> Blank[span]:
 @app.get("/url-for-call")
 async def url_for_call(request: Request) -> span:
     return span(str(request.url_for(blank_component)))
+
+
+@app.get("/use-component")
+async def use_component() -> MyTestComponent:
+    return MyTestComponent(span("inside-span"), id="test-component-1234")
 
 
 def test_auto_component_conversion() -> None:
@@ -112,3 +131,11 @@ def test_url_for_call() -> None:
     response = client.get("/url-for-call")
 
     assert response.status_code == 200
+
+
+def test_use_component() -> None:
+    client = TestClient(app)
+    response = client.get("/use-component")
+
+    assert response.status_code == 200
+    assert b"test-component-1234" in response.content
