@@ -274,7 +274,7 @@ class HeadLinkAttrs(HtmlAttrs, total=False):
 class InputAttrs(GlobalAttrs, total=False):
     accept: str
     alt: str
-    autcomplete: Literal["on", "off"]
+    autocomplete: Literal["on", "off"]
     autofocus: bool
     checked: bool
     dirname: str
