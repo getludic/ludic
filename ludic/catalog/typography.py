@@ -89,7 +89,8 @@ class Code(Component[str, GlobalAttrs]):
         lambda theme: {
             ".code": {
                 "background-color": theme.colors.light,
-                "padding": f"{theme.sizes.xxxxs * 0.3} {theme.sizes.xxxs}",
+                "color": theme.colors.primary.darken(1),
+                "padding": f"{theme.sizes.xxxxs * 0.3} {theme.sizes.xxxxs}",
                 "border-radius": theme.rounding.less,
                 "font-size": theme.fonts.size * 0.9,
             }
@@ -126,8 +127,8 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
                 ),
                 "border-radius": theme.rounding.normal,
                 "background-color": theme.code.background_color,
-                "padding-block": theme.sizes.l,
-                "padding-inline": theme.sizes.xxl,
+                "padding-block": theme.sizes.m,
+                "padding-inline": theme.sizes.l,
                 "font-size": theme.code.font_size,
             },
         }

@@ -52,7 +52,7 @@ dev = [
     "fastapi"
 ]
 test = [
-    "ludic[dev,full,django,fastapi]",
+    "ludic[dev]",
     "pytest",
     "pytest-cov",
     "httpx",
