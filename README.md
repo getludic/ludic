@@ -88,16 +88,10 @@ Python 3.12+
 pip install "ludic[full]"
 ```
 
-Similar to Starlette, you'll also want to install an [ASGI](https://asgi.readthedocs.io/en/latest/) server:
+You can also use a basic cookiecutter template to get quickly started, using [UV](https://docs.astral.sh/uv/), you need to run only one command:
 
 ```
-pip install uvicorn
-```
-
-You can also use a basic cookiecutter template to get quickly started:
-
-```
-cookiecutter gh:getludic/template
+uvx cookiecutter gh:getludic/template
 ```
 
 ## Full Example

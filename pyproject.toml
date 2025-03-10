@@ -32,6 +32,7 @@ dependencies = [
 full = [
     "python-multipart>=0.0.9",
     "starlette",
+    "uvicorn",
     "typeguard>=4.1.5",
     "pygments",
 ]
