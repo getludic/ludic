@@ -1,4 +1,6 @@
-from typing import Annotated, Literal, TypedDict
+import builtins
+import sys
+from typing import Annotated, Any, Literal, TypedDict
 
 import pytest
 from starlette.datastructures import FormData
@@ -103,3 +105,22 @@ def test_parse_list_empty_invalid() -> None:
 def test_parse_list_empty_valid() -> None:
     data = FormData({})
     assert ListParser[ExampleOptional](data).validate() == []
+
+
+def test_module_can_be_imported_without_typeguard(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_import(name: str, *args: Any, **kwargs: Any) -> Any:
+        if name == "typeguard":
+            raise ImportError("No module named 'some_module'")
+        return real_import(name, *args, **kwargs)
+
+    real_import = builtins.__import__
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+    sys.modules.pop("typeguard")
+    sys.modules.pop("ludic.web.parsers")
+
+    from ludic.web.parsers import check_type
+
+    result = check_type(1, int)
+    assert result == 1

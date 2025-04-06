@@ -114,6 +114,7 @@ testpaths = "tests"
 norecursedirs = ".git docs .pytest_cache .mypy_cache .ruff_cache"
 filterwarnings = [
     "ignore:The \\'app\\' shortcut is now deprecated. Use the explicit style \\'transport=WSGITransport\\(app=\\.\\.\\.\\)\\' instead\\.",
+    "ignore: You need to install typeguard"
 ]
 
 [tool.coverage.run]
