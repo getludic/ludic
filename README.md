@@ -170,4 +170,4 @@ Any contributions to the framework are warmly welcome! Your help will make it a 
 
 * [GitHub Issues](https://github.com/getludic/ludic/issues) - If you encounter a bug, please report it here.
 * [GitHub Discussions](https://github.com/getludic/ludic/discussions) - To request a new feature, this is the best place to initiate the discussion.
-* [Discord](https://discord.gg/4Y5fSQUS) - Join our Discord server for support, sharing ideas, and receiving assistance.
+* [Discord](https://discord.gg/7nK4zAXAYC) - Join our Discord server for support, sharing ideas, and receiving assistance.
