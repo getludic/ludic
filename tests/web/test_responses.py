@@ -1,9 +1,8 @@
 # tests/web/test_responses.py
 import pytest
 from starlette.applications import Starlette
-from starlette.responses import Response
 from starlette.requests import Request
-
+from starlette.responses import Response
 from starlette.routing import Route
 from starlette.testclient import TestClient
 
@@ -42,14 +41,15 @@ def invalid_tuple() -> tuple[str, int, dict[str, str], str]:
 
 
 def test_extract_response_status_headers_two_elements() -> None:
-    r, code, headers = extract_response_status_headers(("hello", 404))
-    assert r[0] == "hello"
+    body, code, headers = extract_response_status_headers(("hello", 404))
+    assert isinstance(body, str)
+    assert body == "hello"
     assert code == 404
     assert headers is None
 
 
 def test_extract_response_status_headers_three_elements() -> None:
-    r, code, headers = extract_response_status_headers(("hello", 200, {"x": "1"}))
+    _, code, headers = extract_response_status_headers(("hello", 200, {"x": "1"}))
     assert headers is not None and headers["x"] == "1"
 
 
