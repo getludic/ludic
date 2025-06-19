@@ -1,9 +1,11 @@
 # tests/web/test_responses.py
 import pytest
 from starlette.applications import Starlette
+from starlette.responses import Response
+from starlette.requests import Request
+
 from starlette.routing import Route
 from starlette.testclient import TestClient
-from starlette.responses import Response
 
 from ludic.web.responses import (
     BaseElement,
@@ -64,15 +66,15 @@ def test_ludic_response_render() -> None:
 # ---------- INTEGRATION TEST ---------- #
 
 
-async def plain_view(request) -> Response:
+async def plain_view(request: Request) -> Response:
     return await prepare_response(lambda: "Hello plain", request)
 
 
-async def tuple_view(request) -> Response:
+async def tuple_view(request: Request) -> Response:
     return await prepare_response(lambda: ("Hi", 203), request)
 
 
-async def element_view(request) -> Response:
+async def element_view(request: Request) -> Response:
     return await prepare_response(lambda: DummyElement(), request)
 
 
