@@ -1,5 +1,5 @@
 default_language_version:
-  python: python3.12
+  python: python3
 
 default_install_hook_types:
   - pre-commit
@@ -28,7 +28,7 @@ repos:
         args: ["--fix", "--exit-non-zero-on-fix", "--config", "pyproject.toml"]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.13.0
+    rev: v1.16.1
     hooks:
       - id: mypy
         args: ["--ignore-missing-imports"]

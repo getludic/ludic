@@ -31,7 +31,6 @@ __all__ = (
     "FileResponse",
     "StreamingResponse",
     "RedirectResponse",
-    "BaseElement",
 )
 
 T = TypeVar("T")

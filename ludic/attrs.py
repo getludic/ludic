@@ -229,21 +229,27 @@ class HtmlTagAttrs(Attrs, total=False):
 
 
 class MetaAttrs(HtmlAttrs, total=False):
-    name: str
-    content: str
     charset: str
+    content: str
+    http_equiv: Annotated[str, Alias("http-equiv")]
+    media: str
+    name: str
     property: str
 
 
 class StyleAttrs(HtmlAndEventAttrs, total=False):
+    blocking: str
     media: str
+    nonce: str
     type: Literal["text/css"]
 
 
 class ScriptAttrs(HtmlAttrs, total=False):
     async_: bool
+    blocking: str
     crossorigin: Literal["anonymous", "use-credentials"]
     defer: bool
+    fetchpriority: Literal["high", "low", "auto"]
     integrity: str
     nomodule: bool
     referrerpolicy: Literal[
@@ -261,14 +267,31 @@ class ScriptAttrs(HtmlAttrs, total=False):
 
 
 class HeadLinkAttrs(HtmlAttrs, total=False):
-    type: str
+    as_: Annotated[str, Alias("as")]
+    blocking: str
+    crossorigin: Literal["anonymous", "use-credentials", True]
+    fetchpriority: Literal["high", "low", "auto"]
+    href: str
+    hreflang: str
+    imagesizes: str
+    imagesrcset: str
+    integrity: str
+    media: str
+    referrerpolicy: Literal[
+        "no-referrer",
+        "no-referrer-when-downgrade",
+        "origin",
+        "origin-when-cross-origin",
+        "same-origin",
+        "strict-origin",
+        "strict-origin-when-cross-origin",
+        "unsafe-url",
+    ]
     rel: Literal[
         "canonical", "alternate", "stylesheet", "icon", "apple-touch-icon", "preconnect"
     ]
-    crossorigin: Literal["anonymous", "use-credentials", True]
-    hreflang: str
-    href: str
-    integrity: str
+    sizes: str
+    type: str
 
 
 class InputAttrs(GlobalAttrs, total=False):
@@ -276,6 +299,7 @@ class InputAttrs(GlobalAttrs, total=False):
     alt: str
     autocomplete: Literal["on", "off"]
     autofocus: bool
+    capture: Literal["user", "environment"]
     checked: bool
     dirname: str
     disabled: bool
@@ -351,6 +375,7 @@ class OptgroupAttrs(GlobalAttrs, total=False):
 
 
 class SelectAttrs(GlobalAttrs, total=False):
+    autocomplete: str
     autofocus: bool
     disabled: bool
     form: str
@@ -361,12 +386,14 @@ class SelectAttrs(GlobalAttrs, total=False):
 
 
 class TextAreaAttrs(GlobalAttrs, total=False):
+    autocomplete: str
     autofocus: bool
     cols: int
     dirname: str
     disabled: bool
     form: str
     maxlength: int
+    minlength: int
     name: str
     placeholder: str
     readonly: bool
@@ -465,7 +492,7 @@ class ButtonAttrs(GlobalAttrs, total=False):
 
 class LabelAttrs(GlobalAttrs, total=False):
     for_: Annotated[str, "for"]
-    name: str
+    form: str
 
 
 class TdAttrs(GlobalAttrs, total=False):
@@ -489,6 +516,8 @@ class LiAttrs(GlobalAttrs, total=False):
 class ImgAttrs(GlobalAttrs, total=False):
     alt: str
     crossorigin: Literal["anonymous", "use-credentials"]
+    decoding: Literal["sync", "async", "auto"]
+    fetchpriority: Literal["high", "low", "auto"]
     height: int
     ismap: bool
     loading: Literal["eager", "lazy"]
@@ -553,8 +582,10 @@ class IframeAttrs(GlobalAttrs, total=False):
     allow: str
     allowfullscreen: bool
     allowpaymentrequest: bool
-    height: int
+    csp: str
+    credentialless: bool
     frameborder: str
+    height: int
     loading: Literal["eager", "lazy"]
     name: str
     referrerpolicy: Literal[
@@ -574,9 +605,9 @@ class IframeAttrs(GlobalAttrs, total=False):
         "allow-scripts",
         "allow-top-navigation",
     ]
+    scrolling: str
     src: str
     srcdoc: str
-    scrolling: str
     width: int
 
 
@@ -599,6 +630,8 @@ class AreaAttrs(GlobalAttrs, total=False):
     coords: str
     download: str
     href: str
+    hreflang: str
+    media: str
     ping: str
     referrerpolicy: Literal[
         "no-referrer",
@@ -613,24 +646,29 @@ class AreaAttrs(GlobalAttrs, total=False):
     rel: str
     shape: Literal["rect", "circle", "poly", "default"]
     target: str
+    type: str
 
 
 class SourceAttrs(GlobalAttrs, total=False):
+    height: int
     media: str
     sizes: str
     src: str
     srcset: str
     type: str
+    width: int
 
 
 class AudioAttrs(GlobalAttrs, total=False):
-    src: str
-    preload: Literal["auto", "metadata", "none"]
     autoplay: bool
     controls: bool
+    controlslist: str
+    crossorigin: Literal["anonymous", "use-credentials"]
     loop: bool
-    muted: bool
     mediagroup: str
+    muted: bool
+    preload: Literal["auto", "metadata", "none"]
+    src: str
 
 
 class BaseAttrs(GlobalAttrs, total=False):
@@ -668,12 +706,12 @@ class MapAttrs(GlobalAttrs, total=False):
 
 class MeterAttrs(GlobalAttrs, total=False):
     form: str
-    high: int
-    low: int
-    max: int
-    min: int
-    optimum: int
-    value: int
+    high: float
+    low: float
+    max: float
+    min: float
+    optimum: float
+    value: float
 
 
 class ObjectAttrs(GlobalAttrs, total=False):
@@ -699,8 +737,8 @@ class ParamAttrs(GlobalAttrs, total=False):
 
 
 class ProgressAttrs(GlobalAttrs, total=False):
-    max: int
-    value: int
+    max: float
+    value: float
 
 
 class QAttrs(HtmlAttrs, total=False):
@@ -722,9 +760,14 @@ class TrackAttrs(GlobalAttrs, total=False):
 class VideoAttrs(GlobalAttrs, total=False):
     autoplay: bool
     controls: bool
+    controlslist: str
+    crossorigin: Literal["anonymous", "use-credentials"]
+    disablepictureinpicture: bool
+    disableremoteplayback: bool
     height: int
     loop: bool
     muted: bool
+    playsinline: bool
     poster: str
     preload: Literal["auto", "metadata", "none"]
     src: str

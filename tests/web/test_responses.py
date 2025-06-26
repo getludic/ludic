@@ -1,4 +1,3 @@
-# tests/web/test_responses.py
 import pytest
 from starlette.applications import Starlette
 from starlette.requests import Request
@@ -6,8 +5,8 @@ from starlette.responses import Response
 from starlette.routing import Route
 from starlette.testclient import TestClient
 
+from ludic.base import BaseElement
 from ludic.web.responses import (
-    BaseElement,
     LudicResponse,
     extract_response_status_headers,
     prepare_response,
