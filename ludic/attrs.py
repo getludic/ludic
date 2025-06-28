@@ -56,6 +56,7 @@ class HtmlAttrs(Attrs, total=False):
     ]
     lang: str
     popover: bool
+    role: str
     spellcheck: Literal["true", "false"]
     style: CSSProperties
     tabindex: int
