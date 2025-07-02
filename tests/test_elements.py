@@ -27,7 +27,7 @@ def test_empty_element() -> None:
 
 def test_html_paragraph() -> None:
     paragraph = html.p(
-        f"Hello, World! {html.b("Something bold")} and {html.i("Something italic")}"
+        f"Hello, World! {html.b('Something bold')} and {html.i('Something italic')}"
     )
     assert paragraph.to_html() == (
         "<p>Hello, World! <b>Something bold</b> and <i>Something italic</i></p>"
@@ -164,6 +164,9 @@ def test_data_attributes() -> None:
 
     assert dom.attrs == {"data_foo": "1", "data_bar": "test"}
     assert dom.to_html() == '<div data-foo="1" data-bar="test">content</div>'
+
+    dom2 = html.div("value", dataset={"foo": "bar", "baz": 5, "nothing": False})
+    assert dom2.to_html() == '<div data-foo="bar" data-baz="5">value</div>'
 
 
 def test_htmx_attributes() -> None:

@@ -1,5 +1,6 @@
 import html
 import inspect
+import itertools
 import random
 import re
 from collections.abc import Mapping
@@ -69,6 +70,22 @@ def format_attr_value(key: str, value: Any, is_html: bool = False) -> str:
     return formatted_value
 
 
+def extract_dataset_attrs(attrs: Mapping[str, Any]) -> Mapping[str, Any]:
+    """Converts "dataset" attributes to "data-*" attributes names.
+
+    Args:
+        attrs (Mapping[str, Any]): A dictionary containing HTML attributes.
+
+    Returns:
+        Mapping[str, Any]: A dictionary containing extracted data-* attributes.
+    """
+    extracted_attrs = {}
+    if (dataset_attrs := attrs.get("dataset")) and isinstance(dataset_attrs, dict):
+        for key, value in dataset_attrs.items():
+            extracted_attrs[f"data-{key}"] = value
+    return extracted_attrs
+
+
 def format_attrs(attrs: Mapping[str, Any], is_html: bool = False) -> dict[str, Any]:
     """Format the given attributes.
 
@@ -80,15 +97,18 @@ def format_attrs(attrs: Mapping[str, Any], is_html: bool = False) -> dict[str, A
         >>> {"name": "John", "class": "person"}
 
     Args:
-        attrs (dict[str, Any]): The attributes to format.
+        attrs (Mapping[str, Any]): The attributes to format.
 
     Returns:
-        dict[str, Any]: The formatted attributes.
+        Mapping[str, Any]: The formatted attributes.
     """
     aliases = _load_attrs_aliases()
     result: dict[str, str] = {}
+    dataset_attrs = extract_dataset_attrs(attrs)
 
-    for key, value in attrs.items():
+    for key, value in itertools.chain(attrs.items(), dataset_attrs.items()):
+        if key == "dataset":
+            continue
         if formatted_value := format_attr_value(key, value, is_html=is_html):
             if key in aliases:
                 alias = aliases[key]

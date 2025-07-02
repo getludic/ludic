@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from typing import Annotated, Literal, Protocol, TypedDict
 
 from .styles.types import CSSProperties
@@ -44,7 +45,6 @@ class HtmlAttrs(Attrs, total=False):
     id: str
     accesskey: str
     class_: Annotated[str, Alias("class")]
-    classes: Annotated[list[str], Alias("class")]  # merged with class_
     contenteditable: Literal["true", "false"]
     dir: Literal["ltr", "rtl", "auto"]
     draggable: Literal["true", "false"]
@@ -62,6 +62,10 @@ class HtmlAttrs(Attrs, total=False):
     tabindex: int
     title: str
     translate: Literal["yes", "no"]
+
+    # Special attributes
+    classes: Annotated[list[str], Alias("class")]  # merged with class_
+    dataset: Mapping[str, str | int | bool | float]  # renders data-* attributes
 
 
 class HtmxAttrs(Attrs, total=False):
