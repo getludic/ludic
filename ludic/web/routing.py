@@ -1,5 +1,5 @@
 import inspect
-from collections.abc import Callable
+from collections.abc import Callable, Collection
 from typing import Any
 
 from starlette import routing
@@ -108,7 +108,7 @@ class Router(routing.Router):
         self,
         path: str,
         endpoint: Callable[..., Any],
-        methods: list[str] | None = None,
+        methods: Collection[str] | None = None,
         name: str | None = None,
         include_in_schema: bool = True,
     ) -> None:

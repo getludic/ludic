@@ -135,31 +135,44 @@ async def extract_from_request(  # noqa
         handler_kwargs.update(request.path_params)
 
     for name, param in parameters.items():
-        if isinstance(request, WebSocket):
-            if issubclass(param.annotation, WebSocket):
-                handler_kwargs[name] = request
-        elif (origin := get_origin(param.annotation)) is not None and issubclass(
-            origin, BaseParser
-        ):
-            async with request.form() as form:
-                handler_kwargs[name] = param.annotation(form)
-        elif isinstance(param.annotation, UnionType):
-            if (args := get_args(param.annotation)) and (
-                len(args) != 2 or args[1] is not NoneType
+        annotation = param.annotation
+        # Defensive: skip if annotation is inspect._empty
+        if annotation is inspect._empty:
+            continue
+        try:
+            # Defensive: issubclass only if annotation is a class
+            if isinstance(request, WebSocket):
+                if isinstance(annotation, type) and issubclass(annotation, WebSocket):
+                    handler_kwargs[name] = request
+            elif (
+                (origin := get_origin(annotation)) is not None
+                and isinstance(origin, type)
+                and issubclass(origin, BaseParser)
             ):
-                raise TypeError(
-                    f"Request handler has an invalid signature: {param.annotation!r}"
-                )
-            handler_kwargs[name] = request.query_params.get(name)
-        elif issubclass(param.annotation, FormData):
-            async with request.form() as form:
-                handler_kwargs[name] = form
-        elif issubclass(param.annotation, Request):
-            handler_kwargs[name] = request
-        elif issubclass(param.annotation, QueryParams):
-            handler_kwargs[name] = request.query_params
-        elif issubclass(param.annotation, Headers):
-            handler_kwargs[name] = request.headers
+                async with request.form() as form:
+                    handler_kwargs[name] = annotation(form)
+            elif isinstance(annotation, UnionType):
+                args = get_args(annotation)
+                # Defensive: Only allow Optional[X] (X | NoneType)
+                if not (args and len(args) == 2 and args[1] is NoneType):
+                    raise TypeError(
+                        f"Request handler has an invalid signature: {annotation!r}"
+                    )
+                handler_kwargs[name] = request.query_params.get(name)
+            elif isinstance(annotation, type) and issubclass(annotation, FormData):
+                async with request.form() as form:
+                    handler_kwargs[name] = form
+            elif isinstance(annotation, type) and issubclass(annotation, Request):
+                handler_kwargs[name] = request
+            elif isinstance(annotation, type) and issubclass(annotation, QueryParams):
+                handler_kwargs[name] = request.query_params
+            elif isinstance(annotation, type) and issubclass(annotation, Headers):
+                handler_kwargs[name] = request.headers
+        except Exception as exc:
+            raise TypeError(
+                f"Error extracting parameter '{name}' "
+                f"with annotation {annotation!r}: {exc}"
+            ) from exc
 
     return handler_kwargs
 
