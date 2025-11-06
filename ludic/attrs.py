@@ -66,6 +66,7 @@ class HtmlAttrs(Attrs, total=False):
     # Special attributes
     classes: Annotated[list[str], Alias("class")]  # merged with class_
     dataset: Mapping[str, str | int | bool | float]  # renders data-* attributes
+    attrs: Mapping[str, str | int | bool | float | list[str]]  # raw attributes
 
 
 class HtmxAttrs(Attrs, total=False):
