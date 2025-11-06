@@ -6,7 +6,10 @@ from ludic.base import BaseElement
 
 
 class LudicMiddleware:
-    """Ludic middleware for Django to clean up the cache for f-strings.
+    """Ludic middleware for Django.
+
+    With Python 3.14+ t-strings, this middleware is now optional as it no longer
+    needs to manage the FormatContext cache. It's kept for backward compatibility.
 
     Usage:
 
@@ -22,7 +25,5 @@ class LudicMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: HttpRequest) -> HttpResponse:
-        with BaseElement.formatter:
-            response: HttpResponse = self.get_response(request)
-
+        response: HttpResponse = self.get_response(request)
         return response

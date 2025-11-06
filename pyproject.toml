@@ -5,11 +5,11 @@ build-backend = "hatchling.build"
 [project]
 name = "ludic"
 dynamic = ["version"]
-description = "Lightweight framework for building dynamic HTML pages in pure Python."
-keywords = ["html", "htmx", "async", "web", "templating"]
+description = "Lightweight framework for building dynamic HTML pages in pure Python with t-strings."
+keywords = ["html", "htmx", "async", "web", "templating", "t-strings"]
 authors = [{ name = "Pavel Dedík", email = "dedikx@gmail.com" }]
 maintainers = [{ name = "Pavel Dedík", email = "dedikx@gmail.com" }]
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 license = "MIT"
 readme = "README.md"
 classifiers = [
@@ -19,8 +19,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Internet :: WWW/HTTP",
 ]
@@ -60,9 +59,9 @@ test = [
 ]
 
 [tool.hatch.envs.default]
-python = "3.12"
+python = "3.14"
 platforms = ["linux", "macos"]
-description = "Default environment with Python 3.12 for maximum compatibility"
+description = "Default environment with Python 3.14 for t-string support"
 features = ["dev", "full", "django", "test"]
 
 [tool.hatch.version]
@@ -73,7 +72,7 @@ version-file = "_version.py"
 
 [tool.ruff]
 line-length = 88
-target-version = "py312"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = [
@@ -104,7 +103,7 @@ known-first-party = ["ludic"]
 known-third-party = ["examples"]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.14"
 strict = true
 disallow_subclassing_any = false
 plugins = "ludic/mypy_plugin.py"

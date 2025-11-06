@@ -47,8 +47,7 @@ def function_wrapper(
     @functools.wraps(handler)
     async def wrapped_endpoint(*args: P.args, **kwargs: P.kwargs) -> Any:
         if is_async_callable(handler):
-            with BaseElement.formatter:
-                raw_response = await handler(*args, **kwargs)
+            raw_response = await handler(*args, **kwargs)
         else:
             raw_response = await run_in_threadpool_safe(handler, *args, **kwargs)
 
