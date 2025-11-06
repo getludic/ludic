@@ -1,5 +1,9 @@
 name: Test
 
+# NOTE: Ludic v1.x requires Python 3.14+ for t-string support.
+# Using '3.14-dev' to test against the latest Python 3.14 development builds.
+# Once Python 3.14 is officially released, change to '3.14' or '3.14.0'.
+
 on:
   push:
     branches: [ main ]
@@ -15,10 +19,11 @@ jobs:
     steps:
     - uses: actions/checkout@v5
 
-    - name: Set up Python 3.12
+    - name: Set up Python 3.14
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
+        python-version: '3.14-dev'
+        allow-prereleases: true
 
     - name: Install dependencies
       run: |
@@ -36,7 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.12, 3.13]
+        python-version: ['3.14-dev']
 
     steps:
     - uses: actions/checkout@v5
@@ -45,6 +50,7 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
 
     - name: Install dependencies
       run: |
