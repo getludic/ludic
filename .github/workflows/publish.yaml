@@ -1,5 +1,8 @@
 name: Publish
 
+# NOTE: Ludic v1.x requires Python 3.14+ for t-string support.
+# Using '3.14-dev' until Python 3.14 is officially released.
+
 on:
   workflow_dispatch:
   push:
@@ -20,7 +23,8 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.14-dev"
+          allow-prereleases: true
           cache: pip
           cache-dependency-path: "**/pyproject.toml"
 

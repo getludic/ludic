@@ -1,5 +1,5 @@
 default_language_version:
-  python: python3
+  python: python3.14
 
 default_install_hook_types:
   - pre-commit
