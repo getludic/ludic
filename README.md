@@ -81,36 +81,23 @@ This structure can be type-checked thanks to Python's rich type system. Addition
 
 ## Migration from v0.5 to v1.0
 
-Ludic 1.0 introduces a major change: **t-strings (template strings)** replace the previous f-string approach with `FormatContext`. This provides better performance, simpler code, and enhanced security.
+Ludic 1.0 requires Python 3.14+ and introduces a major change: **t-strings (template strings)** replace the previous f-string approach with `FormatContext`. This provides better performance, simpler code, and enhanced security.
 
 ### Key Changes
 
-1. **Replace `f"` with `t"`** when mixing HTML elements with text:
-   ```python
-   # v0.5 (f-strings)
-   div(f"Hello {b('World')}")
+**Replace `f"` with `t"`** when mixing HTML elements with text:
 
-   # v1.0 (t-strings)
-   div(t"Hello {b('World')}")
-   ```
+```python
+# v0.5 (f-strings)
+div(f"Hello {b('World')}")
 
-2. **No more `FormatContext` needed** - The context manager is no longer required:
-   ```python
-   # v0.5 - Required context manager
-   with BaseElement.formatter:
-       result = div(f"test {b('foo')}")
-
-   # v1.0 - Direct usage
-   result = div(t"test {b('foo')}")
-   ```
-
-3. **Automatic memory management** - No risk of memory leaks from accumulated context
-
-4. **Simpler web handlers** - No need to wrap handlers with context managers
+# v1.0 (t-strings)
+div(t"Hello {b('World')}")
+```
 
 ### Version Compatibility
 
-- **Ludic 0.5.x**: Python 3.12, 3.13 (uses f-strings with FormatContext)
+- **Ludic 0.5.x**: Python 3.12, 3.13 (uses f-strings)
 - **Ludic 1.0.x**: Python 3.14+ (uses t-strings)
 
 ## Requirements

@@ -252,8 +252,8 @@ class Switcher(Block):
                 ),
             },
             (
-                f".switcher > :nth-last-child(n+{theme.layouts.switcher.limit+1})",
-                f".switcher > :nth-last-child(n+{theme.layouts.switcher.limit+1}) ~ *",
+                f".switcher>:nth-last-child(n+{theme.layouts.switcher.limit + 1})",
+                f".switcher>:nth-last-child(n+{theme.layouts.switcher.limit + 1}) ~ *",
             ): {
                 "flex-basis": "100%",
             },

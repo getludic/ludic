@@ -49,7 +49,7 @@ async def run_in_threadpool_safe(
     return response
 
 
-def extract_response_status_headers(
+def extract_response_status_headers[T](
     raw_response: T, status_code: int | None = None, headers: Headers | None = None
 ) -> tuple[T, int | None, Headers | None]:
     """Extracts status code and headers from response if it is a tuple."""

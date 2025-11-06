@@ -1,13 +1,11 @@
 name: Publish
 
-# NOTE: Ludic v1.x requires Python 3.14+ for t-string support.
-
 on:
   workflow_dispatch:
   push:
     tags:
-      - "[0-9].[0-9]+.[0-9]+"
-      - "[0-9].[0-9]+.[0-9]+-pre[0-9]?"
+      - "1.[0-9]+.[0-9]+"
+      - "1.[0-9]+.[0-9]+-pre[0-9]?"
 
 jobs:
   publish:

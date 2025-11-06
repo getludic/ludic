@@ -7,9 +7,8 @@ from typing import (
     Self,
     SupportsIndex,
     TypedDict,
+    TypeVar,
 )
-
-from typing_extensions import TypeVar
 
 from .utils import (
     clamp,
@@ -89,7 +88,7 @@ class ColorRange(Color):
 
     def __new__(
         cls, variants: list[str] | str, position: int | None = None
-    ) -> "ColorRange":
+    ) -> ColorRange:
         if isinstance(variants, str):
             variants = [variants]
 
@@ -152,7 +151,7 @@ class Size(BaseSize):
     value: float
     unit: SizeUnit = "rem"
 
-    def __new__(cls, value: float, unit: SizeUnit = "rem") -> "Size":
+    def __new__(cls, value: float, unit: SizeUnit = "rem") -> Size:
         self = super().__new__(cls, format_unit(value, unit))
         self.value = value
         self.unit = unit
@@ -217,7 +216,7 @@ class SizeClamp(BaseSize):
         maximum: float,
         base_unit: SizeUnit = "rem",
         viewport_unit: SizeUnit = "vw",
-    ) -> "SizeClamp":
+    ) -> SizeClamp:
         self = super().__new__(
             cls,
             clamp(

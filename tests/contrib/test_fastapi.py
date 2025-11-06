@@ -2,7 +2,6 @@ from fastapi import FastAPI, Response
 from fastapi.testclient import TestClient
 
 from ludic.attrs import GlobalAttrs
-from ludic.base import BaseElement
 from ludic.catalog.layouts import Center, Stack
 from ludic.components import Blank, Component
 from ludic.contrib.fastapi import LudicRoute
@@ -45,9 +44,9 @@ async def nested_components() -> div:
     return div(p("Level 1", span("Level 2", div("Level 3"))), id="root")
 
 
-@app.get("/f-string")
-async def f_string_test() -> span:
-    return span(f"Result: {p('This is a test')}")
+@app.get("/t-string")
+async def t_string_test() -> span:
+    return span(t"Result: {p('This is a test')}")
 
 
 @app.get("/status-code", status_code=202)
@@ -103,13 +102,12 @@ def test_nested_components() -> None:
     )
 
 
-def test_formatter_cleanup_with_f_string() -> None:
+def test_formatter_cleanup_with_t_string() -> None:
     client = TestClient(app)
-    response = client.get("/f-string")
+    response = client.get("/t-string")
 
     assert response.status_code == 200
     assert b"Result: <p>This is a test</p>" in response.content
-    assert len(BaseElement.formatter.get()) == 0
 
 
 def test_return_different_status_code() -> None:

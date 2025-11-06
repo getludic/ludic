@@ -51,30 +51,27 @@ def test_styles_formatting() -> None:
 
 
 def test_styles_nested_formatting() -> None:
-    assert (
-        style(
-            {
-                "p.message": {
-                    "color": "black",  # type: ignore[dict-item]
-                    "background": "yellow",  # type: ignore[dict-item]
-                    "padding": "10px",  # type: ignore[dict-item]
-                    "a": {
-                        "color": "red",
-                        "text-decoration": "none",
-                    },
-                    "a:hover": {
-                        "text-decoration": "underline",
-                    },
+    assert style(
+        {
+            "p.message": {
+                "color": "black",  # type: ignore[dict-item]
+                "background": "yellow",  # type: ignore[dict-item]
+                "padding": "10px",  # type: ignore[dict-item]
+                "a": {
+                    "color": "red",
+                    "text-decoration": "none",
                 },
-            }
-        ).to_html()
-        == (
-            "<style>\n"
-            "p.message { color: black; background: yellow; padding: 10px; }\n"
-            "p.message a { color: red; text-decoration: none; }\n"
-            "p.message a:hover { text-decoration: underline; }\n"
-            "</style>"
-        )
+                "a:hover": {
+                    "text-decoration": "underline",
+                },
+            },
+        }
+    ).to_html() == (
+        "<style>\n"
+        "p.message { color: black; background: yellow; padding: 10px; }\n"
+        "p.message a { color: red; text-decoration: none; }\n"
+        "p.message a:hover { text-decoration: underline; }\n"
+        "</style>"
     )
 
 

@@ -113,7 +113,7 @@ def _extract_kwargs_type(ctx: ClassDefContext, base: Instance) -> Type | None:
 
 
 class LudicPlugin(Plugin):
-    def get_base_class_hook(self, fullname: str) -> "CB[ClassDefContext]":
+    def get_base_class_hook(self, fullname: str) -> CB[ClassDefContext]:
         sym = self.lookup_fully_qualified(fullname)
         if sym and isinstance(sym.node, TypeInfo):
             if is_component_base(sym.node):

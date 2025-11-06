@@ -11,7 +11,7 @@ class BaseElement(metaclass=ABCMeta):
     void_element: ClassVar[bool] = False
 
     # Support for wrapping processed template strings in a specific element
-    template_wrap_in: ClassVar[type["BaseElement"] | None] = None
+    template_wrap_in: ClassVar[type[BaseElement] | None] = None
 
     children: Sequence[Any]
     attrs: Mapping[str, Any]

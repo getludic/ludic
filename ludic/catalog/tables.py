@@ -2,9 +2,7 @@
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Literal, cast, get_type_hints, override
-
-from typing_extensions import TypeVar
+from typing import Any, Literal, TypeVar, cast, get_type_hints, override
 
 from ludic.attrs import GlobalAttrs
 from ludic.base import BaseElement

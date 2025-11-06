@@ -2,8 +2,6 @@ from collections.abc import Callable
 
 from django.http import HttpRequest, HttpResponse
 
-from ludic.base import BaseElement
-
 
 class LudicMiddleware:
     """Ludic middleware for Django.

@@ -95,6 +95,7 @@ ignore = [
     "D211",
     "D213",
     "UP040",
+    "UP046",
 ]
 fixable = ["ALL"]
 
@@ -107,6 +108,7 @@ python_version = "3.14"
 strict = true
 disallow_subclassing_any = false
 plugins = "ludic/mypy_plugin.py"
+disable_error_code = ["misc"]
 
 [tool.pytest.ini_options]
 testpaths = "tests"

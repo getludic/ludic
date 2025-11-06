@@ -27,7 +27,7 @@ def test_empty_element() -> None:
 
 def test_html_paragraph() -> None:
     paragraph = html.p(
-        f"Hello, World! {html.b('Something bold')} and {html.i('Something italic')}"
+        t"Hello, World! {html.b('Something bold')} and {html.i('Something italic')}"
     )
     assert paragraph.to_html() == (
         "<p>Hello, World! <b>Something bold</b> and <i>Something italic</i></p>"

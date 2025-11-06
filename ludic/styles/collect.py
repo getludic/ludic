@@ -38,13 +38,13 @@ def format_styles(styles: GlobalStyles, separator: str = "\n") -> str:
                         nodes_to_parse.append(([*parents, key], value))
 
         if content:
-            result.append(f"{" ".join(parents)} {{ {" ".join(content)} }}")
+            result.append(f"{' '.join(parents)} {{ {' '.join(content)} }}")
 
     return separator.join(result)
 
 
 def from_components(
-    *components: type["BaseElement"], theme: Theme | None = None
+    *components: type[BaseElement], theme: Theme | None = None
 ) -> GlobalStyles:
     """Global styles collector from given components.
 

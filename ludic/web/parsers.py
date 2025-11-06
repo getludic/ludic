@@ -27,7 +27,7 @@ try:
     from typeguard import TypeCheckError, check_type
 except ImportError:
 
-    def check_type(
+    def check_type[T](
         value: object, expected_type: type[T], *args: Any, **kwargs: Any
     ) -> T:
         warnings.warn(
