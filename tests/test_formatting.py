@@ -155,3 +155,8 @@ def test_raw_attrs() -> None:
     assert format_attrs({"attrs": {"data_items": ["a", "b", "c"]}}) == {
         "data_items": "a b c"
     }
+
+    # Raw attrs with same key as converted regular attr (concatenation)
+    assert format_attrs({"class_": "btn", "attrs": {"class": "extra"}}) == {
+        "class": "btn extra"
+    }
