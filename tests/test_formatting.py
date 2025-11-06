@@ -155,3 +155,57 @@ def test_raw_attrs() -> None:
     assert format_attrs({"attrs": {"data_items": ["a", "b", "c"]}}) == {
         "data_items": "a b c"
     }
+
+    # Raw attrs with same key as converted regular attr (concatenation)
+    assert format_attrs({"class_": "btn", "attrs": {"class": "extra"}}) == {
+        "class": "btn extra"
+    }
+
+
+def test_raw_attrs_validation() -> None:
+    """Test that attrs parameter validates type correctly."""
+    import pytest
+
+    # Should raise TypeError if attrs is not a dict
+    with pytest.raises(
+        TypeError, match="The 'attrs' parameter must be a dict, got str"
+    ):
+        format_attrs({"attrs": "not a dict"})
+
+    with pytest.raises(
+        TypeError, match="The 'attrs' parameter must be a dict, got list"
+    ):
+        format_attrs({"attrs": ["foo", "bar"]})
+
+    with pytest.raises(
+        TypeError, match="The 'attrs' parameter must be a dict, got int"
+    ):
+        format_attrs({"attrs": 123})
+
+    # None should be treated as no attrs (not raise an error)
+    # This is handled by the walrus operator check
+    assert format_attrs({"attrs": None}) == {}
+
+
+def test_dataset_attrs_validation() -> None:
+    """Test that dataset parameter validates type correctly."""
+    import pytest
+
+    # Should raise TypeError if dataset is not a dict
+    with pytest.raises(
+        TypeError, match="The 'dataset' parameter must be a dict, got str"
+    ):
+        format_attrs({"dataset": "not a dict"})
+
+    with pytest.raises(
+        TypeError, match="The 'dataset' parameter must be a dict, got list"
+    ):
+        format_attrs({"dataset": ["foo", "bar"]})
+
+    with pytest.raises(
+        TypeError, match="The 'dataset' parameter must be a dict, got int"
+    ):
+        format_attrs({"dataset": 123})
+
+    # None should be treated as no dataset (not raise an error)
+    assert format_attrs({"dataset": None}) == {}

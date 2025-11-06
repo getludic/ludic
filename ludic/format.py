@@ -78,9 +78,17 @@ def extract_dataset_attrs(attrs: Mapping[str, Any]) -> Mapping[str, Any]:
 
     Returns:
         Mapping[str, Any]: A dictionary containing extracted data-* attributes.
+
+    Raises:
+        TypeError: If the 'dataset' parameter is not a dict.
     """
     extracted_attrs = {}
-    if (dataset_attrs := attrs.get("dataset")) and isinstance(dataset_attrs, dict):
+    if dataset_attrs := attrs.get("dataset"):
+        if not isinstance(dataset_attrs, dict):
+            raise TypeError(
+                f"The 'dataset' parameter must be a dict, "
+                f"got {type(dataset_attrs).__name__}"
+            )
         for key, value in dataset_attrs.items():
             extracted_attrs[f"data-{key}"] = value
     return extracted_attrs
@@ -96,9 +104,16 @@ def extract_raw_attrs(attrs: Mapping[str, Any]) -> Mapping[str, Any]:
 
     Returns:
         Mapping[str, Any]: A dictionary containing raw attributes with keys as-is.
+
+    Raises:
+        TypeError: If the 'attrs' parameter is not a dict.
     """
     extracted_attrs = {}
-    if (raw_attrs := attrs.get("attrs")) and isinstance(raw_attrs, dict):
+    if raw_attrs := attrs.get("attrs"):
+        if not isinstance(raw_attrs, dict):
+            raise TypeError(
+                f"The 'attrs' parameter must be a dict, got {type(raw_attrs).__name__}"
+            )
         extracted_attrs.update(raw_attrs)
     return extracted_attrs
 
