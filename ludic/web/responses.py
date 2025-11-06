@@ -40,11 +40,12 @@ P = ParamSpec("P")
 async def run_in_threadpool_safe(
     func: Callable[P, T], *args: P.args, **kwargs: P.kwargs
 ) -> T:
-    def func_wrapped(*args: P.args, **kwargs: P.kwargs) -> T:
-        with BaseElement.formatter:
-            return func(*args, **kwargs)
+    """Run a synchronous function in a thread pool.
 
-    response: T = await run_in_threadpool(func_wrapped, *args, **kwargs)
+    With t-strings in Python 3.14, we no longer need the FormatContext
+    wrapper, simplifying this function significantly.
+    """
+    response: T = await run_in_threadpool(func, *args, **kwargs)
     return response
 
 
@@ -89,8 +90,7 @@ async def prepare_response(
     is_async = is_async_callable(handler)
 
     if is_async:
-        with BaseElement.formatter:
-            raw_response = await handler(**handler_kw)
+        raw_response = await handler(**handler_kw)
     else:
         raw_response = await run_in_threadpool_safe(handler, **handler_kw)
 

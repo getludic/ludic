@@ -2,7 +2,7 @@ from abc import ABCMeta
 from collections.abc import Iterator, Mapping, Sequence
 from typing import Any, ClassVar
 
-from .format import FormatContext, format_attrs, format_element
+from .format import Template, format_attrs, format_element, process_template
 
 
 class BaseElement(metaclass=ABCMeta):
@@ -10,8 +10,8 @@ class BaseElement(metaclass=ABCMeta):
     html_name: ClassVar[str | None] = None
     void_element: ClassVar[bool] = False
 
-    formatter: ClassVar[FormatContext] = FormatContext("element_formatter")
-    formatter_fstring_wrap_in: ClassVar[type["BaseElement"] | None] = None
+    # Support for wrapping processed template strings in a specific element
+    template_wrap_in: ClassVar[type["BaseElement"] | None] = None
 
     children: Sequence[Any]
     attrs: Mapping[str, Any]
@@ -19,9 +19,17 @@ class BaseElement(metaclass=ABCMeta):
 
     def __init__(self, *children: Any, **attrs: Any) -> None:
         self.context = {}
-        self.children = self.formatter.extract(
-            *children, WrapIn=self.formatter_fstring_wrap_in
-        )
+        # Process t-string templates in children
+        processed_children: list[Any] = []
+        for child in children:
+            if isinstance(child, Template):
+                # Process t-string template
+                processed_children.extend(
+                    process_template(child, wrap_in=self.template_wrap_in)
+                )
+            else:
+                processed_children.append(child)
+        self.children = tuple(processed_children)
         self.attrs = attrs
 
     def __str__(self) -> str:
@@ -29,9 +37,6 @@ class BaseElement(metaclass=ABCMeta):
 
     def __bytes__(self) -> bytes:
         return self.to_html().encode("utf-8")
-
-    def __format__(self, _: str) -> str:
-        return self.formatter.append(self)
 
     def __len__(self) -> int:
         return len(self.children)

@@ -2,7 +2,7 @@
     <img width="600px" src="https://raw.githubusercontent.com/getludic/ludic/main/docs/assets/ludic.png" alt="Ludic Logo">
 </p>
 
-[![test](https://github.com/getludic/ludic/actions/workflows/test.yaml/badge.svg)](https://github.com/getludic/ludic/actions) [![codecov](https://codecov.io/gh/getludic/ludic/graph/badge.svg?token=BBDNJWHMGX)](https://codecov.io/gh/getludic/ludic) [![Python 3.12 and 3.13](https://img.shields.io/badge/Python-3.12%20%7C%203.13-blue)](https://www.python.org/downloads/release/python-3130/) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/) [![Discord Server](https://img.shields.io/badge/discord-ludic-black)](https://discord.gg/7nK4zAXAYC)
+[![test](https://github.com/getludic/ludic/actions/workflows/test.yaml/badge.svg)](https://github.com/getludic/ludic/actions) [![codecov](https://codecov.io/gh/getludic/ludic/graph/badge.svg?token=BBDNJWHMGX)](https://codecov.io/gh/getludic/ludic) [![Python 3.14+](https://img.shields.io/badge/Python-3.14+-blue)](https://www.python.org/downloads/) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/) [![Discord Server](https://img.shields.io/badge/discord-ludic-black)](https://discord.gg/7nK4zAXAYC)
 
 **Documentation**: https://getludic.dev/docs/
 
@@ -14,14 +14,15 @@
 
 ---
 
-Ludic is a lightweight framework for building HTML pages with a component approach similar to [React](https://react.dev/). It is built to be used together with [htmx.org](https://htmx.org/) so that developers don't need to write almost any JavaScript to create dynamic web services. Its potential can be leveraged together with its web framework which is a wrapper around the powerful [Starlette](https://www.starlette.io/) framework. It is built with the latest Python 3.12 features heavily incorporating typing.
+Ludic is a lightweight framework for building HTML pages with a component approach similar to [React](https://react.dev/). It is built to be used together with [htmx.org](https://htmx.org/) so that developers don't need to write almost any JavaScript to create dynamic web services. Its potential can be leveraged together with its web framework which is a wrapper around the powerful [Starlette](https://www.starlette.io/) framework. Version 1.x leverages Python 3.14's new t-strings (template strings) for safer and simpler HTML templating.
 
 ## Features
 
 - Seamless **&lt;/&gt; htmx** integration for rapid web development in **pure Python**
 - **Type-Guided components** utilizing Python's typing system
 - Uses the power of **Starlette** and **Async** for high-performance web development
-- Build HTML with the ease and power of Python **f-strings**
+- Build HTML with the ease and power of Python **t-strings** (template strings)
+- Enhanced **security** with automatic escaping and clear separation of trusted vs untrusted content
 - Add CSS styling to your components with **Themes**
 - Create simple, responsive layouts adopted from the **Every Layout Book**
 
@@ -78,9 +79,45 @@ Table(
 
 This structure can be type-checked thanks to Python's rich type system. Additionally, this `Table` component could have **dynamic properties** like sorting or filtering.
 
+## Migration from v0.5 to v1.0
+
+Ludic 1.0 introduces a major change: **t-strings (template strings)** replace the previous f-string approach with `FormatContext`. This provides better performance, simpler code, and enhanced security.
+
+### Key Changes
+
+1. **Replace `f"` with `t"`** when mixing HTML elements with text:
+   ```python
+   # v0.5 (f-strings)
+   div(f"Hello {b('World')}")
+
+   # v1.0 (t-strings)
+   div(t"Hello {b('World')}")
+   ```
+
+2. **No more `FormatContext` needed** - The context manager is no longer required:
+   ```python
+   # v0.5 - Required context manager
+   with BaseElement.formatter:
+       result = div(f"test {b('foo')}")
+
+   # v1.0 - Direct usage
+   result = div(t"test {b('foo')}")
+   ```
+
+3. **Automatic memory management** - No risk of memory leaks from accumulated context
+
+4. **Simpler web handlers** - No need to wrap handlers with context managers
+
+### Version Compatibility
+
+- **Ludic 0.5.x**: Python 3.12, 3.13 (uses f-strings with FormatContext)
+- **Ludic 1.0.x**: Python 3.14+ (uses t-strings)
+
 ## Requirements
 
-Python 3.12+
+Python 3.14+
+
+**Note:** Ludic 1.x requires Python 3.14+ for t-string support. If you're using Python 3.12 or 3.13, please use Ludic 0.5.x which uses f-strings instead.
 
 ## Installation
 
@@ -137,7 +174,7 @@ app = LudicApp()
 
 @app.get("/")
 async def homepage() -> p:
-    return p(f"Hello {b("Stranger")}! Click {Link("here", to="https://example.com")}!")
+    return p(t"Hello {b("Stranger")}! Click {Link("here", to="https://example.com")}!")
 ```
 
 To run the application:

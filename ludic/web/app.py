@@ -205,8 +205,7 @@ class LudicApp(Starlette):
                     handler_kw[name] = request
 
             if is_async:
-                with BaseElement.formatter:
-                    response = await handler(**handler_kw)
+                response = await handler(**handler_kw)
             else:
                 response = await run_in_threadpool_safe(handler, **handler_kw)
 

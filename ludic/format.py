@@ -1,16 +1,20 @@
 import html
 import inspect
 import itertools
-import random
-import re
+import sys
 from collections.abc import Mapping
-from contextvars import ContextVar
 from functools import lru_cache
-from typing import Any, Final, TypeVar, get_type_hints
+from typing import Any, TypeVar, get_type_hints
 
 T = TypeVar("T")
 
-_EXTRACT_NUMBER_RE: Final[re.Pattern[str]] = re.compile(r"\{(\d+:id)\}")
+# Check Python version for t-string support
+if sys.version_info >= (3, 14):
+    from string.templatelib import Interpolation, Template
+else:
+    # Fallback types for older Python versions (won't be used at runtime)
+    Template = Any  # type: ignore
+    Interpolation = Any  # type: ignore
 
 
 @lru_cache
@@ -136,125 +140,46 @@ def format_element(child: Any) -> str:
         return str(child)
 
 
-def _extract_match(text: str | Any) -> int | str:
-    if text.endswith(":id") and text[:-3].isdigit():
-        return int(text[:-3])
-    return str(text)
+def process_template(template: Any, wrap_in: type | None = None) -> tuple[Any, ...]:
+    """Process a t-string template into a tuple of children.
 
-
-def extract_identifiers(text: str) -> list[str | int]:
-    """Extract numbers from a string.
-
-    Args:
-        text (str): The string to extract numbers from.
-
-    Returns:
-        Iterable[int]: The extracted numbers.
-    """
-    parts = [_extract_match(match) for match in _EXTRACT_NUMBER_RE.split(text) if match]
-    if any(isinstance(part, int) for part in parts):
-        return parts
-    else:
-        return []
-
-
-class FormatContext:
-    """Format context helper for using f-strings in elements.
-
-    Facilitates dynamic content formatting within Ludic elements using f-strings.
-
-    This class addresses potential memory leaks when using f-strings directly in
-    element generation. Employing the 'with' statement ensures proper cleanup of
-    formatting context.
-
-    It is possible to use f-strings in elements without the contextmanager,
-    however, the contextmanager clears the context (cache) at the end of the block.
-    So without this manager, you can have memory leaks in your app.
-
-    It is recommended to wrap, for example, request context with this manager.
+    This function processes Python 3.14 t-string Template objects, extracting
+    both static string parts and dynamic interpolated values. This replaces the
+    old FormatContext system.
 
     Example usage:
 
-        with FormatContext():
-            dom = div(f"test {b('foo')} {i('bar')}")
+        dom = div(t"test {b('foo')} {i('bar')}")
+        # Internally processes to: div("test ", b('foo'), " ", i('bar'))
 
-        assert dom.to_html() == "<div>test <b>foo</b> <i>bar</i></div>"
+    Args:
+        template: The Template object from a t-string literal.
+        wrap_in: Optional element type to wrap the processed parts in.
+
+    Returns:
+        tuple[Any, ...]: A tuple of children elements and strings.
     """
+    if sys.version_info < (3, 14):
+        # For older Python versions, just return the template as-is
+        # This should never happen at runtime for v1.x
+        return (template,)
 
-    _context: ContextVar[dict[int, Any]]
+    # Template objects are iterable, yielding str or Interpolation objects
+    parts: list[Any] = []
+    for part in template:
+        if isinstance(part, str):
+            # Static string part
+            if part:  # Only add non-empty strings
+                parts.append(part)
+        elif isinstance(part, Interpolation):
+            # Dynamic interpolated value
+            value = part.value
+            parts.append(value)
+        else:
+            # Fallback for unexpected types
+            parts.append(part)
 
-    def __init__(self, name: str) -> None:
-        self._context = ContextVar(name)
+    if wrap_in is not None:
+        return (wrap_in(*parts),)
 
-    def get(self) -> dict[int, Any]:
-        try:
-            return self._context.get()
-        except LookupError:
-            return {}
-
-    def append(self, obj: Any) -> str:
-        """Store the given object in context memory and return the identifier.
-
-        Args:
-            obj (Any): The object to store in context memory.
-
-        Returns:
-            str: The identifier of the stored object.
-        """
-        random_id = random.getrandbits(256)
-
-        try:
-            cache = self._context.get()
-            cache[random_id] = obj
-            self._context.set(cache)
-        except LookupError:
-            self._context.set({random_id: obj})
-
-        return f"{{{random_id}:id}}"
-
-    def extract(self, *args: Any, WrapIn: type | None = None) -> tuple[Any, ...]:
-        """Extract identifiers from the given arguments.
-
-        Example:
-
-            with FormatContext() as ctx:
-                first = ctx.append("foo")
-                second = ctx.append({"bar": "baz"})
-                print(ctx.extract(f"test {first} {second}"))
-
-            ["test ", "foo", " ", {"bar": "baz"}]
-
-        Args:
-            WrapIn
-            args (Any): The arguments to extract identifiers from.
-
-        Returns:
-            Any: The extracted arguments.
-        """
-        arguments: list[Any] = []
-        for arg in args:
-            if isinstance(arg, str) and (parts := extract_identifiers(arg)):
-                cache = self.get()
-                extracted_args = (
-                    cache.pop(part) if isinstance(part, int) else part
-                    for part in parts
-                    if not isinstance(part, int) or part in cache
-                )
-                if WrapIn is not None:
-                    arguments.append(WrapIn(*extracted_args))
-                else:
-                    arguments.extend(extracted_args)
-                self._context.set(cache)
-            else:
-                arguments.append(arg)
-        return tuple(arguments)
-
-    def clear(self) -> None:
-        """Clear the context memory."""
-        self._context.set({})
-
-    def __enter__(self) -> "FormatContext":
-        return self
-
-    def __exit__(self, *_: Any) -> None:
-        self.clear()
+    return tuple(parts)
