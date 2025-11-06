@@ -43,15 +43,15 @@ def test_format_context_in_elements() -> None:
     assert context.get() == {}
 
     with context:
-        f"test {b("foo")} {i("bar")}"
+        f"test {b('foo')} {i('bar')}"
         assert list(context.get().values()) == [b("foo"), i("bar")]
 
     assert context.get() == {}
 
     with context:
-        text = f"test {b("baz")} {i("foo")}"
+        text = f"test {b('baz')} {i('foo')}"
         assert div(text) == div("test ", b("baz"), " ", i("foo"))
-        assert div(f"test {div(f"foo {b("nested")}, {i("nested2")}")}") == div(
+        assert div(f"test {div(f'foo {b("nested")}, {i("nested2")}')}") == div(
             "test ",
             div("foo ", b("nested"), ", ", i("nested2")),
         )
@@ -61,7 +61,7 @@ def test_format_context_in_elements() -> None:
 
 def test_component_with_f_string() -> None:
     paragraph = Paragraph(
-        f"Hello, how {strong("are you")}? Click {Link("here", to="https://example.com")}.",
+        f"Hello, how {strong('are you')}? Click {Link('here', to='https://example.com')}.",
     )
     assert len(paragraph.children) == 5
     assert isinstance(paragraph.children[3], Link)
@@ -118,3 +118,45 @@ def test_attributes() -> None:
     assert format_attrs(
         {"hx-on:htmx:before-request": "alert('Making a request!')"}
     ) == {"hx-on:htmx:before-request": "alert('Making a request!')"}
+
+
+def test_raw_attrs() -> None:
+    """Test that raw attrs are not converted (for libraries like Datastar)."""
+    # Basic raw attrs without conversion
+    assert format_attrs({"attrs": {"data_store": "value"}}) == {"data_store": "value"}
+    assert format_attrs({"attrs": {"data-store_foo": "bar"}}) == {
+        "data-store_foo": "bar"
+    }
+
+    # Combination of regular and raw attrs
+    assert format_attrs({"class_": "test", "attrs": {"data_store": "value"}}) == {
+        "class": "test",
+        "data_store": "value",
+    }
+
+    # Multiple raw attrs
+    assert format_attrs(
+        {"attrs": {"data_store": "value", "data-signal_test": "signal"}}
+    ) == {"data_store": "value", "data-signal_test": "signal"}
+
+    # Raw attrs with dataset attrs
+    assert format_attrs(
+        {"dataset": {"foo": "bar"}, "attrs": {"data_store": "value"}}
+    ) == {"data-foo": "bar", "data_store": "value"}
+
+    # Raw attrs should still format boolean values
+    assert format_attrs({"attrs": {"data_store": True}}) == {"data_store": "true"}
+    assert format_attrs({"attrs": {"data_store": True}}, is_html=True) == {
+        "data_store": "data_store"
+    }
+
+    # Raw attrs should handle different value types
+    assert format_attrs({"attrs": {"data_count": 42}}) == {"data_count": "42"}
+    assert format_attrs({"attrs": {"data_items": ["a", "b", "c"]}}) == {
+        "data_items": "a b c"
+    }
+
+    # Raw attrs with same key as converted regular attr (concatenation)
+    assert format_attrs({"class_": "btn", "attrs": {"class": "extra"}}) == {
+        "class": "btn extra"
+    }
