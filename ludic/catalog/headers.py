@@ -32,7 +32,7 @@ class Anchor(Component[str, AnchorAttrs]):
     @override
     def render(self) -> a:
         return a(
-            self.children[0] if self.children else "#", href=f"#{self.attrs["target"]}"
+            self.children[0] if self.children else "#", href=f"#{self.attrs['target']}"
         )
 
 

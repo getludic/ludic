@@ -2,7 +2,6 @@ import os
 
 from django.http import HttpRequest
 
-from ludic.base import BaseElement
 from ludic.contrib.django import LudicMiddleware, LudicResponse
 from ludic.html import p
 
@@ -20,13 +19,10 @@ def test_django_middleware() -> None:
         nonlocal get_response_called
         get_response_called = True
 
-        assert len(BaseElement.formatter.get()) == 0
-        response = LudicResponse(f"{p("does not clean up cache")}")
-        assert len(BaseElement.formatter.get()) == 1
+        response = LudicResponse(f"{p('does not clean up cache')}")
         return response
 
     middleware = LudicMiddleware(get_response)
     middleware(HttpRequest())
 
     assert get_response_called
-    assert len(BaseElement.formatter.get()) == 0

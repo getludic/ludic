@@ -1,20 +1,13 @@
 import html
 import inspect
 import itertools
-import sys
 from collections.abc import Mapping
 from functools import lru_cache
+from string.templatelib import Interpolation
+from string.templatelib import Template as Template
 from typing import Any, TypeVar, get_type_hints
 
 T = TypeVar("T")
-
-# Check Python version for t-string support
-if sys.version_info >= (3, 14):
-    from string.templatelib import Interpolation, Template
-else:
-    # Fallback types for older Python versions (won't be used at runtime)
-    Template = Any  # type: ignore
-    Interpolation = Any  # type: ignore
 
 
 @lru_cache
@@ -159,11 +152,6 @@ def process_template(template: Any, wrap_in: type | None = None) -> tuple[Any, .
     Returns:
         tuple[Any, ...]: A tuple of children elements and strings.
     """
-    if sys.version_info < (3, 14):
-        # For older Python versions, just return the template as-is
-        # This should never happen at runtime for v1.x
-        return (template,)
-
     # Template objects are iterable, yielding str or Interpolation objects
     parts: list[Any] = []
     for part in template:

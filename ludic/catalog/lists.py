@@ -31,7 +31,7 @@ class List(Component[AnyChildren, GlobalAttrs]):
         List(Item("Item 1"), Item("Item 2"))
     """
 
-    formatter_fstring_wrap_in = Item
+    template_wrap_in = Item
 
     @override
     def render(self) -> ul:
@@ -53,7 +53,7 @@ class NumberedList(Component[AnyChildren, OlAttrs]):
         NumberedList(Item("Item 1"), Item("Item 2"))
     """
 
-    formatter_fstring_wrap_in = Item
+    template_wrap_in = Item
 
     @override
     def render(self) -> ol:

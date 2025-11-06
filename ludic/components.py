@@ -12,7 +12,7 @@ from .styles.types import GlobalStyles
 from .types import AnyChildren, TAttrs, TChildren, TChildrenArgs
 from .utils import get_element_attrs_annotations
 
-COMPONENT_REGISTRY: MutableMapping[str, list[type["BaseComponent"]]] = {}
+COMPONENT_REGISTRY: MutableMapping[str, list[type[BaseComponent]]] = {}
 
 
 class BaseComponent(BaseElement, metaclass=ABCMeta):
@@ -36,7 +36,7 @@ class BaseComponent(BaseElement, metaclass=ABCMeta):
             element.attrs.setdefault("classes", [])  # type: ignore
             element.attrs["classes"].extend(classes)
 
-    def attrs_for(self, cls: type["BaseElement"]) -> dict[str, Any]:
+    def attrs_for(self, cls: type[BaseElement]) -> dict[str, Any]:
         """Get the attributes of this component that are defined in the given element.
 
         This is useful so that you can pass common attributes to an element

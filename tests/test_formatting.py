@@ -1,6 +1,5 @@
-from ludic.base import BaseElement
 from ludic.catalog.typography import Link, Paragraph
-from ludic.format import format_attr_value, format_attrs, process_template
+from ludic.format import format_attr_value, format_attrs
 from ludic.html import b, div, i, p, strong
 
 
@@ -30,57 +29,26 @@ def test_format_attr_value() -> None:
 
 
 def test_template_processing() -> None:
-    """Test t-string template processing.
-
-    Note: This test will only run with Python 3.14+. For older versions,
-    the Template type will be Any and this test should be skipped.
-    """
-    import sys
-
-    if sys.version_info < (3, 14):
-        import pytest
-
-        pytest.skip("T-strings require Python 3.14+")
-
     # With Python 3.14+, t-strings are processed into tuples of parts
     # Example: t"test {b("foo")} {i("bar")}" becomes ("test ", b("foo"), " ", i("bar"))
-    assert div(t"test {b("foo")} {i("bar")}") == div("test ", b("foo"), " ", i("bar"))
+    assert div(t"test {b('foo')} {i('bar')}") == div("test ", b("foo"), " ", i("bar"))
 
 
 def test_tstring_in_elements() -> None:
-    """Test that t-strings work correctly in elements.
-
-    With Python 3.14+, t-strings automatically process embedded elements.
-    """
-    import sys
-
-    if sys.version_info < (3, 14):
-        import pytest
-
-        pytest.skip("T-strings require Python 3.14+")
-
     # Simple t-string with elements
-    text = t"test {b("baz")} {i("foo")}"
+    text = t"test {b('baz')} {i('foo')}"
     assert div(text) == div("test ", b("baz"), " ", i("foo"))
 
     # Nested t-strings
-    assert div(t"test {div(t"foo {b("nested")}, {i("nested2")}")}") == div(
+    assert div(t"test {div(t'foo {b("nested")}, {i("nested2")}')}") == div(
         "test ",
         div("foo ", b("nested"), ", ", i("nested2")),
     )
 
 
 def test_component_with_tstring() -> None:
-    """Test components with t-strings."""
-    import sys
-
-    if sys.version_info < (3, 14):
-        import pytest
-
-        pytest.skip("T-strings require Python 3.14+")
-
     paragraph = Paragraph(
-        t"Hello, how {strong("are you")}? Click {Link("here", to="https://example.com")}.",
+        t"Hello, how {strong('are you')}? Click {Link('here', to='https://example.com')}.",
     )
     assert len(paragraph.children) == 5
     assert isinstance(paragraph.children[3], Link)
@@ -101,13 +69,6 @@ def test_component_with_tstring() -> None:
 
 def test_escaping_works() -> None:
     """Test that HTML escaping works correctly with t-strings."""
-    import sys
-
-    if sys.version_info < (3, 14):
-        import pytest
-
-        pytest.skip("T-strings require Python 3.14+")
-
     link = '<a href="https://example.com">test</a>'
     dom = p(t"Hello, how <b>are you</b>? Click {link}.")
     assert dom.to_html() == (

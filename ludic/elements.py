@@ -22,7 +22,7 @@ class Element(Generic[TChildren, TAttrs], BaseElement):
         self,
         *children: TChildren,
         # FIXME: https://github.com/python/typing/issues/1399
-        **attrs: Unpack[TAttrs],  # type: ignore
+        **attrs: Unpack[TAttrs],
     ) -> None:
         super().__init__(*children, **attrs)
 
@@ -44,7 +44,7 @@ class ElementStrict(Generic[*TChildrenArgs, TAttrs], BaseElement):
         self,
         *children: *TChildrenArgs,
         # FIXME: https://github.com/python/typing/issues/1399
-        **attrs: Unpack[TAttrs],  # type: ignore
+        **attrs: Unpack[TAttrs],
     ) -> None:
         super().__init__(*children, **attrs)
 

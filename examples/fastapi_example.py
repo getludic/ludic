@@ -53,11 +53,11 @@ async def index(request: Request) -> Page:
         H1("Cascading Select"),
         MessageInfo(
             Title("FastAPI Example"),
-            t"This example uses {b("FastAPI")} as backend Web Framework.",
+            t"This example uses {b('FastAPI')} as backend Web Framework.",
         ),
         Quote(
-            t"In this example we show how to make the values in one {Code("select")} "
-            t"depend on the value selected in another {Code("select")}.",
+            t"In this example we show how to make the values in one {Code('select')} "
+            t"depend on the value selected in another {Code('select')}.",
             source_url="https://htmx.org/examples/value-select/",
         ),
         H2("Demo"),

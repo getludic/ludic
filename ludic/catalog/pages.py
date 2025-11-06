@@ -145,40 +145,40 @@ class HtmlPage(ComponentStrict[Head, Body, NoAttrs]):
             },
             # utilities
             ".text-align-center": {
-                "text-align": "center !important",  # type: ignore[typeddict-item]
+                "text-align": "center !important",  # type: ignore[dict-item]
             },
             ".text-align-right": {
-                "text-align": "right !important",  # type: ignore[typeddict-item]
+                "text-align": "right !important",  # type: ignore[dict-item]
             },
             ".text-align-left": {
-                "text-align": "left !important",  # type: ignore[typeddict-item]
+                "text-align": "left !important",  # type: ignore[dict-item]
             },
             ".justify-space-between": {
-                "justify-content": "space-between !important",  # type: ignore[typeddict-item]
+                "justify-content": "space-between !important",  # type: ignore[dict-item]
             },
             ".justify-space-around": {
-                "justify-content": "space-around !important",  # type: ignore[typeddict-item]
+                "justify-content": "space-around !important",  # type: ignore[dict-item]
             },
             ".justify-space-evenly": {
-                "justify-content": "space-evenly !important",  # type: ignore[typeddict-item]
+                "justify-content": "space-evenly !important",  # type: ignore[dict-item]
             },
             ".justify-center": {
-                "justify-content": "center !important",  # type: ignore[typeddict-item]
+                "justify-content": "center !important",  # type: ignore[dict-item]
             },
             ".justify-end": {
-                "justify-content": "end !important",  # type: ignore[typeddict-item]
+                "justify-content": "end !important",  # type: ignore[dict-item]
             },
             ".justify-start": {
-                "justify-content": "start !important",  # type: ignore[typeddict-item]
+                "justify-content": "start !important",  # type: ignore[dict-item]
             },
             ".align-center": {
-                "align-items": "center !important",  # type: ignore[typeddict-item]
+                "align-items": "center !important",  # type: ignore[dict-item]
             },
             ".align-end": {
-                "align-items": "end !important",  # type: ignore[typeddict-item]
+                "align-items": "end !important",  # type: ignore[dict-item]
             },
             ".align-start": {
-                "align-items": "start !important",  # type: ignore[typeddict-item]
+                "align-items": "start !important",  # type: ignore[dict-item]
             },
             ".no-padding": {
                 "padding": "0 !important",

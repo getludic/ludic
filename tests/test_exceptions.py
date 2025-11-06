@@ -45,7 +45,7 @@ async def page_not_found() -> p:
 
 @app.exception_handler(404)
 async def not_found(request: Request) -> p:
-    return p(f"page {request.url.path} does not exist")
+    return p(t"page {request.url.path} does not exist")
 
 
 @app.exception_handler(405)
@@ -55,7 +55,7 @@ async def method_not_allowed() -> p:
 
 @app.exception_handler(500)
 async def server_error(exception: Exception) -> p:
-    return p(f"server error: {exception}")
+    return p(t"server error: {exception}")
 
 
 def test_exception_handling() -> None:

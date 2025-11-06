@@ -245,14 +245,14 @@ def test_choice_field() -> None:
 
 def test_items() -> None:
     assert List("A", "B", "C").to_html() == "<ul><li>A</li><li>B</li><li>C</li></ul>"
-    assert List(f"Test {b("yes")}", "D").to_html() == (
+    assert List(t"Test {b("yes")}", "D").to_html() == (
         "<ul>"
           "<li>Test <b>yes</b></li>"
           "<li>D</li>"
         "</ul>"
     )  # fmt: skip
     assert NumberedList(
-        Item(f"Test {b("ol")}"),
+        Item(t"Test {b("ol")}"),
         Item("E"),
     ).to_html() == (
         "<ol>"
