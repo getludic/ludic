@@ -400,3 +400,33 @@ def test_all_elements() -> None:
     assert html.var("test", id="var").to_html() == '<var id="var">test</var>'
     assert html.video("test", id="video").to_html() == '<video id="video">test</video>'
     assert html.wbr(id="wbr").to_html() == '<wbr id="wbr">'
+
+
+def test_raw_attrs_in_elements() -> None:
+    """Test that the attrs parameter preserves underscores (for Datastar, etc.)."""
+    # Basic usage with raw attrs
+    dom = html.div("content", attrs={"data_store": "value"})
+    assert dom.to_html() == '<div data_store="value">content</div>'
+
+    # Combining regular and raw attrs
+    dom2 = html.div("content", class_="container", attrs={"data-store_foo": "bar"})
+    assert dom2.to_html() == '<div class="container" data-store_foo="bar">content</div>'
+
+    # Multiple raw attrs with Datastar-like syntax
+    button = html.button(
+        "Click me",
+        class_="btn",
+        attrs={
+            "data-store_count": "0",
+            "data-on-click_increment": "$store.count++",
+        },
+    )
+    assert button.to_html() == (
+        '<button class="btn" '
+        'data-store_count="0" '
+        'data-on-click_increment="$store.count++">Click me</button>'
+    )
+
+    # Raw attrs with dataset
+    dom3 = html.div("test", dataset={"id": "123"}, attrs={"data_store": "value"})
+    assert dom3.to_html() == '<div data-id="123" data_store="value">test</div>'
