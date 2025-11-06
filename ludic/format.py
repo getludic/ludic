@@ -83,6 +83,23 @@ def extract_dataset_attrs(attrs: Mapping[str, Any]) -> Mapping[str, Any]:
     return extracted_attrs
 
 
+def extract_raw_attrs(attrs: Mapping[str, Any]) -> Mapping[str, Any]:
+    """Extracts raw attributes that bypass underscore-to-dash conversion.
+
+    This is useful for libraries like Datastar that use underscores in their DSL.
+
+    Args:
+        attrs (Mapping[str, Any]): A dictionary containing HTML attributes.
+
+    Returns:
+        Mapping[str, Any]: A dictionary containing raw attributes with keys as-is.
+    """
+    extracted_attrs = {}
+    if (raw_attrs := attrs.get("attrs")) and isinstance(raw_attrs, dict):
+        extracted_attrs.update(raw_attrs)
+    return extracted_attrs
+
+
 def format_attrs(attrs: Mapping[str, Any], is_html: bool = False) -> dict[str, Any]:
     """Format the given attributes.
 
@@ -102,9 +119,10 @@ def format_attrs(attrs: Mapping[str, Any], is_html: bool = False) -> dict[str, A
     aliases = _load_attrs_aliases()
     result: dict[str, str] = {}
     dataset_attrs = extract_dataset_attrs(attrs)
+    raw_attrs = extract_raw_attrs(attrs)
 
     for key, value in itertools.chain(attrs.items(), dataset_attrs.items()):
-        if key == "dataset":
+        if key in ("dataset", "attrs"):
             continue
         if formatted_value := format_attr_value(key, value, is_html=is_html):
             if key in aliases:
@@ -116,6 +134,15 @@ def format_attrs(attrs: Mapping[str, Any], is_html: bool = False) -> dict[str, A
                 result[alias] += " " + formatted_value
             else:
                 result[alias] = formatted_value
+
+    # Add raw attributes without underscore-to-dash conversion
+    for key, value in raw_attrs.items():
+        if formatted_value := format_attr_value(key, value, is_html=is_html):
+            if key in result:
+                result[key] += " " + formatted_value
+            else:
+                result[key] = formatted_value
+
     return result
 
 
