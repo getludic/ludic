@@ -1,7 +1,7 @@
 import inspect
 from collections.abc import Callable
 from types import NoneType, UnionType
-from typing import Any, ParamSpec, TypeVar, get_args, get_origin
+from typing import Any, ParamSpec, TypeVar, get_args, get_origin, get_type_hints
 
 from starlette._utils import is_async_callable
 from starlette.concurrency import run_in_threadpool
@@ -130,12 +130,13 @@ async def extract_from_request(  # noqa
     """
     parameters = inspect.signature(handler).parameters
     handler_kwargs: dict[str, Any] = {}
+    type_hints = get_type_hints(handler)
 
     if all(key in parameters for key in request.path_params):
         handler_kwargs.update(request.path_params)
 
     for name, param in parameters.items():
-        annotation = param.annotation
+        annotation = type_hints.get(name, param.annotation)
         # Defensive: skip if annotation is inspect._empty
         if annotation is inspect._empty:
             continue
