@@ -230,7 +230,7 @@ class GlobalAttrs(HtmxAttrs, HtmlAndEventAttrs, total=False):
     """Global attributes for HTML elements."""
 
 
-class HtmlTagAttrs(Attrs, total=False):
+class HtmlTagAttrs(HtmlAttrs, total=False):
     xmlns: str
 
 
