@@ -430,3 +430,11 @@ def test_raw_attrs_in_elements() -> None:
     # Raw attrs with dataset
     dom3 = html.div("test", dataset={"id": "123"}, attrs={"data_store": "value"})
     assert dom3.to_html() == '<div data-id="123" data_store="value">test</div>'
+
+
+def test_html_attributes() -> None:
+    """Test that html element supports global attributes."""
+    assert (
+        html.html(html.head(), html.body(), lang="en").to_html()
+        == '<!doctype html>\n<html lang="en"><head></head><body></body></html>'
+    )
