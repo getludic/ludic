@@ -1,5 +1,7 @@
 import inspect
-from collections.abc import Callable, Mapping, Sequence
+import warnings
+from collections.abc import AsyncIterator, Callable, Mapping, Sequence
+from contextlib import asynccontextmanager
 from functools import wraps
 from typing import Any, Literal, TypeVar, cast
 
@@ -22,6 +24,27 @@ from .routing import Router
 
 TCallable = TypeVar("TCallable", bound=Callable[..., Any])
 TEndpoint = TypeVar("TEndpoint", bound=Endpoint[Attrs])
+
+
+def _build_lifespan(
+    on_startup: Sequence[Callable[[], Any]],
+    on_shutdown: Sequence[Callable[[], Any]],
+) -> Lifespan[Any]:
+    @asynccontextmanager
+    async def lifespan(app: Any) -> AsyncIterator[None]:
+        for handler in on_startup:
+            if is_async_callable(handler):
+                await handler()
+            else:
+                handler()
+        yield
+        for handler in on_shutdown:
+            if is_async_callable(handler):
+                await handler()
+            else:
+                handler()
+
+    return lifespan
 
 
 class LudicApp(Starlette):
@@ -59,9 +82,21 @@ class LudicApp(Starlette):
         for key, value in (exception_handlers or {}).items():
             self.add_exception_handler(key, value)
 
-        self.router = Router(
-            routes, on_startup=on_startup, on_shutdown=on_shutdown, lifespan=lifespan
-        )
+        if (on_startup or on_shutdown) and lifespan is not None:
+            raise AssertionError(
+                "Use either 'lifespan' or 'on_startup'/'on_shutdown', not both."
+            )
+
+        if on_startup or on_shutdown:
+            warnings.warn(
+                "The on_startup and on_shutdown parameters are deprecated, "
+                "use lifespan instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            lifespan = _build_lifespan(on_startup or (), on_shutdown or ())
+
+        self.router = Router(routes, lifespan=lifespan)
 
     def get(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
         """Register GET endpoint to the application."""
