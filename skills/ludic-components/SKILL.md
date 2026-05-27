@@ -1,6 +1,21 @@
 ---
 name: ludic-components
-description: Build typed, React-like HTML components in Python with Ludic — uses PEP 750 t-strings (Python 3.14+) and pairs with htmx. Use this skill whenever the user is writing or modifying Ludic component code: subclassing Component or ComponentStrict, declaring Attrs TypedDicts, composing HTML elements from ludic.html (div, a, html, head, body, table, form, ...), mixing markup with interpolation via t"...", reaching for catalog widgets (Table, PageLayout, Form, Button, Navigation), wiring htmx attributes (hx_get, hx_post, hx_target, hx_swap) on elements, defining Themes or CSS styles on components, or anything involving the trusted-vs-untrusted (Safe) content boundary. Also trigger on questions about why mypy is flagging a component's children/attrs. Prefer this skill even when the user does not explicitly say "Ludic" — the import `from ludic ...` or any usage of t-strings to build HTML is a strong signal. For building endpoints, request handling, FastAPI/Django integration, or URL generation, use the companion `ludic-web` skill instead.
+description: >-
+  Build typed, React-like HTML components in Python with Ludic — uses PEP 750
+  t-strings (Python 3.14+) and pairs with htmx. Use this skill whenever the
+  user is writing or modifying Ludic component code: subclassing Component or
+  ComponentStrict, declaring Attrs TypedDicts, composing HTML elements from
+  ludic.html (div, a, html, head, body, table, form, ...), mixing markup with
+  interpolation via t"...", reaching for catalog widgets (Table, PageLayout,
+  Form, Button, Navigation), wiring htmx attributes (hx_get, hx_post,
+  hx_target, hx_swap) on elements, defining Themes or CSS styles on
+  components, or anything involving the trusted-vs-untrusted (Safe) content
+  boundary. Also trigger on questions about why mypy is flagging a
+  component's children/attrs. Prefer this skill even when the user does not
+  explicitly say "Ludic" — the import `from ludic ...` or any usage of
+  t-strings to build HTML is a strong signal. For building endpoints,
+  request handling, FastAPI/Django integration, or URL generation, use the
+  companion `ludic-web` skill instead.
 metadata:
   type: framework-guide
   framework: ludic
