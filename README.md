@@ -188,6 +188,30 @@ For more complex usage incorporating all capabilities of the framework:
 - inspect the [source of getludic.dev](https://github.com/getludic/web/blob/main/web/endpoints/docs/htmx.py) which is written with Ludic
 - check [this small repository](https://github.com/getludic/ludic-slides/blob/main/ludic_slides/components.py) rendering slides in the browser
 
+## Agent Skills
+
+Ludic ships two agent skills, installable via the [`skills`](https://www.npmjs.com/package/skills) CLI (works with any supported coding agent):
+
+- [`ludic-components`](skills/ludic-components/SKILL.md) — building components: t-string templating, `Component` / `ComponentStrict` typing, the catalog widgets, htmx attributes, the trusted-vs-untrusted (`Safe`) content boundary.
+- [`ludic-web`](skills/ludic-web/SKILL.md) — building web apps: `LudicApp`, typed `Endpoint` classes, FastAPI / Django integrations, parsers and responses, htmx response patterns, and **safe URL generation (host header poisoning mitigations)**.
+
+Install one:
+
+```bash
+npx skills add https://github.com/getludic/ludic --skill ludic-components
+npx skills add https://github.com/getludic/ludic --skill ludic-web
+```
+
+Install both at once:
+
+```bash
+npx skills add https://github.com/getludic/ludic --skill ludic-components --skill ludic-web
+# or, equivalently:
+npx skills add https://github.com/getludic/ludic --skill '*'
+```
+
+Once installed, the agent will pick the relevant skill up automatically whenever you ask it to write or modify Ludic code.
+
 ## Contributing
 
 Any contributions to the framework are warmly welcome! Your help will make it a better resource for the community. If you're ready to contribute, read the [contribution guide](https://github.com/getludic/ludic/tree/master/CONTRIBUTING.md).
