@@ -1,6 +1,21 @@
 ---
 name: ludic-web
-description: Build web apps with Ludic's web integration — Starlette-based LudicApp, typed Endpoint classes, and the FastAPI / Django integrations. Use this skill whenever the user is wiring Ludic components into HTTP handlers: routing requests with LudicApp, declaring async endpoints that return components, subclassing ludic.web.endpoints.Endpoint, parsing form data or query params, returning htmx partials, handling redirects, mounting Ludic inside an existing FastAPI or Django app, or generating URLs from a request (request.url_for / request.url_path_for). Always trigger this skill on any code that generates absolute URLs from request data — there is a host header poisoning class of vulnerability that affects every Ludic web app and needs explicit guarding. Also trigger on questions about LudicRequest, LudicResponse, the Starlette/FastAPI/Django bridge, or htmx response patterns (HX-Trigger, HX-Redirect, HX-Push-Url headers). For pure component authoring without an HTTP layer, use the companion `ludic-components` skill.
+description: >-
+  Build web apps with Ludic's web integration — Starlette-based LudicApp,
+  typed Endpoint classes, and the FastAPI / Django integrations. Use this
+  skill whenever the user is wiring Ludic components into HTTP handlers:
+  routing requests with LudicApp, declaring async endpoints that return
+  components, subclassing ludic.web.endpoints.Endpoint, parsing form data
+  or query params, returning htmx partials, handling redirects, mounting
+  Ludic inside an existing FastAPI or Django app, or generating URLs from
+  a request (request.url_for / request.url_path_for). Always trigger this
+  skill on any code that generates absolute URLs from request data — there
+  is a host header poisoning class of vulnerability that affects every
+  Ludic web app and needs explicit guarding. Also trigger on questions
+  about LudicRequest, LudicResponse, the Starlette/FastAPI/Django bridge,
+  or htmx response patterns (HX-Trigger, HX-Redirect, HX-Push-Url
+  headers). For pure component authoring without an HTTP layer, use the
+  companion `ludic-components` skill.
 metadata:
   type: framework-guide
   framework: ludic
