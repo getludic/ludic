@@ -21,6 +21,14 @@ When opening a PR against `main`, you usually also need to **backport the change
 
 ## Common commands
 
+Prefer `uv` for running commands in this repo. It pins Python 3.14 and resolves the optional extras without needing a hand-managed venv:
+
+```bash
+uv run --python 3.14 --with ".[full,test]" pytest
+uv run --python 3.14 --with ".[full,test]" pytest tests/test_components.py::test_name
+uv run --python 3.14 --with ".[full,test]" mypy ludic
+```
+
 Install for development (editable, with all extras):
 
 ```bash
