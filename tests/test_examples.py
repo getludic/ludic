@@ -97,6 +97,23 @@ def test_infinite_scroll() -> None:
         assert client.get("/contacts/?page=2").status_code == 200
 
 
+def test_active_search() -> None:
+    from examples.active_search import app, load_contacts
+
+    with TestClient(app) as client:
+        assert client.get("/").status_code == 200
+
+        all_results = client.get("/search/")
+        assert all_results.status_code == 200
+        assert all_results.text.count("<tr") == min(len(load_contacts()), 50) + 1
+
+        assert client.get("/search/", params={"search": "smith"}).status_code == 200
+
+        empty = client.get("/search/", params={"search": "zzzznomatch"})
+        assert empty.status_code == 200
+        assert "No matching contacts." in empty.text
+
+
 def test_fastapi_example() -> None:
     from examples.fastapi_example import app
 
