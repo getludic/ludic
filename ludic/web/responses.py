@@ -34,7 +34,6 @@ __all__ = (
 )
 
 
-
 async def run_in_threadpool_safe[T, **P](
     func: Callable[P, T], *args: P.args, **kwargs: P.kwargs
 ) -> T:

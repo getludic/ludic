@@ -95,31 +95,45 @@ class LudicApp(Starlette):
 
         self.router = Router(routes, lifespan=lifespan)
 
-    def get[TCallable: Callable[..., Any]](self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
+    def get[TCallable: Callable[..., Any]](
+        self, path: str, **kwargs: Any
+    ) -> Callable[[TCallable], TCallable]:
         """Register GET endpoint to the application."""
         return self.register_route(path, method="GET", **kwargs)
 
-    def head[TCallable: Callable[..., Any]](self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
+    def head[TCallable: Callable[..., Any]](
+        self, path: str, **kwargs: Any
+    ) -> Callable[[TCallable], TCallable]:
         """Register GET endpoint to the application."""
         return self.register_route(path, method="HEAD", **kwargs)
 
-    def post[TCallable: Callable[..., Any]](self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
+    def post[TCallable: Callable[..., Any]](
+        self, path: str, **kwargs: Any
+    ) -> Callable[[TCallable], TCallable]:
         """Register POST endpoint to the application."""
         return self.register_route(path, method="POST", **kwargs)
 
-    def put[TCallable: Callable[..., Any]](self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
+    def put[TCallable: Callable[..., Any]](
+        self, path: str, **kwargs: Any
+    ) -> Callable[[TCallable], TCallable]:
         """Register PUT endpoint to the application."""
         return self.register_route(path, method="PUT", **kwargs)
 
-    def delete[TCallable: Callable[..., Any]](self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
+    def delete[TCallable: Callable[..., Any]](
+        self, path: str, **kwargs: Any
+    ) -> Callable[[TCallable], TCallable]:
         """Register DELETE endpoint to the application."""
         return self.register_route(path, method="DELETE", **kwargs)
 
-    def patch[TCallable: Callable[..., Any]](self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
+    def patch[TCallable: Callable[..., Any]](
+        self, path: str, **kwargs: Any
+    ) -> Callable[[TCallable], TCallable]:
         """Register PATCH endpoint to the application."""
         return self.register_route(path, method="PATCH", **kwargs)
 
-    def options[TCallable: Callable[..., Any]](self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
+    def options[TCallable: Callable[..., Any]](
+        self, path: str, **kwargs: Any
+    ) -> Callable[[TCallable], TCallable]:
         """Register OPTIONS endpoint to the application."""
         return self.register_route(path, method="OPTIONS", **kwargs)
 

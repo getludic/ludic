@@ -16,7 +16,6 @@ except ImportError:
     pass
 
 
-
 @dataclass
 class Colors:
     """Colors for a theme."""
