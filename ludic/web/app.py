@@ -6,7 +6,7 @@ from functools import wraps
 from typing import Any, Literal, cast
 
 from starlette._utils import is_async_callable
-from starlette.applications import AppType, Starlette
+from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.requests import Request
 from starlette.responses import Response
@@ -64,7 +64,7 @@ class LudicApp(Starlette):
 
     router: Router
 
-    def __init__[TCallable: Callable[..., Any]](
+    def __init__[TCallable: Callable[..., Any], AppType: Starlette](
         self,
         debug: bool = False,
         routes: Sequence[BaseRoute] | None = None,
