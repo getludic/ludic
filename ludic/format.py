@@ -5,9 +5,7 @@ from collections.abc import Mapping
 from functools import lru_cache
 from string.templatelib import Interpolation
 from string.templatelib import Template as Template
-from typing import Any, TypeVar, get_type_hints
-
-T = TypeVar("T")
+from typing import Any, get_type_hints
 
 
 @lru_cache

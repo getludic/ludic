@@ -1,7 +1,7 @@
 import inspect
 from collections.abc import Callable
 from types import NoneType, UnionType
-from typing import Any, ParamSpec, TypeVar, get_args, get_origin, get_type_hints
+from typing import Any, get_args, get_origin, get_type_hints
 
 from starlette._utils import is_async_callable
 from starlette.concurrency import run_in_threadpool
@@ -33,11 +33,9 @@ __all__ = (
     "RedirectResponse",
 )
 
-T = TypeVar("T")
-P = ParamSpec("P")
 
 
-async def run_in_threadpool_safe(
+async def run_in_threadpool_safe[T, **P](
     func: Callable[P, T], *args: P.args, **kwargs: P.kwargs
 ) -> T:
     """Run a synchronous function in a thread pool.
