@@ -56,10 +56,17 @@ class BaseElement(metaclass=ABCMeta):
 
     def _format_attributes(self, is_html: bool = False) -> str:
         attrs: dict[str, Any] = format_attrs(self.attrs, is_html=is_html)
-        return " ".join(
-            f'{key}="{value}"' if '"' not in value else f"{key}='{value}'"
-            for key, value in attrs.items()
-        )
+        formatted: list[str] = []
+        for key, value in attrs.items():
+            # Attribute values are always wrapped in double quotes. Quotes are
+            # deliberately left untouched by format_attr_value() (text content
+            # keeps them unescaped, see test_quotes_not_escaped), so escape them
+            # here. Switching to single quotes when a value contained a double
+            # quote used to let a value with both quote kinds terminate its own
+            # attribute and inject additional attributes.
+            escaped = value.replace('"', "&quot;" if is_html else '\\"')
+            formatted.append(f'{key}="{escaped}"')
+        return " ".join(formatted)
 
     def _format_children(self) -> str:
         formatted = ""
