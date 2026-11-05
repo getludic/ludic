@@ -1,6 +1,5 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
-from typing import TypeVar
 
 from ludic.base import BaseElement
 
@@ -15,8 +14,6 @@ try:
     highlight_dark = LudicDark
 except ImportError:
     pass
-
-_T = TypeVar("_T", bound="BaseElement")
 
 
 @dataclass
@@ -218,7 +215,7 @@ class Theme(metaclass=ABCMeta):
         """Name of the theme."""
         raise NotImplementedError
 
-    def use(self, element: _T) -> _T:
+    def use[T: "BaseElement"](self, element: T) -> T:
         """Apply the theme to an element.
 
         Args:

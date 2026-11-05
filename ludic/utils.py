@@ -3,13 +3,10 @@ from functools import lru_cache
 from typing import (
     Annotated,
     Any,
-    TypeVar,
     get_args,
     get_origin,
     get_type_hints,
 )
-
-_T = TypeVar("_T", covariant=True)
 
 
 @lru_cache
@@ -54,11 +51,11 @@ def get_element_attrs_annotations(
     return {}
 
 
-def get_annotations_metadata_of_type(
+def get_annotations_metadata_of_type[T](
     annotations: dict[str, Any],
-    expected_type: type[_T],
-    default: _T | None = None,
-) -> dict[str, _T]:
+    expected_type: type[T],
+    default: T | None = None,
+) -> dict[str, T]:
     """Get the metadata of the annotations with the given type.
 
     Args:
@@ -69,7 +66,7 @@ def get_annotations_metadata_of_type(
     Returns:
         dict[str, Any]: The metadata.
     """
-    result: dict[str, _T] = {}
+    result: dict[str, T] = {}
     for name, annotation in annotations.items():
         if get_origin(annotation) is not Annotated:
             continue

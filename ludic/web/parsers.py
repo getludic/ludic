@@ -1,7 +1,7 @@
 import warnings
 from abc import ABCMeta, abstractmethod
 from collections.abc import Callable
-from typing import Any, Generic, Protocol, TypeVar, get_args, get_type_hints, override
+from typing import Any, Generic, Protocol, get_args, get_type_hints, override
 
 from starlette.datastructures import FormData
 
@@ -10,11 +10,9 @@ from ludic.utils import get_annotations_metadata_of_type
 
 from .exceptions import BadRequestError
 
-T = TypeVar("T")
-
 
 class CheckTypeProtocol(Protocol):
-    def __call__(
+    def __call__[T](
         self, value: object, expected_type: type[T], *args: Any, **kwargs: Any
     ) -> T:
         pass

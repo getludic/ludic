@@ -1,7 +1,7 @@
 import functools
 import inspect
 from collections.abc import Callable, Coroutine
-from typing import Any, ParamSpec, get_args, get_origin
+from typing import Any, get_args, get_origin
 
 from fastapi import Request
 from fastapi._compat import lenient_issubclass
@@ -16,8 +16,6 @@ from ludic.base import BaseElement
 from ludic.web.requests import Request as LudicRequest
 from ludic.web.responses import LudicResponse, run_in_threadpool_safe
 
-P = ParamSpec("P")
-
 
 def is_base_element(type_: type[Any]) -> bool:
     """Check if type is ludic's BaseElement"""
@@ -26,7 +24,7 @@ def is_base_element(type_: type[Any]) -> bool:
     return lenient_issubclass(type_, BaseElement)
 
 
-def function_wrapper(
+def function_wrapper[**P](
     handler: Callable[..., Any], status_code: int = 200
 ) -> Callable[P, Any]:
     """Wraps endpoints to ensure responses are formatted as LudicResponse objects.

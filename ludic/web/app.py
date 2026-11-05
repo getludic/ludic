@@ -3,10 +3,10 @@ import warnings
 from collections.abc import AsyncIterator, Callable, Mapping, Sequence
 from contextlib import asynccontextmanager
 from functools import wraps
-from typing import Any, Literal, TypeVar, cast
+from typing import Any, Literal, cast
 
 from starlette._utils import is_async_callable
-from starlette.applications import AppType, Starlette
+from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.requests import Request
 from starlette.responses import Response
@@ -21,9 +21,6 @@ from .datastructures import URLPath
 from .endpoints import Endpoint
 from .responses import LudicResponse, run_in_threadpool_safe
 from .routing import Router
-
-TCallable = TypeVar("TCallable", bound=Callable[..., Any])
-TEndpoint = TypeVar("TEndpoint", bound=Endpoint[Attrs])
 
 
 def _build_lifespan(
@@ -67,7 +64,7 @@ class LudicApp(Starlette):
 
     router: Router
 
-    def __init__(
+    def __init__[TCallable: Callable[..., Any], AppType: Starlette](
         self,
         debug: bool = False,
         routes: Sequence[BaseRoute] | None = None,
@@ -98,35 +95,49 @@ class LudicApp(Starlette):
 
         self.router = Router(routes, lifespan=lifespan)
 
-    def get(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
+    def get[TCallable: Callable[..., Any]](
+        self, path: str, **kwargs: Any
+    ) -> Callable[[TCallable], TCallable]:
         """Register GET endpoint to the application."""
         return self.register_route(path, method="GET", **kwargs)
 
-    def head(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
+    def head[TCallable: Callable[..., Any]](
+        self, path: str, **kwargs: Any
+    ) -> Callable[[TCallable], TCallable]:
         """Register GET endpoint to the application."""
         return self.register_route(path, method="HEAD", **kwargs)
 
-    def post(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
+    def post[TCallable: Callable[..., Any]](
+        self, path: str, **kwargs: Any
+    ) -> Callable[[TCallable], TCallable]:
         """Register POST endpoint to the application."""
         return self.register_route(path, method="POST", **kwargs)
 
-    def put(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
+    def put[TCallable: Callable[..., Any]](
+        self, path: str, **kwargs: Any
+    ) -> Callable[[TCallable], TCallable]:
         """Register PUT endpoint to the application."""
         return self.register_route(path, method="PUT", **kwargs)
 
-    def delete(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
+    def delete[TCallable: Callable[..., Any]](
+        self, path: str, **kwargs: Any
+    ) -> Callable[[TCallable], TCallable]:
         """Register DELETE endpoint to the application."""
         return self.register_route(path, method="DELETE", **kwargs)
 
-    def patch(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
+    def patch[TCallable: Callable[..., Any]](
+        self, path: str, **kwargs: Any
+    ) -> Callable[[TCallable], TCallable]:
         """Register PATCH endpoint to the application."""
         return self.register_route(path, method="PATCH", **kwargs)
 
-    def options(self, path: str, **kwargs: Any) -> Callable[[TCallable], TCallable]:
+    def options[TCallable: Callable[..., Any]](
+        self, path: str, **kwargs: Any
+    ) -> Callable[[TCallable], TCallable]:
         """Register OPTIONS endpoint to the application."""
         return self.register_route(path, method="OPTIONS", **kwargs)
 
-    def register_route(
+    def register_route[TCallable: Callable[..., Any]](
         self,
         path: str,
         method: Literal[
@@ -149,7 +160,7 @@ class LudicApp(Starlette):
 
         return register
 
-    def endpoint(
+    def endpoint[TEndpoint: Endpoint[Attrs]](
         self,
         path: str,
         name: str | None = None,
@@ -203,7 +214,7 @@ class LudicApp(Starlette):
         """
         return self.router.url_path_for(name, **path_params)
 
-    def add_exception_handler(
+    def add_exception_handler[TCallable: Callable[..., Any]](
         self,
         exc_class_or_status_code: int | type[Exception],
         handler: TCallable,
@@ -250,7 +261,7 @@ class LudicApp(Starlette):
 
         self.exception_handlers[exc_class_or_status_code] = wrapped_handler
 
-    def exception_handler(
+    def exception_handler[TCallable: Callable[..., Any]](
         self, exc_class_or_status_code: int | type[Exception]
     ) -> Callable[[TCallable], TCallable]:
         """Register an exception handler to the application.
