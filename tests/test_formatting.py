@@ -1,3 +1,5 @@
+import pytest
+
 from ludic.catalog.typography import Link, Paragraph
 from ludic.format import format_attr_value, format_attrs
 from ludic.html import b, div, i, p, strong, style
@@ -112,6 +114,33 @@ def test_attribute_value_with_double_quotes() -> None:
         '<div hx-vals="{&quot;name&quot;: &quot;O\'Brien&quot;}">x</div>'
     )
     assert dom.to_string(pretty=False) == dom.to_html()
+
+
+@pytest.mark.parametrize(
+    "name",
+    ["x onclick", "x\tonclick", "x\nonclick", 'x"', "x'", "x>", "x<", "x/", "x=y"],
+)
+def test_invalid_attribute_name_is_rejected(name: str) -> None:
+    for attrs in ({name: "v"}, {"attrs": {name: "v"}}, {"dataset": {name: "v"}}):
+        with pytest.raises(ValueError, match="Invalid character .* in attribute name"):
+            div("x", **attrs).to_html()
+
+
+def test_special_attribute_names_are_allowed() -> None:
+    dom = div(
+        "x",
+        attrs={
+            "@click": "a",
+            ":class": "b",
+            "x-on:click.prevent": "c",
+            "data-on-click__debounce.500ms": "d",
+            "_": "e",
+        },
+    )
+    assert dom.to_html() == (
+        '<div @click="a" :class="b" x-on:click.prevent="c" '
+        'data-on-click__debounce.500ms="d" _="e">x</div>'
+    )
 
 
 def test_attributes() -> None:

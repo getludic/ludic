@@ -1,11 +1,15 @@
 import html
 import inspect
 import itertools
+import re
 from collections.abc import Mapping
 from functools import lru_cache
 from string.templatelib import Interpolation
 from string.templatelib import Template as Template
-from typing import Any, get_type_hints
+from typing import Any, Final, get_type_hints
+
+# Characters that end an attribute name or are not allowed in one.
+_INVALID_ATTR_NAME_RE: Final[re.Pattern[str]] = re.compile(r"[\s\x00-\x1f\x7f\"'<>/=]")
 
 
 @lru_cache
@@ -63,6 +67,24 @@ def format_attr_value(key: str, value: Any, is_html: bool = False) -> str:
         formatted_value = _html_escape(value)
 
     return formatted_value
+
+
+def check_attr_name(name: str) -> None:
+    """Check that the attribute name cannot change the structure of a tag.
+
+    Attribute names are written to the HTML as they are, so a name containing
+    a space, a quote, `>`, `/` or `=` would add markup of its own.
+
+    Args:
+        name (str): The name of the attribute as it appears in the HTML.
+
+    Raises:
+        ValueError: If the name contains a character not allowed in a name.
+    """
+    if match := _INVALID_ATTR_NAME_RE.search(str(name)):
+        raise ValueError(
+            f"Invalid character {match.group()!r} in attribute name {name!r}"
+        )
 
 
 def extract_dataset_attrs(attrs: Mapping[str, Any]) -> Mapping[str, Any]:
@@ -142,6 +164,7 @@ def format_attrs(attrs: Mapping[str, Any], is_html: bool = False) -> dict[str, A
                 alias = aliases[key]
             else:
                 alias = key.strip("_").replace("_", "-")
+            check_attr_name(alias)
 
             if alias in result:
                 result[alias] += " " + formatted_value
@@ -151,6 +174,7 @@ def format_attrs(attrs: Mapping[str, Any], is_html: bool = False) -> dict[str, A
     # Add raw attributes without underscore-to-dash conversion
     for key, value in raw_attrs.items():
         if formatted_value := format_attr_value(key, value, is_html=is_html):
+            check_attr_name(key)
             if key in result:
                 result[key] += " " + formatted_value
             else:
