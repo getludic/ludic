@@ -42,13 +42,8 @@ def format_attr_value(key: str, value: Any, is_html: bool = False) -> str:
     """
 
     def _html_escape(value: Any) -> str:
-        if (
-            is_html
-            and value
-            and isinstance(value, str)
-            and getattr(value, "escape", True)
-        ):
-            return html.escape(value, False)  # type: ignore
+        if is_html and getattr(value, "escape", True):
+            return html.escape(str(value), False)
         return str(value)
 
     if isinstance(value, dict):
@@ -189,10 +184,10 @@ def format_element(child: Any) -> str:
     Args:
         child (AnyChild): The HTML element or text to format.
     """
-    if isinstance(child, str) and getattr(child, "escape", True):
-        return html.escape(child, False)
-    elif hasattr(child, "to_html"):
+    if hasattr(child, "to_html"):
         return child.to_html()  # type: ignore
+    elif getattr(child, "escape", True):
+        return html.escape(str(child), False)
     else:
         return str(child)
 

@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 from ludic.catalog.typography import Link, Paragraph
@@ -83,6 +85,36 @@ def test_escaping_works() -> None:
 def test_quotes_not_escaped() -> None:
     dom = p("It's alive <3.")
     assert dom.to_html() == "<p>It's alive &lt;3.</p>"
+
+
+class Markup:
+    """An object that is not a string and renders as HTML markup."""
+
+    def __str__(self) -> str:
+        return "<b>&</b>"
+
+
+def test_non_string_children_are_escaped() -> None:
+    child: Any = Markup()
+    assert div(child).to_html() == "<div>&lt;b&gt;&amp;&lt;/b&gt;</div>"
+    assert p(t"Error: {child}").to_html() == ("<p>Error: &lt;b&gt;&amp;&lt;/b&gt;</p>")
+
+    error: Any = ValueError("invalid value '<script>alert(1)</script>'")
+    assert p(error).to_html() == (
+        "<p>invalid value '&lt;script&gt;alert(1)&lt;/script&gt;'</p>"
+    )
+
+    assert div(1, " ", 2.5, " ", True).to_html() == "<div>1 2.5 True</div>"
+    assert div(Safe("<b>&</b>")).to_html() == "<div><b>&</b></div>"
+
+
+def test_non_string_attribute_values_are_escaped() -> None:
+    escaped = "&lt;b&gt;&amp;&lt;/b&gt;"
+    assert format_attr_value("title", Markup(), is_html=True) == escaped
+    assert format_attr_value("title", Markup()) == "<b>&</b>"
+    assert format_attr_value("title", Safe("<b>&</b>"), is_html=True) == "<b>&</b>"
+    assert format_attr_value("tabindex", 0, is_html=True) == "0"
+    assert format_attr_value("title", "", is_html=True) == ""
 
 
 def test_attribute_value_cannot_break_out_of_quotes() -> None:
