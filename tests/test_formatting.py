@@ -1,6 +1,7 @@
 from ludic.catalog.typography import Link, Paragraph
 from ludic.format import format_attr_value, format_attrs
-from ludic.html import b, div, i, p, strong
+from ludic.html import b, div, i, p, strong, style
+from ludic.types import Safe
 
 
 def test_format_attr_value() -> None:
@@ -80,6 +81,37 @@ def test_escaping_works() -> None:
 def test_quotes_not_escaped() -> None:
     dom = p("It's alive <3.")
     assert dom.to_html() == "<p>It's alive &lt;3.</p>"
+
+
+def test_attribute_value_cannot_break_out_of_quotes() -> None:
+    payload = "x\" ' autofocus onfocus=alert(1) y='"
+    escaped = "x&quot; ' autofocus onfocus=alert(1) y='"
+
+    assert div("x", title=payload).to_html() == f'<div title="{escaped}">x</div>'
+    assert div("x", classes=[payload]).to_html() == f'<div class="{escaped}">x</div>'
+    assert div("x", style={"color": payload}).to_html() == (
+        f'<div style="color:{escaped}">x</div>'
+    )
+    assert div("x", dataset={"key": payload}).to_html() == (
+        f'<div data-key="{escaped}">x</div>'
+    )
+    assert div("x", attrs={"data_key": payload}).to_html() == (
+        f'<div data_key="{escaped}">x</div>'
+    )
+    assert div("x", title=Safe(payload)).to_html() == (
+        f'<div title="{escaped}">x</div>'
+    )
+    assert style("a{}", media=payload).to_html() == (
+        f'<style media="{escaped}">\na{{}}\n</style>'
+    )
+
+
+def test_attribute_value_with_double_quotes() -> None:
+    dom = div("x", hx_vals='{"name": "O\'Brien"}')
+    assert dom.to_html() == (
+        '<div hx-vals="{&quot;name&quot;: &quot;O\'Brien&quot;}">x</div>'
+    )
+    assert dom.to_string(pretty=False) == dom.to_html()
 
 
 def test_attributes() -> None:

@@ -56,9 +56,11 @@ class BaseElement(metaclass=ABCMeta):
 
     def _format_attributes(self, is_html: bool = False) -> str:
         attrs: dict[str, Any] = format_attrs(self.attrs, is_html=is_html)
+        # Values are always double-quoted, so a double quote is the only character
+        # that could end the value early. Escaping it here covers every value type,
+        # including the ones marked as safe.
         return " ".join(
-            f'{key}="{value}"' if '"' not in value else f"{key}='{value}'"
-            for key, value in attrs.items()
+            f'{key}="{value.replace('"', "&quot;")}"' for key, value in attrs.items()
         )
 
     def _format_children(self) -> str:
