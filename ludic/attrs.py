@@ -63,6 +63,21 @@ class HtmlAttrs(Attrs, total=False):
     title: str
     translate: Literal["yes", "no"]
 
+    # Accessibility (WAI-ARIA) attributes
+    aria_controls: Annotated[str, Alias("aria-controls")]
+    aria_current: Annotated[
+        Literal["page", "step", "location", "date", "time", "true", "false"],
+        Alias("aria-current"),
+    ]
+    aria_describedby: Annotated[str, Alias("aria-describedby")]
+    aria_expanded: Annotated[Literal["true", "false"], Alias("aria-expanded")]
+    aria_hidden: Annotated[Literal["true", "false"], Alias("aria-hidden")]
+    aria_label: Annotated[str, Alias("aria-label")]
+    aria_labelledby: Annotated[str, Alias("aria-labelledby")]
+    aria_live: Annotated[Literal["off", "polite", "assertive"], Alias("aria-live")]
+    aria_pressed: Annotated[Literal["true", "false", "mixed"], Alias("aria-pressed")]
+    aria_selected: Annotated[Literal["true", "false"], Alias("aria-selected")]
+
     # Special attributes
     classes: Annotated[list[str], Alias("class")]  # merged with class_
     dataset: Mapping[str, str | int | bool | float]  # renders data-* attributes
