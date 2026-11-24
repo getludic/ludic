@@ -2,7 +2,7 @@ from typing import override
 
 from ludic.attrs import Attrs
 from ludic.base import BaseElement
-from ludic.components import ComponentStrict
+from ludic.components import Component
 from ludic.html import a, blockquote, div, footer, p, style
 from ludic.types import AnyChildren
 
@@ -12,7 +12,7 @@ class QuoteAttrs(Attrs, total=False):
     source_text: str
 
 
-class Quote(ComponentStrict[str, QuoteAttrs]):
+class Quote(Component[AnyChildren, QuoteAttrs]):
     """Simple component rendering as the HTML ``blockquote`` element."""
 
     classes = ["quote"]

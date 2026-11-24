@@ -62,7 +62,10 @@ class TableRow(Component[AnyChildren, GlobalAttrs]):
     def get_value(self, index: int) -> PrimitiveChildren | None:
         if len(self.children) > index:
             child = self.children[index]
-            return child.text if isinstance(child, BaseElement) else child
+            if isinstance(child, BaseElement):
+                return child.text
+            if isinstance(child, PrimitiveChildren):
+                return child
         return None
 
     @override

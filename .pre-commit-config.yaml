@@ -28,7 +28,7 @@ repos:
         args: ["--fix", "--exit-non-zero-on-fix", "--config", "pyproject.toml"]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+    rev: v2.4.1
     hooks:
       - id: mypy
         args: ["--ignore-missing-imports"]
@@ -37,6 +37,7 @@ repos:
           - typeguard
           - django
           - fastapi
+          - pytest
 
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.3.0
