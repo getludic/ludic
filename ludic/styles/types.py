@@ -407,6 +407,7 @@ CSSProperties = TypedDict(
         "clip": str,
         "clip-path": str,
         "color": str,
+        "color-scheme": str,
         "column-count": str,
         "column-fill": Literal["auto", "balance"],
         "column-gap": str,

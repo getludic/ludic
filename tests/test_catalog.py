@@ -332,3 +332,188 @@ def test_quote_paragraphs() -> None:
           "<blockquote><p><i>a</i></p><p><i>b</i></p></blockquote>"
         "</div>"
     )  # fmt: skip
+
+
+def test_head_with_dark_theme() -> None:
+    from ludic.catalog.pages import DARK_STYLES_ID, Head
+
+    head = Head(
+        title="Dark",
+        theme=themes.LightTheme(),
+        dark_theme=themes.DarkTheme(),
+    ).to_html()
+
+    assert head.count("<style") == 2
+    assert '<style type="text/css">' in head
+    assert (
+        f'<style media="(prefers-color-scheme: dark)" id="{DARK_STYLES_ID}" '
+        'type="text/css">'
+    ) in head
+    assert "html { color-scheme: light; }" in head
+    assert "html { color-scheme: dark; }" in head
+    assert 'localStorage.getItem("ludic-color-scheme")' in head
+    # The script restoring the scheme must run after the dark styles exist.
+    assert head.index("localStorage") > head.index(DARK_STYLES_ID)
+
+
+def test_head_without_dark_theme() -> None:
+    from ludic.catalog.pages import Head
+
+    head = Head(title="Light").to_html()
+    assert head.count("<style") == 1
+    assert "localStorage" not in head
+
+
+def test_color_scheme_toggle() -> None:
+    from ludic.catalog.pages import ColorSchemeToggle
+
+    toggle = ColorSchemeToggle().to_html()
+    assert toggle.startswith('<button type="button" onclick="')
+    assert 'aria-label="Switch between light and dark theme"' in toggle
+    assert 'class="color-scheme-toggle"' in toggle
+    assert '<span class="when-light"><svg' in toggle
+    assert '<span class="when-dark"><svg' in toggle
+    assert "&quot;ludic-dark-styles&quot;" in toggle
+
+    custom = ColorSchemeToggle("Theme", aria_label="Theme").to_html()
+    assert ">Theme</button>" in custom
+
+
+def test_tabs() -> None:
+    from ludic.catalog.tabs import Tab, Tabs
+
+    tabs = Tabs(
+        Tab("pip install ludic", label="pip"),
+        Tab(b("uv add ludic"), label="uv"),
+        id="install",
+    )
+    assert tabs.to_html() == (
+        '<div id="install" class="tabs">'
+            '<input type="radio" name="install" id="install-0" checked="checked" '
+                'class="tab-input">'
+            '<label for="install-0" class="tab-label">pip</label>'
+            '<div class="tab-panel">pip install ludic</div>'
+            '<input type="radio" name="install" id="install-1" class="tab-input">'
+            '<label for="install-1" class="tab-label">uv</label>'
+            '<div class="tab-panel"><b>uv add ludic</b></div>'
+        "</div>"
+    )  # fmt: skip
+
+
+def test_tabs_default_name_is_stable() -> None:
+    from ludic.catalog.tabs import Tab, Tabs
+
+    first = Tabs(Tab("a", label="A"), Tab("b", label="B")).to_html()
+    second = Tabs(Tab("a", label="A"), Tab("b", label="B")).to_html()
+    other = Tabs(Tab("a", label="A"), Tab("c", label="C")).to_html()
+    assert first == second
+    assert 'name="tabs-' in first
+    assert first.split('name="')[1][:14] != other.split('name="')[1][:14]
+
+
+def test_code_block_with_copy_button() -> None:
+    from ludic.catalog.typography import CodeBlock
+
+    plain = CodeBlock("print(1)").to_html()
+    assert plain == '<pre class="code-block">print(1)</pre>'
+
+    block = CodeBlock("print(1)", copy_button=True, id="example").to_html()
+    assert block.startswith('<div id="example" class="code-block"><pre>print(1)</pre>')
+    assert '<button type="button" class="copy-button" aria-label="Copy code"' in block
+    assert "navigator.clipboard.writeText" in block
+    assert block.endswith(">Copy</button></div>")
+
+
+def test_code_block_line_numbers_are_marked() -> None:
+    from ludic.catalog.typography import CodeBlock
+
+    block = CodeBlock("a = 1\nb = 2", language="python", line_numbers=True).to_html()
+    assert block.count('class="line-number"') == 2
+
+
+def test_code_block_with_label() -> None:
+    from ludic.catalog.typography import CodeBlock
+
+    assert CodeBlock("print(1)", label="app.py").to_html() == (
+        '<div class="code-block">'
+        '<div class="code-block-label">app.py</div>'
+        "<pre>print(1)</pre>"
+        "</div>"
+    )
+
+
+def test_table_of_contents() -> None:
+    from ludic.catalog.headers import H1, H2, H3
+    from ludic.catalog.navigation import TableOfContents
+    from ludic.html import h2
+
+    content = [
+        H1("Guide"),
+        H2("Getting Started", anchor=True),
+        Paragraph("Text"),
+        H3("Install It", anchor=True),
+        h2("Usage", id="how-to-use"),
+        H2("Example", anchor=False),
+        h2("Plain"),
+    ]
+    assert TableOfContents(*content, label="On this page").to_html() == (
+        '<nav aria-label="On this page" class="table-of-contents">'
+            '<p class="toc-title">On this page</p>'
+            "<ul>"
+                '<li class="level-2">'
+                    '<a href="#getting-started">Getting Started</a>'
+                "</li>"
+                '<li class="level-2"><a href="#how-to-use">Usage</a></li>'
+            "</ul>"
+        "</nav>"
+    )  # fmt: skip
+    deeper = TableOfContents(*content, max_level=3).to_html()
+    assert '<li class="level-3"><a href="#install-it">Install It</a></li>' in deeper
+    assert 'aria-label="Table of contents"' in deeper
+
+
+def test_table_of_contents_links_match_header_anchors() -> None:
+    from ludic.catalog.headers import H2
+    from ludic.catalog.navigation import TableOfContents
+
+    header = H2("Error Handlers", anchor=True)
+    toc = TableOfContents(header).to_html()
+    assert 'id="error-handlers"' in header.to_html()
+    assert 'href="#error-handlers"' in toc
+
+    # The default theme renders H2 without an anchor, so it has no id to link to.
+    assert "<li" not in TableOfContents(H2("Error Handlers")).to_html()
+
+
+def test_navbar() -> None:
+    from ludic.catalog.navigation import NavBar
+
+    assert NavBar(Link("App", to="/"), Link("Docs", to="/docs")).to_html() == (
+        '<header class="navbar">'
+            '<div class="navbar-content">'
+                '<a href="/">App</a><a href="/docs">Docs</a>'
+            "</div>"
+        "</header>"
+    )  # fmt: skip
+
+
+def test_card() -> None:
+    from ludic.catalog.cards import Card
+    from ludic.html import h3
+
+    assert Card(h3("Typed"), Paragraph("Checked by mypy.")).to_html() == (
+        '<div class="card"><h3>Typed</h3><p>Checked by mypy.</p></div>'
+    )
+    assert Card(h3("Docs"), to="/docs", id="docs").to_html() == (
+        '<a href="/docs" id="docs" class="card"><h3>Docs</h3></a>'
+    )
+
+
+def test_code_block_wrapper_styles() -> None:
+    from ludic.catalog.typography import CodeBlock
+    from ludic.html import style
+
+    css = style.from_components(CodeBlock, theme=themes.LightTheme()).to_html()
+    assert "div.code-block > pre { padding-block:" in css
+    assert "color: inherit;" in css
+    assert "div.code-block:has(> .copy-button) > pre {" in css

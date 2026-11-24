@@ -1,11 +1,14 @@
 from typing import NotRequired, override
 
 from ludic.attrs import GlobalAttrs
+from ludic.base import BaseElement
 from ludic.components import Component, ComponentStrict
-from ludic.html import h2, li, nav, style, ul
-from ludic.types import PrimitiveChildren
+from ludic.html import a, div, h2, h3, h4, header, li, nav, p, style, ul
+from ludic.types import AnyChildren, PrimitiveChildren
 
 from .buttons import ButtonLink
+from .headers import H2, H3, H4
+from .utils import text_to_kebab
 
 
 class NavItemAttrs(GlobalAttrs):
@@ -105,16 +108,184 @@ class Navigation(Component[NavItem | NavSection, GlobalAttrs]):
     """
 
     classes = ["navigation"]
-    styles = {
-        "nav.navigation ul": {
-            "list-style": "none",
-            "padding": "0",
-        },
-    }
+    styles = style.use(
+        lambda theme: {
+            "nav.navigation ul": {
+                "list-style": "none",
+                "padding": "0",
+            },
+            "nav.navigation .btn": {
+                "display": "block",
+                "padding": f"{theme.sizes.xxxxs} {theme.sizes.xs}",
+                "background": "none",
+                "color": theme.colors.dark,
+            },
+            ("nav.navigation .btn:hover", "nav.navigation .btn:focus-visible"): {
+                "background-color": theme.colors.light,
+                "filter": "none",
+            },
+            "nav.navigation .active .btn": {
+                "background-color": theme.colors.light,
+                "color": theme.colors.primary.darken(1),
+                "font-weight": "600",
+            },
+        }
+    )
 
     @override
     def render(self) -> nav:
         return nav(
             ul(*self.children, classes=["stack", "small"]),
             **self.attrs_for(nav),
+        )
+
+
+class TableOfContentsAttrs(GlobalAttrs, total=False):
+    label: str
+    max_level: int
+
+
+class TableOfContents(Component[AnyChildren, TableOfContentsAttrs]):
+    """Links to the headings found among the given elements.
+
+    Pass the elements of a page, the table of contents picks the level 2
+    headings (``H2`` or ``h2``), and with ``max_level=3`` or ``4`` also the
+    deeper ones. A heading links to its ``id``, or to the id a header with an
+    anchor gets, which is its text in kebab case. Headings without an id, such
+    as ``H2("Example", anchor=False)``, are left out. The ``label`` is shown
+    above the links.
+
+    Example usage:
+
+        content = [H1("Guide"), H2("Install"), Paragraph("..."), H2("Usage")]
+        TableOfContents(*content, label="On this page")
+    """
+
+    classes = ["table-of-contents"]
+    styles = style.use(
+        lambda theme: {
+            ".table-of-contents .toc-title": {
+                "margin-block-end": theme.sizes.xxs,
+                "color": theme.colors.dark,
+                "font-size": theme.fonts.size * 0.8,
+                "font-weight": "600",
+                "text-transform": "uppercase",
+                "letter-spacing": "0.05em",
+            },
+            ".table-of-contents ul": {
+                "list-style": "none",
+                "padding": "0",
+            },
+            ".table-of-contents li + li": {
+                "margin-block-start": theme.sizes.xxxs,
+            },
+            ".table-of-contents a": {
+                "color": theme.colors.dark.lighten(1),
+                "font-size": theme.fonts.size * 0.9,
+            },
+            ".table-of-contents a:hover": {
+                "color": theme.colors.primary.darken(1),
+            },
+            ".table-of-contents .level-3": {
+                "padding-inline-start": theme.sizes.s,
+            },
+            ".table-of-contents .level-4": {
+                "padding-inline-start": theme.sizes.xl,
+            },
+        }
+    )
+
+    @override
+    def render(self) -> nav:
+        max_level = self.attrs.get("max_level", 2)
+        items = []
+        for child in self.children:
+            level = self._heading_level(child)
+            if not isinstance(child, BaseElement) or not 0 < level <= max_level:
+                continue
+            if target := self._target(child):
+                items.append(
+                    li(a(child.text, href=f"#{target}"), classes=[f"level-{level}"])
+                )
+
+        label = self.attrs.get("label")
+        self.attrs.setdefault("aria_label", label or "Table of contents")
+        return nav(
+            *([p(label, classes=["toc-title"])] if label else []),
+            ul(*items),
+            **self.attrs_for(nav),
+        )
+
+    def _target(self, heading: BaseElement) -> str | None:
+        """The id of the heading, or None if it is rendered without one."""
+        if target := heading.attrs.get("id"):
+            return str(target)
+        if isinstance(heading, H2 | H3 | H4):
+            anchor = heading.attrs.get("anchor")
+            header_theme = {
+                H2: self.theme.headers.h2,
+                H3: self.theme.headers.h3,
+                H4: self.theme.headers.h4,
+            }[type(heading)]
+            if anchor or (header_theme.anchor and anchor is not False):
+                return text_to_kebab(heading.text)
+        return None
+
+    @staticmethod
+    def _heading_level(child: AnyChildren) -> int:
+        if isinstance(child, H2 | h2):
+            return 2
+        if isinstance(child, H3 | h3):
+            return 3
+        if isinstance(child, H4 | h4):
+            return 4
+        return 0
+
+
+class NavBar(Component[AnyChildren, GlobalAttrs]):
+    """A bar at the top of the page, which stays visible when the page scrolls.
+
+    The children, typically a logo, links and actions, are laid out in a row
+    with the space distributed between them, and wrap on narrow screens.
+
+    Example usage:
+
+        NavBar(
+            Link("My App", to="/"),
+            Cluster(Link("Docs", to="/docs"), Link("Blog", to="/blog")),
+        )
+    """
+
+    classes = ["navbar"]
+    styles = style.use(
+        lambda theme: {
+            ".navbar": {
+                "position": "sticky",
+                "top": "0",
+                "z-index": "10",
+                "border-block-end": (
+                    f"{theme.borders.thin} solid {theme.colors.light.darken(1)}"
+                ),
+                "background-color": (
+                    f"color-mix(in srgb, {theme.colors.white} 85%, transparent)"
+                ),
+                "backdrop-filter": "blur(12px)",
+            },
+            ".navbar > .navbar-content": {
+                "display": "flex",
+                "flex-wrap": "wrap",
+                "align-items": "center",
+                "justify-content": "space-between",
+                "gap": theme.sizes.m,
+                "padding-block": theme.sizes.xs,
+                "padding-inline": theme.sizes.l,
+            },
+        }
+    )
+
+    @override
+    def render(self) -> header:
+        return header(
+            div(*self.children, classes=["navbar-content"]),
+            **self.attrs_for(header),
         )

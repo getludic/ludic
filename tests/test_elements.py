@@ -446,3 +446,34 @@ def test_html_attributes() -> None:
         html.html(html.head(), html.body(), lang="en").to_html()
         == '<!doctype html>\n<html lang="en"><head></head><body></body></html>'
     )
+
+
+def test_aria_attributes() -> None:
+    assert html.nav(
+        html.a("Docs", href="/docs", aria_current="page"),
+        aria_label="Main",
+    ).to_html() == (
+        '<nav aria-label="Main"><a href="/docs" aria-current="page">Docs</a></nav>'
+    )
+    assert html.button(
+        html.span("☾", aria_hidden="true"),
+        aria_label="Switch theme",
+        aria_pressed="false",
+    ).to_html() == (
+        '<button aria-label="Switch theme" aria-pressed="false">'
+        '<span aria-hidden="true">☾</span>'
+        "</button>"
+    )
+
+
+def test_link_preload() -> None:
+    assert html.link(
+        rel="preload",
+        href="/fonts/inter.woff2",
+        as_="font",
+        type="font/woff2",
+        crossorigin=True,
+    ).to_html() == (
+        '<link rel="preload" href="/fonts/inter.woff2" as="font" '
+        'type="font/woff2" crossorigin="crossorigin">'
+    )

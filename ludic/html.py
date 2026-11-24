@@ -556,13 +556,39 @@ class style(Generic[TTheme], BaseElement, GlobalStyles):
 
     @classmethod
     def from_components(
-        cls, *components: type[BaseElement], theme: TTheme | None = None
+        cls,
+        *components: type[BaseElement],
+        theme: TTheme | None = None,
+        **attrs: Unpack[StyleAttrs],
     ) -> Self:
-        return cls(from_components(*components, theme=theme), type="text/css")
+        """Create a style element with the styles of the given components.
+
+        Args:
+            *components: The components to collect the styles from.
+            theme: The theme to render the styles with, the default theme if None.
+            **attrs: Attributes of the style element, e.g. ``media`` or ``id``.
+        """
+        attrs.setdefault("type", "text/css")
+        return cls(from_components(*components, theme=theme), **attrs)
 
     @classmethod
-    def load(cls, cache: bool = False, theme: TTheme | None = None) -> Self:
-        return cls(from_loaded(cache=cache, theme=theme), type="text/css")
+    def load(
+        cls,
+        cache: bool = False,
+        theme: TTheme | None = None,
+        **attrs: Unpack[StyleAttrs],
+    ) -> Self:
+        """Create a style element with the styles of all loaded components.
+
+        Args:
+            cache: Whether to cache the collected styles per theme name.
+            theme: The theme to render the styles with, the default theme if None.
+            **attrs: Attributes of the style element, e.g. ``media`` or ``id``.
+                ``style.load(theme=dark, media="(prefers-color-scheme: dark)")``
+                renders a stylesheet that applies only in dark mode.
+        """
+        attrs.setdefault("type", "text/css")
+        return cls(from_loaded(cache=cache, theme=theme), **attrs)
 
     def __getitem__(self, key: str | tuple[str, ...]) -> CSSProperties | GlobalStyles:
         return self.styles[key]
