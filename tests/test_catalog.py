@@ -409,3 +409,23 @@ def test_tabs_default_name_is_stable() -> None:
     assert first == second
     assert 'name="tabs-' in first
     assert first.split('name="')[1][:14] != other.split('name="')[1][:14]
+
+
+def test_code_block_with_copy_button() -> None:
+    from ludic.catalog.typography import CodeBlock
+
+    plain = CodeBlock("print(1)").to_html()
+    assert plain == '<pre class="code-block">print(1)</pre>'
+
+    block = CodeBlock("print(1)", copy_button=True, id="example").to_html()
+    assert block.startswith('<div id="example" class="code-block"><pre>print(1)</pre>')
+    assert '<button type="button" class="copy-button" aria-label="Copy code"' in block
+    assert "navigator.clipboard.writeText" in block
+    assert block.endswith(">Copy</button></div>")
+
+
+def test_code_block_line_numbers_are_marked() -> None:
+    from ludic.catalog.typography import CodeBlock
+
+    block = CodeBlock("a = 1\nb = 2", language="python", line_numbers=True).to_html()
+    assert block.count('class="line-number"') == 2

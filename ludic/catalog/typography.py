@@ -11,7 +11,7 @@ except ImportError:
 
 from ludic.attrs import Attrs, GlobalAttrs, HyperlinkAttrs
 from ludic.components import Component, ComponentStrict
-from ludic.html import a, code, p, pre, span, style
+from ludic.html import a, button, code, div, p, pre, span, style
 from ludic.types import (
     AnyChildren,
     PrimitiveChildren,
@@ -102,18 +102,32 @@ class Code(Component[str, GlobalAttrs]):
         return code(*self.children, **self.attrs)
 
 
+_COPY_CODE = (
+    'const code = this.closest(".code-block").querySelector("pre").cloneNode(true);'
+    'code.querySelectorAll(".line-number").forEach((number) => number.remove());'
+    "navigator.clipboard.writeText(code.textContent).then(() => {"
+    'this.textContent = "Copied";'
+    'setTimeout(() => { this.textContent = "Copy"; }, 1500);'
+    "});"
+)
+
+
 class CodeBlockAttrs(GlobalAttrs, total=False):
     language: str
     line_numbers: bool
     remove_whitespaces: bool
+    copy_button: bool
 
 
 class CodeBlock(Component[str, CodeBlockAttrs]):
     """Simple component simulating a code block.
 
+    With ``copy_button=True``, the block has a button copying the code to the
+    clipboard, without the line numbers.
+
     Example usage:
 
-        CodeBlock("print('Hello, World!')")
+        CodeBlock("print('Hello, World!')", language="python", copy_button=True)
     """
 
     classes = ["code-block"]
@@ -131,6 +145,38 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
                 "padding-inline": theme.sizes.l,
                 "font-size": theme.code.font_size,
             },
+            "div.code-block": {
+                "position": "relative",
+                "padding": "0",
+            },
+            "div.code-block > pre": {
+                "padding-block": theme.sizes.m,
+                "padding-inline": theme.sizes.l,
+            },
+            ".code-block > .copy-button": {
+                "position": "absolute",
+                "top": theme.sizes.xxs,
+                "right": theme.sizes.xxs,
+                "padding": f"{theme.sizes.xxxxs} {theme.sizes.xxs}",
+                "border": (
+                    f"{theme.borders.thin} solid "
+                    f"{theme.code.background_color.lighten(2)}"
+                ),
+                "border-radius": theme.rounding.normal,
+                "background-color": theme.code.background_color,
+                "color": theme.code.color,
+                "font-family": theme.fonts.primary,
+                "font-size": theme.fonts.size * 0.75,
+                "line-height": 1.4,
+                "cursor": "pointer",
+                "opacity": "0.75",
+            },
+            (
+                ".code-block > .copy-button:hover",
+                ".code-block > .copy-button:focus-visible",
+            ): {
+                "opacity": "1",
+            },
         }
     )
 
@@ -138,6 +184,7 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
         return str(
             span(
                 line,
+                classes=["line-number"],
                 style={
                     "color": self.theme.code.line_number_color,
                     "user-select": "none",
@@ -146,7 +193,7 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
         )
 
     @override
-    def render(self) -> pre:
+    def render(self) -> pre | div:
         content = "".join(self.children)
         append_line_numbers = self.attrs.get(
             "line_numbers", self.theme.code.line_numbers
@@ -170,6 +217,21 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
                     highlighted_content, apply_fun=self._get_line_number_span
                 )
 
-            return pre(Safe(highlighted_content), **self.attrs_for(pre))
+            code_content: str = Safe(highlighted_content)
         else:
-            return pre(content, **self.attrs_for(pre))
+            code_content = content
+
+        if not self.attrs.get("copy_button"):
+            return pre(code_content, **self.attrs_for(pre))
+
+        return div(
+            pre(code_content),
+            button(
+                "Copy",
+                type="button",
+                classes=["copy-button"],
+                aria_label="Copy code",
+                on_click=_COPY_CODE,
+            ),
+            **self.attrs_for(div),
+        )
