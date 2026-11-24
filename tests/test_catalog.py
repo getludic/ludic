@@ -478,3 +478,15 @@ def test_table_of_contents_links_match_header_anchors() -> None:
     toc = TableOfContents(H2("Error Handlers")).to_html()
     assert 'id="error-handlers"' in header
     assert 'href="#error-handlers"' in toc
+
+
+def test_navbar() -> None:
+    from ludic.catalog.navigation import NavBar
+
+    assert NavBar(Link("App", to="/"), Link("Docs", to="/docs")).to_html() == (
+        '<header class="navbar">'
+            '<div class="navbar-content">'
+                '<a href="/">App</a><a href="/docs">Docs</a>'
+            "</div>"
+        "</header>"
+    )  # fmt: skip

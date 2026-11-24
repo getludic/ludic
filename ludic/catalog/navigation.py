@@ -3,7 +3,7 @@ from typing import NotRequired, override
 from ludic.attrs import GlobalAttrs
 from ludic.base import BaseElement
 from ludic.components import Component, ComponentStrict
-from ludic.html import a, h2, h3, h4, li, nav, p, style, ul
+from ludic.html import a, div, h2, h3, h4, header, li, nav, p, style, ul
 from ludic.types import AnyChildren, PrimitiveChildren
 
 from .buttons import ButtonLink
@@ -223,3 +223,52 @@ class TableOfContents(Component[AnyChildren, TableOfContentsAttrs]):
         if isinstance(child, H4 | h4):
             return 4
         return 0
+
+
+class NavBar(Component[AnyChildren, GlobalAttrs]):
+    """A bar at the top of the page, which stays visible when the page scrolls.
+
+    The children, typically a logo, links and actions, are laid out in a row
+    with the space distributed between them, and wrap on narrow screens.
+
+    Example usage:
+
+        NavBar(
+            Link("My App", to="/"),
+            Cluster(Link("Docs", to="/docs"), Link("Blog", to="/blog")),
+        )
+    """
+
+    classes = ["navbar"]
+    styles = style.use(
+        lambda theme: {
+            ".navbar": {
+                "position": "sticky",
+                "top": "0",
+                "z-index": "10",
+                "border-block-end": (
+                    f"{theme.borders.thin} solid {theme.colors.light.darken(1)}"
+                ),
+                "background-color": (
+                    f"color-mix(in srgb, {theme.colors.white} 85%, transparent)"
+                ),
+                "backdrop-filter": "blur(12px)",
+            },
+            ".navbar > .navbar-content": {
+                "display": "flex",
+                "flex-wrap": "wrap",
+                "align-items": "center",
+                "justify-content": "space-between",
+                "gap": theme.sizes.m,
+                "padding-block": theme.sizes.xs,
+                "padding-inline": theme.sizes.l,
+            },
+        }
+    )
+
+    @override
+    def render(self) -> header:
+        return header(
+            div(*self.children, classes=["navbar-content"]),
+            **self.attrs_for(header),
+        )
