@@ -60,4 +60,4 @@ class Blank(Element[TChildren, NoAttrs]):
         super().__init__(*children)
 
     def to_html(self) -> str:
-        return "".join(map(str, self.children))
+        return self._format_children()

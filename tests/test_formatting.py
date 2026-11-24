@@ -1,11 +1,13 @@
-from typing import Any
+from typing import Any, override
 
 import pytest
 
+from ludic import Blank, Component, NoAttrs
 from ludic.catalog.typography import Link, Paragraph
 from ludic.format import format_attr_value, format_attrs
 from ludic.html import b, div, i, p, strong, style
-from ludic.types import Safe
+from ludic.styles.themes import DarkTheme
+from ludic.types import NoChildren, Safe
 
 
 def test_format_attr_value() -> None:
@@ -106,6 +108,29 @@ def test_non_string_children_are_escaped() -> None:
 
     assert div(1, " ", 2.5, " ", True).to_html() == "<div>1 2.5 True</div>"
     assert div(Safe("<b>&</b>")).to_html() == "<div><b>&</b></div>"
+
+
+def test_blank_children_are_escaped() -> None:
+    payload = "<script>alert(1)</script>"
+    escaped = "&lt;script&gt;alert(1)&lt;/script&gt;"
+
+    assert Blank(payload).to_html() == escaped
+    assert div(Blank(payload)).to_html() == f"<div>{escaped}</div>"
+    assert Blank(t"Hi {payload} {b('there')}").to_html() == (
+        f"Hi {escaped} <b>there</b>"
+    )
+    assert Blank(Safe("<b>&</b>"), 1, b("x")).to_html() == "<b>&</b>1<b>x</b>"
+
+
+class ThemeName(Component[NoChildren, NoAttrs]):
+    @override
+    def render(self) -> i:
+        return i(self.theme.name)
+
+
+def test_blank_passes_theme_to_children() -> None:
+    dom = DarkTheme().use(Blank(ThemeName()))
+    assert dom.to_html() == "<i>dark</i>"
 
 
 def test_non_string_attribute_values_are_escaped() -> None:
