@@ -1,3 +1,4 @@
+from string.templatelib import Template
 from typing import override
 
 from ludic.attrs import Attrs, GlobalAttrs
@@ -40,7 +41,7 @@ class WithAnchorAttrs(GlobalAttrs, total=False):
     anchor: Anchor | bool
 
 
-class WithAnchor(ComponentStrict[h1 | h2 | h3 | h4 | str, WithAnchorAttrs]):
+class WithAnchor(ComponentStrict[h1 | h2 | h3 | h4 | str | Template, WithAnchorAttrs]):
     """Component which renders its content (header) with a clickable anchor."""
 
     classes = ["with-anchor"]
@@ -95,7 +96,7 @@ class WithAnchor(ComponentStrict[h1 | h2 | h3 | h4 | str, WithAnchorAttrs]):
         )
 
 
-class H1(ComponentStrict[str, WithAnchorAttrs]):
+class H1(ComponentStrict[str | Template, WithAnchorAttrs]):
     """Component rendering as h1 with an optional clickable anchor."""
 
     @override
@@ -110,7 +111,7 @@ class H1(ComponentStrict[str, WithAnchorAttrs]):
             return header
 
 
-class H2(ComponentStrict[str, WithAnchorAttrs]):
+class H2(ComponentStrict[str | Template, WithAnchorAttrs]):
     """Component rendering as h2 with an optional clickable anchor."""
 
     @override
@@ -125,7 +126,7 @@ class H2(ComponentStrict[str, WithAnchorAttrs]):
             return header
 
 
-class H3(ComponentStrict[str, WithAnchorAttrs]):
+class H3(ComponentStrict[str | Template, WithAnchorAttrs]):
     """Component rendering as h3 with an optional clickable anchor."""
 
     @override
@@ -140,7 +141,7 @@ class H3(ComponentStrict[str, WithAnchorAttrs]):
             return header
 
 
-class H4(ComponentStrict[str, WithAnchorAttrs]):
+class H4(ComponentStrict[str | Template, WithAnchorAttrs]):
     """Component rendering as h4 with an optional clickable anchor."""
 
     @override
