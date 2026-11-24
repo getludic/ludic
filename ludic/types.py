@@ -1,4 +1,5 @@
 from collections.abc import Iterable, Mapping
+from string.templatelib import Template
 from typing import Never, TypeAlias, TypedDict, TypeVar, TypeVarTuple
 
 from .attrs import Attrs, NoAttrs, URLType
@@ -71,8 +72,13 @@ Primitive children are ``str``, ``bool``, ``int`` and ``float``.
 ComplexChildren: TypeAlias = BaseElement
 """Type alias for elements that are allowed to have only non-primitive children."""
 
-AnyChildren: TypeAlias = PrimitiveChildren | ComplexChildren | Safe
-"""Type alias for elements that are allowed to have any children."""
+AnyChildren: TypeAlias = PrimitiveChildren | ComplexChildren | Safe | Template
+"""Type alias for elements that are allowed to have any children.
+
+A t-string (``Template``) is accepted because it can mix text with elements.
+The element splits it into its parts when it is created, so ``children``
+never contains the ``Template`` itself.
+"""
 
 TChildren = TypeVar("TChildren", bound=AnyChildren, covariant=True)
 """Type variable for elements representing type of children (the type of *args).

@@ -11,8 +11,9 @@ from ludic.catalog.messages import (
     Title,
 )
 from ludic.catalog.navigation import Navigation, NavItem
+from ludic.catalog.quotes import Quote
 from ludic.catalog.tables import Table, TableHead, TableRow
-from ludic.catalog.typography import Link, Paragraph
+from ludic.catalog.typography import Code, Link, Paragraph
 from ludic.html import b
 from ludic.styles import themes
 
@@ -259,4 +260,24 @@ def test_items() -> None:
           "<li>Test <b>ol</b></li>"
           "<li>E</li>"
         "</ol>"
+    )  # fmt: skip
+
+
+def test_quote_with_tstring() -> None:
+    quote = Quote(
+        t"One {Code('select')} depends on another.",
+        source_url="https://htmx.org/examples/value-select/",
+    )
+    assert quote.to_html() == (
+        '<div class="quote">'
+          "<blockquote>"
+            '<p>One <code class="code">select</code> depends on another.</p>'
+          "</blockquote>"
+          "<footer>"
+            "Source: "
+            '<a href="https://htmx.org/examples/value-select/">'
+              "https://htmx.org/examples/value-select/"
+            "</a>"
+          "</footer>"
+        "</div>"
     )  # fmt: skip
