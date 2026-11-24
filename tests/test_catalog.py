@@ -200,6 +200,25 @@ def test_headers() -> None:
     )  # fmt: skip
 
 
+def test_headers_with_t_strings() -> None:
+    assert H1(t"The {Code('style')} Attribute").to_html() == (
+        '<h1>The <code class="code">style</code> Attribute</h1>'
+    )
+    assert H4(t"{Code('ludic.types')}").to_html() == (
+        '<h4><code class="code">ludic.types</code></h4>'
+    )
+
+    theme = themes.LightTheme(headers=themes.Headers(h3=themes.Header(anchor=True)))
+    assert theme.use(H3(t"The {Code('style')} Attribute")).to_html() == (
+        '<div class="with-anchor">'
+            '<h3 id="the-style-attribute">'
+                'The <code class="code">style</code> Attribute'
+            '</h3>'
+            '<a href="#the-style-attribute" class="anchor">#</a>'
+        '</div>'
+    )  # fmt: skip
+
+
 def test_messages() -> None:
     assert Message("test").to_html() == (
         '<div class="message"><div class="content">test</div></div>'
