@@ -217,7 +217,13 @@ mypy with the plugin reports:
 - children passed to void elements like `br`;
 - documents in the wrong shape: `html` needs `head` and then `body`.
 
-Other type checkers (pyright and Pylance, ty, Pyrefly) do not run mypy plugins, so they do not check the attributes passed to components. Run mypy even when the editor shows no errors.
+Other type checkers do not run mypy plugins, so none of them checks the attributes passed to components:
+
+- **pyright and Pylance** (the errors shown in VS Code and Cursor) report everything in the list above except the attributes of components.
+- **ty** misses unknown attributes on elements, and it reports every attribute passed to a component as an error, e.g. ``Expected `LinkAttrs`, found `Literal["/home"]` ``, even in valid code. Do not change valid code to silence these errors.
+- **Pyrefly** reports only unknown attributes on elements.
+
+Run mypy even when the editor shows no errors.
 
 To see what a component renders, call `.to_html()` on it, e.g. in a test.
 
