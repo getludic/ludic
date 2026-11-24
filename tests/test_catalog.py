@@ -449,10 +449,12 @@ def test_table_of_contents() -> None:
 
     content = [
         H1("Guide"),
-        H2("Getting Started"),
+        H2("Getting Started", anchor=True),
         Paragraph("Text"),
-        H3("Install It"),
+        H3("Install It", anchor=True),
         h2("Usage", id="how-to-use"),
+        H2("Example", anchor=False),
+        h2("Plain"),
     ]
     assert TableOfContents(*content, label="On this page").to_html() == (
         '<nav aria-label="On this page" class="table-of-contents">'
@@ -474,10 +476,13 @@ def test_table_of_contents_links_match_header_anchors() -> None:
     from ludic.catalog.headers import H2
     from ludic.catalog.navigation import TableOfContents
 
-    header = H2("Error Handlers", anchor=True).to_html()
-    toc = TableOfContents(H2("Error Handlers")).to_html()
-    assert 'id="error-handlers"' in header
+    header = H2("Error Handlers", anchor=True)
+    toc = TableOfContents(header).to_html()
+    assert 'id="error-handlers"' in header.to_html()
     assert 'href="#error-handlers"' in toc
+
+    # The default theme renders H2 without an anchor, so it has no id to link to.
+    assert "<li" not in TableOfContents(H2("Error Handlers")).to_html()
 
 
 def test_navbar() -> None:

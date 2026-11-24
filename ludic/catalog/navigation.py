@@ -151,8 +151,9 @@ class TableOfContents(Component[AnyChildren, TableOfContentsAttrs]):
     Pass the elements of a page, the table of contents picks the level 2
     headings (``H2`` or ``h2``), and with ``max_level=3`` or ``4`` also the
     deeper ones. A heading links to its ``id``, or to the id a header with an
-    anchor gets, which is its text in kebab case. The ``label`` is shown above
-    the links.
+    anchor gets, which is its text in kebab case. Headings without an id, such
+    as ``H2("Example", anchor=False)``, are left out. The ``label`` is shown
+    above the links.
 
     Example usage:
 
@@ -200,8 +201,9 @@ class TableOfContents(Component[AnyChildren, TableOfContentsAttrs]):
         items = []
         for child in self.children:
             level = self._heading_level(child)
-            if isinstance(child, BaseElement) and level and level <= max_level:
-                target = child.attrs.get("id") or text_to_kebab(child.text)
+            if not isinstance(child, BaseElement) or not 0 < level <= max_level:
+                continue
+            if target := self._target(child):
                 items.append(
                     li(a(child.text, href=f"#{target}"), classes=[f"level-{level}"])
                 )
@@ -213,6 +215,21 @@ class TableOfContents(Component[AnyChildren, TableOfContentsAttrs]):
             ul(*items),
             **self.attrs_for(nav),
         )
+
+    def _target(self, heading: BaseElement) -> str | None:
+        """The id of the heading, or None if it is rendered without one."""
+        if target := heading.attrs.get("id"):
+            return str(target)
+        if isinstance(heading, H2 | H3 | H4):
+            anchor = heading.attrs.get("anchor")
+            header_theme = {
+                H2: self.theme.headers.h2,
+                H3: self.theme.headers.h3,
+                H4: self.theme.headers.h4,
+            }[type(heading)]
+            if anchor or (header_theme.anchor and anchor is not False):
+                return text_to_kebab(heading.text)
+        return None
 
     @staticmethod
     def _heading_level(child: AnyChildren) -> int:
