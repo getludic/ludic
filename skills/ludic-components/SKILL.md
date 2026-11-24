@@ -70,6 +70,13 @@ div(Safe("Hello <b>World</b>")).to_html()
 
 Only use `Safe` for content you control or have sanitized. **Never wrap user input in `Safe`** — that's the XSS hole this whole system exists to prevent. There's also `JavaScript(Safe)` for inline JS bodies.
 
+Ludic also speaks the `__html__` protocol used by MarkupSafe, Jinja2 and Django, in both directions:
+
+- A child that implements `__html__` (`markupsafe.Markup`, Django's `mark_safe(...)` result) is trusted like `Safe` and written as it is. This applies to children only; attribute values are escaped unless they are `Safe`.
+- Every element and `Safe` string implements `__html__`, so `{{ component }}` in a Jinja2 or Django template renders the markup instead of escaping it.
+
+Elements also implement `_repr_html_`, so a notebook cell that ends with an element displays the rendered HTML.
+
 ## Writing a component
 
 Two component classes:
