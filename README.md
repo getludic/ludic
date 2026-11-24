@@ -273,7 +273,16 @@ npx skills add https://github.com/getludic/ludic --skill ludic-components --skil
 npx skills add https://github.com/getludic/ludic --skill '*'
 ```
 
+In Claude Code, you can install both skills as a plugin instead:
+
+```
+/plugin marketplace add getludic/ludic
+/plugin install ludic@ludic
+```
+
 Once installed, the agent will pick the relevant skill up automatically whenever you ask it to write or modify Ludic code.
+
+Agents that look up documentation with [Context7](https://context7.com/getludic/ludic) get the Ludic docs and a short list of rules for writing Ludic code from there.
 
 ## Contributing
 

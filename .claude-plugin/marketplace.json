@@ -1,0 +1,16 @@
+{
+  "name": "ludic",
+  "description": "Claude Code plugins for the Ludic framework.",
+  "owner": {
+    "name": "Ludic",
+    "url": "https://github.com/getludic"
+  },
+  "plugins": [
+    {
+      "name": "ludic",
+      "source": "./",
+      "description": "Agent skills for Ludic, typed HTML components in pure Python: components with t-strings, the catalog, htmx, and web apps with LudicApp, FastAPI or Django.",
+      "category": "development"
+    }
+  ]
+}

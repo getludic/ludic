@@ -1,0 +1,12 @@
+{
+  "name": "ludic",
+  "description": "Agent skills for Ludic, typed HTML components in pure Python: components with t-strings, the catalog, htmx, and web apps with LudicApp, FastAPI or Django.",
+  "author": {
+    "name": "Ludic",
+    "url": "https://github.com/getludic"
+  },
+  "homepage": "https://getludic.dev",
+  "repository": "https://github.com/getludic/ludic",
+  "license": "MIT",
+  "keywords": ["python", "html", "htmx", "components", "t-strings", "starlette"]
+}
