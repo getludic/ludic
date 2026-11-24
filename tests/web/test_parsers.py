@@ -36,6 +36,25 @@ def test_parse_form_data() -> None:
     )
 
 
+class PlainExample(TypedDict):
+    name: str
+    tags: Annotated[str, FieldMeta()]
+    count: Annotated[int, int]
+
+
+def test_parse_form_data_without_annotated() -> None:
+    data = FormData({"name": "test", "tags": "a,b", "count": "3", "other": "x"})
+    assert Parser[PlainExample](data).validate() == PlainExample(
+        name="test", tags="a,b", count=3
+    )
+    data = FormData(
+        {"name:_index:0": "first", "tags:_index:0": "", "count:_index:0": "1"}
+    )
+    assert ListParser[PlainExample](data).validate() == [
+        PlainExample(name="first", tags="", count=1)
+    ]
+
+
 def test_parse_invalid_form_data() -> None:
     data = FormData({"sample_str": "test", "sample_int": "10a", "sample_bool": "on"})
     with pytest.raises(ValidationError):
