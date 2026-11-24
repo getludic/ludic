@@ -149,6 +149,7 @@ class Item(Endpoint[ItemAttrs]):
 Notes:
 
 - `Parser[ItemForm]` reads the form data. `validate()` checks it against the `ItemForm` TypedDict and raises `ValidationError`, a `400 Bad Request`, when it does not match. Form values are strings; to convert one, annotate the key with a parser, e.g. `count: Annotated[int, int]`.
+- Before Ludic 1.0.6 and 0.5.22, `Parser` ignored every key without `Annotated[...]`, so `validate()` failed on a plain `name: str`. On those versions, write `name: Annotated[str, str]`.
 - `self.url_for(Item)` fills the path parameters from the endpoint's own attributes, so `id` does not have to be passed. Take `.path` of the result: see [Generating URLs](#generating-urls--beware-host-header-poisoning).
 - `self.url_for` and `self.request` work only while the endpoint renders as part of a response, because they read the request from the render context.
 - `self.lazy_load(OtherEndpoint)` renders a placeholder that htmx replaces with the other endpoint's content once the page loads.
