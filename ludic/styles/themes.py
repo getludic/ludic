@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
+from typing import Literal
 
 from ludic.base import BaseElement
 
@@ -194,6 +195,12 @@ class Theme(metaclass=ABCMeta):
 
     measure: BaseSize = Size(70, "ch")
     line_height: float = 1.5
+    color_scheme: Literal["light", "dark"] = "light"
+    """Whether the theme has dark text on a light background or the opposite.
+
+    Browsers use it for form controls and scrollbars, and the catalog uses it to
+    show the right icon in :class:`ludic.catalog.pages.ColorSchemeToggle`.
+    """
 
     fonts: Fonts = field(default_factory=Fonts)
     colors: Colors = field(default_factory=Colors)
@@ -233,6 +240,7 @@ class DarkTheme(Theme):
     """The dark theme."""
 
     name: str = "dark"
+    color_scheme: Literal["light", "dark"] = "dark"
 
     colors: Colors = field(
         default_factory=lambda: Colors(

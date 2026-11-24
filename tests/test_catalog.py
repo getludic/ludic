@@ -332,3 +332,48 @@ def test_quote_paragraphs() -> None:
           "<blockquote><p><i>a</i></p><p><i>b</i></p></blockquote>"
         "</div>"
     )  # fmt: skip
+
+
+def test_head_with_dark_theme() -> None:
+    from ludic.catalog.pages import DARK_STYLES_ID, Head
+
+    head = Head(
+        title="Dark",
+        theme=themes.LightTheme(),
+        dark_theme=themes.DarkTheme(),
+    ).to_html()
+
+    assert head.count("<style") == 2
+    assert '<style type="text/css">' in head
+    assert (
+        f'<style media="(prefers-color-scheme: dark)" id="{DARK_STYLES_ID}" '
+        'type="text/css">'
+    ) in head
+    assert "html { color-scheme: light; }" in head
+    assert "html { color-scheme: dark; }" in head
+    assert 'localStorage.getItem("ludic-color-scheme")' in head
+    # The script restoring the scheme must run after the dark styles exist.
+    assert head.index("localStorage") > head.index(DARK_STYLES_ID)
+
+
+def test_head_without_dark_theme() -> None:
+    from ludic.catalog.pages import Head
+
+    head = Head(title="Light").to_html()
+    assert head.count("<style") == 1
+    assert "localStorage" not in head
+
+
+def test_color_scheme_toggle() -> None:
+    from ludic.catalog.pages import ColorSchemeToggle
+
+    toggle = ColorSchemeToggle().to_html()
+    assert toggle.startswith('<button type="button" onclick="')
+    assert 'aria-label="Switch between light and dark theme"' in toggle
+    assert 'class="color-scheme-toggle"' in toggle
+    assert '<span class="when-light"><svg' in toggle
+    assert '<span class="when-dark"><svg' in toggle
+    assert "&quot;ludic-dark-styles&quot;" in toggle
+
+    custom = ColorSchemeToggle("Theme", aria_label="Theme").to_html()
+    assert ">Theme</button>" in custom
