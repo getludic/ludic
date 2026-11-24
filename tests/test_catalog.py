@@ -440,3 +440,41 @@ def test_code_block_with_label() -> None:
         "<pre>print(1)</pre>"
         "</div>"
     )
+
+
+def test_table_of_contents() -> None:
+    from ludic.catalog.headers import H1, H2, H3
+    from ludic.catalog.navigation import TableOfContents
+    from ludic.html import h2
+
+    content = [
+        H1("Guide"),
+        H2("Getting Started"),
+        Paragraph("Text"),
+        H3("Install It"),
+        h2("Usage", id="how-to-use"),
+    ]
+    assert TableOfContents(*content, label="On this page").to_html() == (
+        '<nav aria-label="On this page" class="table-of-contents">'
+            '<p class="toc-title">On this page</p>'
+            "<ul>"
+                '<li class="level-2">'
+                    '<a href="#getting-started">Getting Started</a>'
+                "</li>"
+                '<li class="level-2"><a href="#how-to-use">Usage</a></li>'
+            "</ul>"
+        "</nav>"
+    )  # fmt: skip
+    deeper = TableOfContents(*content, max_level=3).to_html()
+    assert '<li class="level-3"><a href="#install-it">Install It</a></li>' in deeper
+    assert 'aria-label="Table of contents"' in deeper
+
+
+def test_table_of_contents_links_match_header_anchors() -> None:
+    from ludic.catalog.headers import H2
+    from ludic.catalog.navigation import TableOfContents
+
+    header = H2("Error Handlers", anchor=True).to_html()
+    toc = TableOfContents(H2("Error Handlers")).to_html()
+    assert 'id="error-handlers"' in header
+    assert 'href="#error-handlers"' in toc
