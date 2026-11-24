@@ -1,0 +1,17 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "Ludic",
+  "description": "Typed HTML components in pure Python with t-strings. Type checkers validate the markup. Pairs with htmx and works with Starlette, FastAPI, Django or no framework.",
+  "excludeFolders": ["tests", "dist", ".github"],
+  "excludeFiles": ["AGENTS.md", "CLAUDE.md", "CONTRIBUTING.md", "SECURITY.md"],
+  "rules": [
+    "Ludic 1.x needs Python 3.14+ and mixes text with elements in t-strings: p(t\"Hello {b('World')}!\"). Use f-strings only in projects on Ludic 0.5.x.",
+    "Set plugins = [\"ludic.mypy_plugin\"] for mypy and run mypy after changes. Only mypy with the plugin checks the attributes passed to components.",
+    "Text children are escaped. Wrap only trusted HTML in Safe, never user input.",
+    "The HTTP methods of an Endpoint (get, post, put, ...) are classmethods that usually return Self; render() builds the HTML.",
+    "Read form data with a handler parameter typed Parser[SomeAttrs] and call .validate(), which returns the TypedDict or raises a 400 ValidationError.",
+    "Use request.url_path_for(...) or the .path of url_for(...) in links and hx_* attributes, so a forged Host header cannot change them.",
+    "Prefer the catalog (ludic.catalog.pages, layouts, forms, tables) to building pages from raw div elements."
+  ],
+  "previousVersions": [{ "branch": "v0.5" }]
+}
