@@ -117,17 +117,24 @@ class CodeBlockAttrs(GlobalAttrs, total=False):
     line_numbers: bool
     remove_whitespaces: bool
     copy_button: bool
+    label: str
 
 
 class CodeBlock(Component[str, CodeBlockAttrs]):
     """Simple component simulating a code block.
 
     With ``copy_button=True``, the block has a button copying the code to the
-    clipboard, without the line numbers.
+    clipboard, without the line numbers. A ``label``, such as a file name, is
+    shown above the code.
 
     Example usage:
 
-        CodeBlock("print('Hello, World!')", language="python", copy_button=True)
+        CodeBlock(
+            "print('Hello, World!')",
+            language="python",
+            label="hello.py",
+            copy_button=True,
+        )
     """
 
     classes = ["code-block"]
@@ -152,6 +159,17 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
             "div.code-block > pre": {
                 "padding-block": theme.sizes.m,
                 "padding-inline": theme.sizes.l,
+            },
+            ".code-block > .code-block-label": {
+                "padding-block": theme.sizes.xxs,
+                "padding-inline": theme.sizes.l,
+                "border-block-end": (
+                    f"{theme.borders.thin} solid "
+                    f"{theme.code.background_color.lighten(1)}"
+                ),
+                "color": theme.code.line_number_color,
+                "font-family": theme.fonts.monospace,
+                "font-size": theme.fonts.size * 0.8,
             },
             ".code-block > .copy-button": {
                 "position": "absolute",
@@ -221,17 +239,23 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
         else:
             code_content = content
 
-        if not self.attrs.get("copy_button"):
+        label = self.attrs.get("label")
+        copy_button = self.attrs.get("copy_button", False)
+        if not label and not copy_button:
             return pre(code_content, **self.attrs_for(pre))
 
-        return div(
-            pre(code_content),
-            button(
-                "Copy",
-                type="button",
-                classes=["copy-button"],
-                aria_label="Copy code",
-                on_click=_COPY_CODE,
-            ),
-            **self.attrs_for(div),
-        )
+        parts: list[div | pre | button] = []
+        if label:
+            parts.append(div(label, classes=["code-block-label"]))
+        parts.append(pre(code_content))
+        if copy_button:
+            parts.append(
+                button(
+                    "Copy",
+                    type="button",
+                    classes=["copy-button"],
+                    aria_label="Copy code",
+                    on_click=_COPY_CODE,
+                )
+            )
+        return div(*parts, **self.attrs_for(div))

@@ -429,3 +429,14 @@ def test_code_block_line_numbers_are_marked() -> None:
 
     block = CodeBlock("a = 1\nb = 2", language="python", line_numbers=True).to_html()
     assert block.count('class="line-number"') == 2
+
+
+def test_code_block_with_label() -> None:
+    from ludic.catalog.typography import CodeBlock
+
+    assert CodeBlock("print(1)", label="app.py").to_html() == (
+        '<div class="code-block">'
+        '<div class="code-block-label">app.py</div>'
+        "<pre>print(1)</pre>"
+        "</div>"
+    )
