@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from collections.abc import MutableMapping, Sequence
-from typing import Any, ClassVar, override
+from typing import Any, ClassVar, Final, override
 
 from .attrs import GlobalAttrs
 from .base import BaseElement
@@ -13,6 +13,26 @@ from .types import AnyChildren, TAttrs, TChildren, TChildrenArgs
 from .utils import get_element_attrs_annotations
 
 COMPONENT_REGISTRY: MutableMapping[str, list[type["BaseComponent"]]] = {}
+
+_RENDER_PATH_NOTE: Final = "While rendering: "
+
+
+def _add_render_path(exc: Exception, path: Sequence[str]) -> None:
+    """Note on the exception which components were being rendered.
+
+    The exception passes through every component on its way up. The note written
+    by a nested component is replaced with one that starts at the outer component,
+    so the exception ends up with a single note such as:
+
+        While rendering: Page > PeopleTable > Table > TableRow
+    """
+    notes: list[str] = getattr(exc, "__notes__", [])
+    for index, note in enumerate(notes):
+        if note.startswith(_RENDER_PATH_NOTE):
+            path = [*path, note.removeprefix(_RENDER_PATH_NOTE)]
+            del notes[index]
+            break
+    exc.add_note(_RENDER_PATH_NOTE + " > ".join(path))
 
 
 class BaseComponent(BaseElement, metaclass=ABCMeta):
@@ -55,15 +75,21 @@ class BaseComponent(BaseElement, metaclass=ABCMeta):
     def to_html(self) -> str:
         dom: BaseElement | BaseComponent = self
         classes: list[str] = []
+        path: list[str] = []
 
-        while isinstance(dom, BaseComponent):
-            classes += dom.classes
-            context = dom.context
-            dom = dom.render()
-            dom.context.update(context)
+        try:
+            while isinstance(dom, BaseComponent):
+                path.append(type(dom).__name__)
+                classes += dom.classes
+                context = dom.context
+                dom = dom.render()
+                dom.context.update(context)
 
-        self._add_classes(classes, dom)
-        return dom.to_html()
+            self._add_classes(classes, dom)
+            return dom.to_html()
+        except Exception as exc:
+            _add_render_path(exc, path)
+            raise
 
     @abstractmethod
     def render(self) -> BaseElement:

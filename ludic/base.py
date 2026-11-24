@@ -33,6 +33,18 @@ class BaseElement(metaclass=ABCMeta):
     def __format__(self, _: str) -> str:
         return self.formatter.append(self)
 
+    def __html__(self) -> str:
+        """Render the element for libraries supporting the ``__html__`` protocol.
+
+        Jinja2, Django templates and MarkupSafe write the result as it is instead
+        of escaping it, so an element can be used inside their templates.
+        """
+        return self.to_html()
+
+    def _repr_html_(self) -> str:
+        """Render the element as the rich output of a notebook cell."""
+        return self.to_html()
+
     def __len__(self) -> int:
         return len(self.children)
 
