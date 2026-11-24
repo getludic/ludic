@@ -50,17 +50,22 @@ class Quote(ComponentStrict[str, QuoteAttrs]):
 
     @override
     def render(self) -> div:
-        p_children: list[BaseElement] = []
-        current_children: list[AnyChildren] = []
-
+        # A blank line ("\n\n") in a text child starts a new paragraph.
+        paragraphs: list[list[AnyChildren]] = [[]]
         for child in self.children:
             if isinstance(child, str) and "\n\n" in child:
-                p_children.append(p(*current_children))
-                current_children = []
+                for index, text in enumerate(child.split("\n\n")):
+                    if index > 0:
+                        paragraphs.append([])
+                    if text:
+                        # Keep the type of the text, e.g. Safe stays Safe.
+                        paragraphs[-1].append(type(child)(text))
             else:
-                current_children.append(child)
+                paragraphs[-1].append(child)
 
-        children: list[BaseElement] = [blockquote(*p_children, p(*current_children))]
+        children: list[BaseElement] = [
+            blockquote(*(p(*paragraph) for paragraph in paragraphs if paragraph))
+        ]
         if source_url := self.attrs.get("source_url"):
             source_text = self.attrs.get("source_text", "Source: ")
             children.append(footer(source_text, a(source_url, href=source_url)))
