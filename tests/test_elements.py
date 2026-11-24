@@ -464,3 +464,16 @@ def test_aria_attributes() -> None:
         '<span aria-hidden="true">☾</span>'
         "</button>"
     )
+
+
+def test_link_preload() -> None:
+    assert html.link(
+        rel="preload",
+        href="/fonts/inter.woff2",
+        as_="font",
+        type="font/woff2",
+        crossorigin=True,
+    ).to_html() == (
+        '<link rel="preload" href="/fonts/inter.woff2" as="font" '
+        'type="font/woff2" crossorigin="crossorigin">'
+    )
