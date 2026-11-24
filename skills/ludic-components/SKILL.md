@@ -28,6 +28,13 @@ Ludic is a Python framework for building HTML pages with a typed, React-like com
 
 This skill helps you write idiomatic Ludic components: well-composed, type-safe under mypy (with the Ludic mypy plugin), safe by default, and legible. For wiring components into a web app (endpoints, request handling, URL generation, framework integrations), use the companion `ludic-web` skill.
 
+## Check the Ludic version first
+
+Look at the project's dependencies (`pyproject.toml`, the lock file) before writing code:
+
+- **Ludic 1.x** (Python 3.14+): text mixed with elements is a t-string, `t"..."`. Everything in this skill is written for 1.x.
+- **Ludic 0.5.x** (Python 3.12 and 3.13): t-strings do not exist yet, so the same code uses f-strings, `p(f"Hello {b('World')}!")`. Ludic 0.5 renders the elements inside these f-strings correctly. The rest of the API is the same, apart from features added in 1.x.
+
 ## Mental model
 
 Three layers, top to bottom:
@@ -45,6 +52,8 @@ The rendering pipeline runs once when you call `.to_html()`: it walks children, 
 In v1.x, code that mixes HTML elements with interpolated text uses **t-strings** (PEP 750), not f-strings:
 
 ```python
+from ludic.html import b, div
+
 # correct — v1.x
 div(t"Hello {b('World')}!")
 
@@ -59,6 +68,7 @@ The `t"..."` literal produces a `Template` object that Ludic's element construct
 Everything is HTML-escaped by default. To opt out — for content you've already verified is safe HTML — wrap it in `Safe`:
 
 ```python
+from ludic.html import div
 from ludic.types import Safe
 
 div("Hello <b>World</b>").to_html()
@@ -107,7 +117,9 @@ class Link(Component[str, LinkAttrs]):
         )
 ```
 
-A few rules the Ludic mypy plugin enforces — make sure your app's `pyproject.toml` (or `mypy.ini`) has `plugins = ["ludic.mypy_plugin"]`, otherwise you'll get false positives on every component:
+To render several elements without a wrapping element, return `Blank(...)` from `render()`. It renders only its children and escapes text like any other element.
+
+A few rules the Ludic mypy plugin enforces — make sure your app's `pyproject.toml` (or `mypy.ini`) has `plugins = ["ludic.mypy_plugin"]`, otherwise mypy does not check the attributes passed to components (see [Check your work](#check-your-work)):
 
 - The generic parameters on `Component[...]` / `ComponentStrict[...]` synthesize `__init__`, so call sites get checked against `TChildren` and `TAttrs`.
 - `Attrs` (and the per-element TypedDicts in `ludic.attrs`) describe **allowed** attributes. Unknown attributes are a type error.
@@ -118,6 +130,8 @@ A few rules the Ludic mypy plugin enforces — make sure your app's `pyproject.t
 htmx attributes are exposed as `hx_*` keyword arguments on every element with `GlobalAttrs`:
 
 ```python
+from ludic.html import button
+
 button(
     "Load more",
     hx_get="/items?page=2",
@@ -132,10 +146,11 @@ When you serve the rendered HTML from an endpoint, htmx swaps it into the page. 
 
 Before composing a layout out of `div`s, check `ludic.catalog`:
 
-- `catalog.layouts` — `PageLayout`, `Stack`, `Cluster`, `Sidebar`, `Box`, `Center`, `Cover`, `Grid`, `Switcher`, `Frame`, `Reel`, `Imposter` (adapted from *Every Layout*).
-- `catalog.forms` — `Form`, `FormField`, `InputField`, `TextAreaField`, `SelectField`, `CheckboxField`.
+- `catalog.pages` — `HtmlPage`, `Head`, `Body`: a whole HTML document with the collected CSS and, optionally, the htmx script (`Body(..., htmx_version="2.0.4")`).
+- `catalog.layouts` — `Stack`, `Box`, `Center`, `Cluster`, `Sidebar`, `WithSidebar`, `Switcher`, `Cover`, `Grid`, `Frame` (adapted from *Every Layout*).
+- `catalog.forms` — `Form`, `FormField`, `InputField`, `TextAreaField`, `SelectField` with `Option`, `ChoiceField`, and `create_fields` with `FieldMeta`, which builds form fields from an `Attrs` TypedDict.
 - `catalog.tables` — `Table`, `TableHead`, `TableRow`.
-- `catalog.navigation`, `catalog.buttons`, `catalog.typography`, `catalog.messages`, `catalog.loaders`, `catalog.headers`, `catalog.items`, `catalog.lists`, `catalog.quotes`, `catalog.icons`, `catalog.pages`.
+- `catalog.navigation`, `catalog.buttons`, `catalog.typography`, `catalog.messages`, `catalog.loaders`, `catalog.headers`, `catalog.items`, `catalog.lists`, `catalog.quotes`, `catalog.icons`.
 
 These are also the best place to learn idiomatic Ludic — they exercise the full surface area of the framework.
 
@@ -180,6 +195,37 @@ What to notice:
 - The t-string in `h2(t"Hello, {b(...)}!")` keeps `b(...)` as a real element — it isn't stringified.
 - `self.attrs['name']` flows into `b(...)` and is HTML-escaped on output (because it isn't wrapped in `Safe`).
 - `Stack` from the catalog handles vertical spacing — no need to roll a `div` with margin classes.
+
+## Check your work
+
+Run mypy with the Ludic plugin after writing or changing components, and fix what it reports before you finish:
+
+```toml
+# pyproject.toml
+[tool.mypy]
+plugins = ["ludic.mypy_plugin"]
+```
+
+```bash
+mypy path/to/your/package
+```
+
+mypy with the plugin reports:
+
+- unknown or misspelled attributes on elements and components, and missing required attributes on components;
+- children of the wrong type, e.g. text in a `ul` or an element in a `Component[str, ...]`;
+- children passed to void elements like `br`;
+- documents in the wrong shape: `html` needs `head` and then `body`.
+
+Other type checkers do not run mypy plugins, so none of them checks the attributes passed to components:
+
+- **pyright and Pylance** (the errors shown in VS Code and Cursor) report everything in the list above except the attributes of components.
+- **ty** misses unknown attributes on elements, and it reports every attribute passed to a component as an error, e.g. ``Expected `LinkAttrs`, found `Literal["/home"]` ``, even in valid code. Do not change valid code to silence these errors.
+- **Pyrefly** reports only unknown attributes on elements.
+
+Run mypy even when the editor shows no errors.
+
+To see what a component renders, call `.to_html()` on it, e.g. in a test.
 
 ## When in doubt
 

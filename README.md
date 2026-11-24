@@ -96,7 +96,7 @@ uvx cookiecutter gh:getludic/template
 
 ### Type Checking
 
-Elements from `ludic.html` are checked by plain type hints. To also check the attributes of your own components, enable the mypy plugin in `pyproject.toml`:
+Elements from `ludic.html` are checked by plain type hints, so mypy and pyright (and Pylance in VS Code) report the errors above, except those about component attributes. To also check the attributes of your own components, enable the mypy plugin in `pyproject.toml`:
 
 ```toml
 [tool.mypy]
