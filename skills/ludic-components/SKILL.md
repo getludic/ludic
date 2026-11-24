@@ -146,11 +146,15 @@ When you serve the rendered HTML from an endpoint, htmx swaps it into the page. 
 
 Before composing a layout out of `div`s, check `ludic.catalog`:
 
-- `catalog.pages` — `HtmlPage`, `Head`, `Body`: a whole HTML document with the collected CSS and, optionally, the htmx script (`Body(..., htmx_version="2.0.4")`).
+- `catalog.pages` — `HtmlPage`, `Head`, `Body`: a whole HTML document with the collected CSS and, optionally, the htmx script (`Body(..., htmx_version="2.0.4")`). `Head(dark_theme=...)` and `ColorSchemeToggle` add a dark mode (see [Theming and styles](#theming-and-styles)).
 - `catalog.layouts` — `Stack`, `Box`, `Center`, `Cluster`, `Sidebar`, `WithSidebar`, `Switcher`, `Cover`, `Grid`, `Frame` (adapted from *Every Layout*).
 - `catalog.forms` — `Form`, `FormField`, `InputField`, `TextAreaField`, `SelectField` with `Option`, `ChoiceField`, and `create_fields` with `FieldMeta`, which builds form fields from an `Attrs` TypedDict.
 - `catalog.tables` — `Table`, `TableHead`, `TableRow`.
-- `catalog.navigation`, `catalog.buttons`, `catalog.typography`, `catalog.messages`, `catalog.loaders`, `catalog.headers`, `catalog.items`, `catalog.lists`, `catalog.quotes`, `catalog.icons`.
+- `catalog.navigation` — `Navigation` with `NavItem` for a menu, `NavBar` for a sticky bar at the top of the page, and `TableOfContents(*page_elements)`, which links to the `H2` headings among the elements.
+- `catalog.tabs` — `Tabs` with `Tab(content, label="...")`, which switch without JavaScript.
+- `catalog.cards` — `Card`, a framed box for short content; put cards in a `Grid` for responsive columns, and pass `to="/url"` to make a card a link.
+- `catalog.typography` — `Paragraph`, `Link`, `Code`, and `CodeBlock`, which takes `language=`, a `label=` such as a file name, and `copy_button=True`.
+- `catalog.buttons`, `catalog.messages`, `catalog.loaders`, `catalog.headers`, `catalog.items`, `catalog.lists`, `catalog.quotes`, `catalog.icons`.
 
 These are also the best place to learn idiomatic Ludic — they exercise the full surface area of the framework.
 
@@ -162,6 +166,22 @@ These are also the best place to learn idiomatic Ludic — they exercise the ful
 - `styles: GlobalStyles` — collected at startup so you can emit a single `<style>` block for the page.
 
 Read the active theme via `self.theme` (returns the default theme if none is in scope). Themes flow down the tree automatically, so children see the same theme as the parent rendering them.
+
+For a dark mode, give `Head` a second theme. The page then follows the system setting, and `ColorSchemeToggle` lets the visitor switch and remembers the choice:
+
+```python
+from ludic.catalog.pages import Body, ColorSchemeToggle, Head, HtmlPage
+from ludic.catalog.typography import Paragraph
+from ludic.styles.themes import DarkTheme, LightTheme
+
+page = HtmlPage(
+    Head(title="My App", theme=LightTheme(), dark_theme=DarkTheme()),
+    Body(ColorSchemeToggle(), Paragraph("Hello!"), htmx_version="2.0.4"),
+)
+assert 'media="(prefers-color-scheme: dark)"' in page.to_html()
+```
+
+Both themes must have different names, because the styles are cached per theme name. Put colors in `styles` rather than in inline `style={...}` attributes, because inline styles do not switch with the theme.
 
 ## A complete worked example
 
