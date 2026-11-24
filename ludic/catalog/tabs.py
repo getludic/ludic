@@ -90,6 +90,7 @@ class Tabs(Component[Tab, TabsAttrs]):
                 "display": "none",
                 "order": "1",
                 "flex-basis": "100%",
+                "min-inline-size": "0",
                 "padding-block-start": theme.sizes.s,
                 "border-block-start": (
                     f"{theme.borders.thin} solid {theme.colors.light.darken(1)}"
