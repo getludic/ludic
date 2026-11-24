@@ -490,3 +490,15 @@ def test_navbar() -> None:
             "</div>"
         "</header>"
     )  # fmt: skip
+
+
+def test_card() -> None:
+    from ludic.catalog.cards import Card
+    from ludic.html import h3
+
+    assert Card(h3("Typed"), Paragraph("Checked by mypy.")).to_html() == (
+        '<div class="card"><h3>Typed</h3><p>Checked by mypy.</p></div>'
+    )
+    assert Card(h3("Docs"), to="/docs", id="docs").to_html() == (
+        '<a href="/docs" id="docs" class="card"><h3>Docs</h3></a>'
+    )
