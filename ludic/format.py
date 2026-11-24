@@ -181,11 +181,17 @@ def format_attrs(attrs: Mapping[str, Any], is_html: bool = False) -> dict[str, A
 def format_element(child: Any) -> str:
     """Default HTML formatter.
 
+    Elements are rendered. Objects implementing the ``__html__`` protocol, such
+    as ``markupsafe.Markup``, are trusted markup and written as they are.
+    Everything else is escaped.
+
     Args:
         child (AnyChild): The HTML element or text to format.
     """
     if hasattr(child, "to_html"):
         return child.to_html()  # type: ignore
+    elif hasattr(child, "__html__"):
+        return str(child.__html__())
     elif getattr(child, "escape", True):
         return html.escape(str(child), False)
     else:

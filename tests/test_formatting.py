@@ -117,6 +117,55 @@ def test_non_string_attribute_values_are_escaped() -> None:
     assert format_attr_value("title", "", is_html=True) == ""
 
 
+class TrustedMarkup:
+    """An object that is not a string and implements the ``__html__`` protocol."""
+
+    def __html__(self) -> str:
+        return "<b>&amp;</b>"
+
+
+class TrustedString(str):
+    """A string implementing ``__html__`` the way ``markupsafe.Markup`` does."""
+
+    def __html__(self) -> str:
+        return str(self)
+
+
+def test_html_protocol_children_are_not_escaped() -> None:
+    child: Any = TrustedMarkup()
+    assert div(child).to_html() == "<div><b>&amp;</b></div>"
+    assert p(t"Total: {child}").to_html() == "<p>Total: <b>&amp;</b></p>"
+    assert div(TrustedString("<i>x</i>")).to_html() == "<div><i>x</i></div>"
+
+    # only the interpolated value is trusted, the text around it is still escaped
+    assert p(t"<i>{child}</i>").to_html() == "<p>&lt;i&gt;<b>&amp;</b>&lt;/i&gt;</p>"
+
+
+def test_safe_implements_html_protocol() -> None:
+    assert Safe("<b>&</b>").__html__() == "<b>&</b>"
+
+
+def test_escape_flag_without_html_protocol() -> None:
+    class Raw:
+        escape = False
+
+        def __str__(self) -> str:
+            return "<b>&</b>"
+
+    child: Any = Raw()
+    assert div(child).to_html() == "<div><b>&</b></div>"
+
+
+def test_html_protocol_does_not_apply_to_attribute_values() -> None:
+    value = TrustedString("<b>&</b>")
+    assert format_attr_value("title", value, is_html=True) == (
+        "&lt;b&gt;&amp;&lt;/b&gt;"
+    )
+    assert div("x", title=value).to_html() == (
+        '<div title="&lt;b&gt;&amp;&lt;/b&gt;">x</div>'
+    )
+
+
 def test_attribute_value_cannot_break_out_of_quotes() -> None:
     payload = "x\" ' autofocus onfocus=alert(1) y='"
     escaped = "x&quot; ' autofocus onfocus=alert(1) y='"

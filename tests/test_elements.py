@@ -7,6 +7,14 @@ def test_str_and_bytes() -> None:
     assert bytes(html.p("str")) == b"<p>str</p>"
 
 
+def test_html_protocol_and_notebook_repr() -> None:
+    dom = html.div(html.p("a & b"), id="test")
+    expected = '<div id="test"><p>a &amp; b</p></div>'
+
+    assert dom.__html__() == expected
+    assert dom._repr_html_() == expected
+
+
 def test_empty_element() -> None:
     dom = html.div()
     assert dom.to_html() == "<div></div>"

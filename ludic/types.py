@@ -15,9 +15,15 @@ class Safe(str):
 
         >>> div(Safe("Hello <b>World!</b>")).to_html()
         '<div>Hello <b>World!</b></div>'
+
+    The string also implements the ``__html__`` protocol, so libraries such as
+    Jinja2, Django and MarkupSafe treat it as trusted markup too.
     """
 
     escape = False
+
+    def __html__(self) -> str:
+        return str(self)
 
 
 class JavaScript(Safe):
