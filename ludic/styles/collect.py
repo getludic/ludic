@@ -4,7 +4,7 @@ from typing import Any
 from ludic.base import BaseElement
 
 from .themes import Theme, get_default_theme
-from .types import CSSProperties, GlobalStyles
+from .types import GlobalStyles
 
 GLOBAL_STYLES_CACHE: MutableMapping[str, GlobalStyles] = {}
 
@@ -66,9 +66,13 @@ def from_components(
 
     This would render an HTML page containing the ``<style>`` element
     with the styles the given components.
+
+    When two components use the same selector or at-rule, e.g. the same
+    ``@media`` query, their declarations are merged. A property declared by
+    both takes the value of the later component, as it would in the cascade.
     """
     theme = theme or get_default_theme()
-    all_styles: dict[str | tuple[str, ...], CSSProperties | GlobalStyles] = {}
+    all_styles: dict[str | tuple[str, ...], Any] = {}
 
     for component in components:
         styles = getattr(component, "styles", {})
@@ -80,9 +84,20 @@ def from_components(
 
         for key, value in styles.items():
             if isinstance(value, Mapping):
-                all_styles[key] = value
+                all_styles[key] = _merge(all_styles.get(key), value)
 
     return all_styles
+
+
+def _merge(current: Any, new: Mapping[Any, Any]) -> dict[Any, Any]:
+    """Merge the declarations or nested rules of two style blocks."""
+    merged = dict(current) if isinstance(current, Mapping) else {}
+    for key, value in new.items():
+        if isinstance(value, Mapping):
+            merged[key] = _merge(merged.get(key), value)
+        else:
+            merged[key] = value
+    return merged
 
 
 def from_loaded(cache: bool = False, theme: Theme | None = None) -> GlobalStyles:

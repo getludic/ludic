@@ -132,3 +132,38 @@ def test_styles_collection_with_attributes() -> None:
 def test_styles_load_with_attributes() -> None:
     loaded = style.load(theme=FooTheme(), media="print")
     assert loaded.attrs == {"media": "print", "type": "text/css"}
+
+
+class C(Component[AnyChildren, Attrs]):
+    styles = {
+        "a.test": {
+            "text-decoration": "none",
+        },
+        "@media (max-width: 40rem)": {
+            ".content": {"padding": "0"},
+        },
+    }
+
+
+class D(Component[AnyChildren, Attrs]):
+    styles = {
+        "a.test": {
+            "color": "green",
+        },
+        "@media (max-width: 40rem)": {
+            ".content": {"margin": "0"},
+            ".sidebar": {"display": "none"},
+        },
+    }
+
+
+def test_styles_collection_merges_the_same_selectors() -> None:
+    assert style.from_components(B, C, D, theme=FooTheme()).to_html() == (
+        '<style type="text/css">\n'
+        "a.test { color: green; text-decoration: none; }\n"
+        "@media (max-width: 40rem) { "
+        ".content { padding: 0; margin: 0; } "
+        ".sidebar { display: none; } "
+        "}\n"
+        "</style>"
+    )
