@@ -10,11 +10,16 @@ The documentation for some of the examples can be found here:
 
 ## Running
 
-Make sure you are using Python 3.12+ and have Ludic and Uvicorn installed:
+Make sure you are using Python 3.14+ and have Ludic installed with its web framework, which also brings Uvicorn:
 
 ```bash
 pip install "ludic[full]"
-pip install uvicorn
+```
+
+The FastAPI example needs FastAPI as well:
+
+```bash
+pip install "ludic[full,fastapi]"
 ```
 
 Now you can run any example with the following command (you must run the command from the root of the repository):

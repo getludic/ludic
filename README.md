@@ -8,65 +8,165 @@
 
 ---
 
+Ludic lets you write HTML as typed Python components. Your type checker validates the markup, so wrong nesting, unknown attributes and missing arguments are caught before a page ever renders. At its core Ludic only renders HTML, so it fits into the web framework you already use, and it pairs naturally with [htmx](https://htmx.org/).
+
+```python
+from typing import override
+
+from ludic import Attrs, Component
+from ludic.html import a, b, p
+
+
+class LinkAttrs(Attrs):
+    to: str
+
+
+class Link(Component[str, LinkAttrs]):
+    @override
+    def render(self) -> a:
+        return a(*self.children, href=self.attrs["to"])
+
+
+p(t"Hello {b('Stranger')}! Click {Link('here', to='/home')}.").to_html()
+# <p>Hello <b>Stranger</b>! Click <a href="/home">here</a>.</p>
+```
+
+Invalid markup is a type error. This is what [mypy](https://mypy-lang.org/) reports:
+
+```python
+br("Hello, World!")
+# error: Argument 1 to "br" has incompatible type "str"; expected "Never"
+
+html(body())
+# error: Argument 1 to "html" has incompatible type "body"; expected "head"
+
+div("Test", href="test")
+# error: Unexpected keyword argument "href" for "div"
+
+Link("here", too="/home")
+# error: Unexpected keyword argument "too" for "Link"; did you mean "to"?
+
+Link(div("here"), to="/home")
+# error: Argument 1 to "Link" has incompatible type "div"; expected "str"
+
+Link("here")
+# error: Missing named argument "to" for "Link"
+```
+
+---
+
 *"I've just composed my first `PageLayout` component and I have no words!"*
 
 – Igor Davydenko
 
 ---
 
-Ludic is a lightweight framework for building HTML pages with a component approach similar to [React](https://react.dev/). It is built to be used together with [htmx.org](https://htmx.org/) so that developers don't need to write almost any JavaScript to create dynamic web services. Its potential can be leveraged together with its web framework which is a wrapper around the powerful [Starlette](https://www.starlette.io/) framework. Version 1.x leverages Python 3.14's new t-strings (template strings) for safer and simpler HTML templating.
-
 ## Features
 
-- Seamless **&lt;/&gt; htmx** integration for rapid web development in **pure Python**
-- **Type-Guided components** utilizing Python's typing system
-- Uses the power of **Starlette** and **Async** for high-performance web development
-- Build HTML with the ease and power of Python **t-strings** (template strings)
-- Enhanced **security** with automatic escaping and clear separation of trusted vs untrusted content
-- Add CSS styling to your components with **Themes**
-- Create simple, responsive layouts adopted from the **Every Layout Book**
+- **Type-guided HTML**: every element knows which children and attributes it allows
+- **Components** in pure Python, composed like in [React](https://react.dev/)
+- Mix markup and text with Python 3.14 **t-strings** (template strings)
+- Text is **escaped by default**, trusted markup is marked explicitly with `Safe`
+- Typed **&lt;/&gt; htmx** attributes, so dynamic pages need almost no JavaScript
+- Works with **Starlette**, **FastAPI** and **Django**, or with no framework at all
+- Typed CSS for your components with **Themes**
+- Simple, responsive layouts adopted from the **Every Layout Book**
 
-## Comparison
+## Installation
 
-Here is a table comparing Ludic to other similar tools:
+Ludic 1.x requires Python 3.14+ for t-string support. If you are on Python 3.12 or 3.13, use Ludic 0.5.x, which uses f-strings instead.
 
-| Feature                     | Ludic       | FastUI      | Reflex      |
-|-----------------------------|-------------|-------------|-------------|
-| HTML rendering              | Server Side | Client Side | Client Side |
-| Uses a template engine      | No          | No          | No          |
-| UI interactivity            | [</> htmx](https://htmx.org)* | [React](https://react.dev/) | [React](https://react.dev/) |
-| Backend framework           | [Starlette](https://www.starlette.io), [FastAPI](https://fastapi.tiangolo.com/), [Django](https://www.djangoproject.com/)*  | [FastAPI](https://fastapi.tiangolo.com) | [FastAPI](https://fastapi.tiangolo.com) |
-| Client-Server Communication | [HTML + REST](https://htmx.org/essays/how-did-rest-come-to-mean-the-opposite-of-rest/) | [JSON + REST](https://github.com/pydantic/FastUI?tab=readme-ov-file#the-principle-long-version) | [WebSockets](https://reflex.dev/blog/2024-03-21-reflex-architecture/) |
+The core package renders HTML and has a single dependency:
 
-<sup>(*) HTMX as well as Starlette, FastAPI and Django are optional dependencies for Ludic, it does not enforce any frontend or backend frameworks. At it's core, Ludic only generates HTML and allows registering CSS.</sup>
-
-## Motivation
-
-This framework allows HTML generation in Python while utilizing Python's typing system. Our goal is to enable the creation of dynamic web applications with reusable components, all while offering a greater level of type safety than raw HTML.
-
-**Key Ideas:**
-
-- **Type-Guided HTML**: Catch potential HTML structural errors at development time thanks to type hints. The framework enforces stricter rules than standard HTML, promoting well-structured and maintainable code.
-- **Composable Components**: Define reusable, dynamic HTML components in pure Python. This aligns with modern web development practices, emphasizing modularity.
-
-### Type-Guided HTML
-
-Here is an example of how Python's type system can be leveraged to enforce HTML structure:
-
-```python
-br("Hello, World!")        # type error (<br> can't have children)
-br()                       # ok
-
-html(body(...))            # type error (first child must be a <head>)
-html(head(...), body(...)) # ok
-
-div("Test", href="test")   # type error (unknown attribute)
-a("Test", href="...")      # ok
+```
+pip install ludic
 ```
 
-### Composable Components
+To also get the Starlette based web framework, form parsing and code highlighting:
 
-Instead of using only basic HTML elements, it is possible to create modular components with the support of Python's type system. Let's take a look at an example:
+```
+pip install "ludic[full]"
+```
+
+You can also use a basic cookiecutter template to get started quickly. With [UV](https://docs.astral.sh/uv/), you need to run only one command:
+
+```
+uvx cookiecutter gh:getludic/template
+```
+
+### Type Checking
+
+Elements from `ludic.html` are checked by plain type hints. To also check the attributes of your own components, enable the mypy plugin in `pyproject.toml`:
+
+```toml
+[tool.mypy]
+plugins = ["ludic.mypy_plugin"]
+```
+
+## Use It With Your Framework
+
+Ludic does not enforce any frontend or backend framework. Pick the integration that matches your stack:
+
+**[Starlette](https://getludic.dev/docs/web-framework)** – `LudicApp` is a thin wrapper around Starlette, handlers return elements directly:
+
+```python
+from ludic.html import b, p
+from ludic.web import LudicApp
+
+app = LudicApp()
+
+
+@app.get("/")
+async def homepage() -> p:
+    return p(t"Hello {b('Stranger')}!")
+```
+
+**[FastAPI](https://getludic.dev/docs/integrations#fastapi)** – set the route class and return elements from your endpoints:
+
+```python
+from fastapi import FastAPI
+
+from ludic.contrib.fastapi import LudicRoute
+from ludic.html import p
+
+app = FastAPI()
+app.router.route_class = LudicRoute
+
+
+@app.get("/")
+async def homepage() -> p:
+    return p("Hello, World!")
+```
+
+**[Django](https://getludic.dev/docs/integrations#django)** – wrap the element in a response:
+
+```python
+from django.http import HttpRequest
+
+from ludic.contrib.django import LudicResponse
+from ludic.html import p
+
+
+def index(request: HttpRequest) -> LudicResponse:
+    return LudicResponse(p("Hello, World!"))
+```
+
+**Anything else** – `element.to_html()` returns a string, which every framework can send as a response.
+
+## htmx
+
+htmx attributes are typed like any other attribute:
+
+```python
+button("Load more", hx_get="/items?page=2", hx_target="#items", hx_swap="beforeend")
+# <button hx-get="/items?page=2" hx-target="#items" hx-swap="beforeend">Load more</button>
+```
+
+The [examples](https://getludic.dev/examples) reimplement the patterns from htmx.org, such as click to edit, infinite scroll, active search and bulk update.
+
+## Composable Components
+
+Instead of using only basic HTML elements, you can build modular components with the support of Python's type system. The [catalog](https://getludic.dev/catalog/) ships ready-made ones:
 
 ```python
 Table(
@@ -77,7 +177,48 @@ Table(
 )
 ```
 
-This structure can be type-checked thanks to Python's rich type system. Additionally, this `Table` component could have **dynamic properties** like sorting or filtering.
+This structure is type-checked: a `Table` expects one `TableHead` followed by any number of `TableRow` components.
+
+## Styles and Themes
+
+Components can declare their CSS classes and styles, and read colors, fonts and sizes from the active theme:
+
+```python
+class Link(Component[str, LinkAttrs]):
+    classes = ["link"]
+
+    @override
+    def render(self) -> a:
+        return a(
+            *self.children,
+            href=self.attrs["to"],
+            style={"color": self.theme.colors.primary},
+        )
+```
+
+CSS properties are typed as well, so your editor completes them:
+
+<p align="center">
+    <img width="600px" src="https://raw.githubusercontent.com/getludic/ludic/main/docs/assets/quick-demo.gif" alt="Editor completing CSS properties in a Ludic component">
+</p>
+
+## Comparison
+
+Here is how Ludic compares to other ways of producing HTML in Python:
+
+| | Ludic | [htpy](https://htpy.dev/) | [FastHTML](https://fastht.ml/) | [tdom](https://github.com/t-strings/tdom) | [Jinja2](https://jinja.palletsprojects.com/) |
+|---|---|---|---|---|---|
+| How you write HTML | Python calls and t-strings | Python calls, children in `[]` | Python calls | HTML inside t-strings | Template files |
+| Children and attributes type-checked per element | Yes | No | No | No | No |
+| Web framework | Optional: Starlette, FastAPI, Django or none | Any | Its own, built on Starlette | Any | Any |
+| Python | 3.14+ (3.12+ with 0.5.x) | 3.10+ | 3.10+ | 3.14+ | 3.7+ |
+
+The others are a better fit in some cases:
+
+- **htpy** supports older Python versions and needs no type checker plugin.
+- **FastHTML** is a complete web framework rather than a library you add to one.
+- **tdom** lets you write real HTML syntax instead of Python calls.
+- **Jinja2** keeps templates in files that people who do not write Python can edit.
 
 ## Migration from v0.5 to v1.0
 
@@ -100,90 +241,12 @@ div(t"Hello {b('World')}")
 - **Ludic 0.5.x**: Python 3.12, 3.13 (uses f-strings)
 - **Ludic 1.0.x**: Python 3.14+ (uses t-strings)
 
-## Requirements
-
-Python 3.14+
-
-**Note:** Ludic 1.x requires Python 3.14+ for t-string support. If you're using Python 3.12 or 3.13, please use Ludic 0.5.x which uses f-strings instead.
-
-## Installation
-
-```
-pip install "ludic[full]"
-```
-
-You can also use a basic cookiecutter template to get quickly started, using [UV](https://docs.astral.sh/uv/), you need to run only one command:
-
-```
-uvx cookiecutter gh:getludic/template
-```
-
-## Full Example
-
-**components.py**:
-
-```python
-from typing import override
-
-from ludic import Attrs, Component
-from ludic.html import a
-
-class LinkAttrs(Attrs):
-    to: str
-
-class Link(Component[str, LinkAttrs]):
-    classes = ["link"]
-
-    @override
-    def render(self) -> a:
-        return a(
-            *self.children,
-            href=self.attrs["to"],
-            style={"color": self.theme.colors.primary},
-        )
-```
-
-Now you can use it like this:
-
-```python
-link = Link("Hello, World!", to="/home")
-```
-
-**web.py**:
-
-```python
-from ludic.web import LudicApp
-from ludic.html import b, p
-
-from .components import Link
-
-app = LudicApp()
-
-@app.get("/")
-async def homepage() -> p:
-    return p(t"Hello {b("Stranger")}! Click {Link("here", to="https://example.com")}!")
-```
-
-To run the application:
-
-```python
-uvicorn web:app
-```
-
-### Integrations
-
-Here is a list of integrations and a link to the guide on how to get started:
-
-* [Starlette](https://getludic.dev/docs/web-framework)
-* [FastAPI](https://getludic.dev/docs/integrations#fastapi)
-* [Django](https://getludic.dev/docs/integrations#django)
-
-### More Examples
+## More Examples
 
 For more complex usage incorporating all capabilities of the framework:
 
 - visit the examples on [getludic.dev](https://getludic.dev/examples)
-- check the folder with examples [on GitHub](https://github.com/getludic/ludic/tree/master/examples/)
+- check the folder with examples [on GitHub](https://github.com/getludic/ludic/tree/main/examples/)
 - check the source code of the [Ludic Catalog](https://github.com/getludic/ludic/tree/main/ludic/catalog)
 - inspect the [source of getludic.dev](https://github.com/getludic/web/blob/main/web/endpoints/docs/htmx.py) which is written with Ludic
 - check [this small repository](https://github.com/getludic/ludic-slides/blob/main/ludic_slides/components.py) rendering slides in the browser
@@ -214,7 +277,7 @@ Once installed, the agent will pick the relevant skill up automatically whenever
 
 ## Contributing
 
-Any contributions to the framework are warmly welcome! Your help will make it a better resource for the community. If you're ready to contribute, read the [contribution guide](https://github.com/getludic/ludic/tree/master/CONTRIBUTING.md).
+Any contributions to the framework are warmly welcome! Your help will make it a better resource for the community. If you're ready to contribute, read the [contribution guide](https://github.com/getludic/ludic/tree/main/CONTRIBUTING.md).
 
 * [GitHub Issues](https://github.com/getludic/ludic/issues) - If you encounter a bug, please report it here.
 * [GitHub Discussions](https://github.com/getludic/ludic/discussions) - To request a new feature, this is the best place to initiate the discussion.
