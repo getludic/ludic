@@ -86,10 +86,10 @@ class BaseParser(Generic[TAttrs], metaclass=ABCMeta):
             )
 
         hints = get_type_hints(self._spec, include_extras=True)
-        self._parsers = get_annotations_metadata_of_type(
+        # A key without a parser in its Annotated metadata is read as a string.
+        self._parsers = dict.fromkeys(hints, str) | get_annotations_metadata_of_type(
             hints,
             Callable,  # type: ignore
-            default=str,
         )
 
     def _validate(self, attrs: dict[str, Any]) -> TAttrs:
