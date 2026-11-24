@@ -16,6 +16,7 @@ from ludic.catalog.tables import Table, TableHead, TableRow
 from ludic.catalog.typography import Code, Link, Paragraph
 from ludic.html import b
 from ludic.styles import themes
+from ludic.types import Safe
 
 
 def test_link() -> None:
@@ -97,6 +98,8 @@ def test_tables() -> None:
 
     assert len(table.children) > 2
     assert table.children[2].get_value(123) is None
+
+    assert TableRow(b("John"), 42).get_value(0) == "John"
 
     assert table.to_html() == (
         '<div class="table">'
@@ -279,5 +282,34 @@ def test_quote_with_tstring() -> None:
               "https://htmx.org/examples/value-select/"
             "</a>"
           "</footer>"
+        "</div>"
+    )  # fmt: skip
+
+
+def test_quote_paragraphs() -> None:
+    assert Quote("First.\n\nSecond.").to_html() == (
+        '<div class="quote">'
+          "<blockquote><p>First.</p><p>Second.</p></blockquote>"
+        "</div>"
+    )  # fmt: skip
+    assert Quote(t"One {Code('a')}.\n\nTwo {Code('b')}.").to_html() == (
+        '<div class="quote">'
+          "<blockquote>"
+            '<p>One <code class="code">a</code>.</p>'
+            '<p>Two <code class="code">b</code>.</p>'
+          "</blockquote>"
+        "</div>"
+    )  # fmt: skip
+    assert Quote(t"{Code('a')}\n\n{Code('b')}").to_html() == (
+        '<div class="quote">'
+          "<blockquote>"
+            '<p><code class="code">a</code></p>'
+            '<p><code class="code">b</code></p>'
+          "</blockquote>"
+        "</div>"
+    )  # fmt: skip
+    assert Quote(Safe("<i>a</i>\n\n<i>b</i>")).to_html() == (
+        '<div class="quote">'
+          "<blockquote><p><i>a</i></p><p><i>b</i></p></blockquote>"
         "</div>"
     )  # fmt: skip
