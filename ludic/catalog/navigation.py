@@ -105,12 +105,29 @@ class Navigation(Component[NavItem | NavSection, GlobalAttrs]):
     """
 
     classes = ["navigation"]
-    styles = {
-        "nav.navigation ul": {
-            "list-style": "none",
-            "padding": "0",
-        },
-    }
+    styles = style.use(
+        lambda theme: {
+            "nav.navigation ul": {
+                "list-style": "none",
+                "padding": "0",
+            },
+            "nav.navigation .btn": {
+                "display": "block",
+                "padding": f"{theme.sizes.xxxxs} {theme.sizes.xs}",
+                "background": "none",
+                "color": theme.colors.dark,
+            },
+            ("nav.navigation .btn:hover", "nav.navigation .btn:focus-visible"): {
+                "background-color": theme.colors.light,
+                "filter": "none",
+            },
+            "nav.navigation .active .btn": {
+                "background-color": theme.colors.light,
+                "color": theme.colors.primary.darken(1),
+                "font-weight": "600",
+            },
+        }
+    )
 
     @override
     def render(self) -> nav:
