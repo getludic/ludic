@@ -377,3 +377,35 @@ def test_color_scheme_toggle() -> None:
 
     custom = ColorSchemeToggle("Theme", aria_label="Theme").to_html()
     assert ">Theme</button>" in custom
+
+
+def test_tabs() -> None:
+    from ludic.catalog.tabs import Tab, Tabs
+
+    tabs = Tabs(
+        Tab("pip install ludic", label="pip"),
+        Tab(b("uv add ludic"), label="uv"),
+        id="install",
+    )
+    assert tabs.to_html() == (
+        '<div id="install" class="tabs">'
+            '<input type="radio" name="install" id="install-0" checked="checked" '
+                'class="tab-input">'
+            '<label for="install-0" class="tab-label">pip</label>'
+            '<div class="tab-panel">pip install ludic</div>'
+            '<input type="radio" name="install" id="install-1" class="tab-input">'
+            '<label for="install-1" class="tab-label">uv</label>'
+            '<div class="tab-panel"><b>uv add ludic</b></div>'
+        "</div>"
+    )  # fmt: skip
+
+
+def test_tabs_default_name_is_stable() -> None:
+    from ludic.catalog.tabs import Tab, Tabs
+
+    first = Tabs(Tab("a", label="A"), Tab("b", label="B")).to_html()
+    second = Tabs(Tab("a", label="A"), Tab("b", label="B")).to_html()
+    other = Tabs(Tab("a", label="A"), Tab("c", label="C")).to_html()
+    assert first == second
+    assert 'name="tabs-' in first
+    assert first.split('name="')[1][:14] != other.split('name="')[1][:14]
