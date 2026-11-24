@@ -116,3 +116,19 @@ def test_styles_collection() -> None:
         "a.test { color: blue; }\n"
         "</style>"
     )
+
+
+def test_styles_collection_with_attributes() -> None:
+    dark = style.from_components(
+        B, theme=FooTheme(), media="(prefers-color-scheme: dark)", id="dark"
+    )
+    assert dark.to_html() == (
+        '<style media="(prefers-color-scheme: dark)" id="dark" type="text/css">\n'
+        "a.test { color: blue; }\n"
+        "</style>"
+    )
+
+
+def test_styles_load_with_attributes() -> None:
+    loaded = style.load(theme=FooTheme(), media="print")
+    assert loaded.attrs == {"media": "print", "type": "text/css"}
