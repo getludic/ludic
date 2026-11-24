@@ -159,6 +159,10 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
             "div.code-block > pre": {
                 "padding-block": theme.sizes.m,
                 "padding-inline": theme.sizes.l,
+                "color": "inherit",
+            },
+            "div.code-block:has(> .copy-button) > pre": {
+                "padding-inline-end": theme.sizes.xxxxl * 1.6,
             },
             ".code-block > .code-block-label": {
                 "padding-block": theme.sizes.xxs,

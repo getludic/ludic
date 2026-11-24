@@ -502,3 +502,13 @@ def test_card() -> None:
     assert Card(h3("Docs"), to="/docs", id="docs").to_html() == (
         '<a href="/docs" id="docs" class="card"><h3>Docs</h3></a>'
     )
+
+
+def test_code_block_wrapper_styles() -> None:
+    from ludic.catalog.typography import CodeBlock
+    from ludic.html import style
+
+    css = style.from_components(CodeBlock, theme=themes.LightTheme()).to_html()
+    assert "div.code-block > pre { padding-block:" in css
+    assert "color: inherit;" in css
+    assert "div.code-block:has(> .copy-button) > pre {" in css
