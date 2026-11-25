@@ -130,6 +130,10 @@ class CodeBlock(Component[str, CodeBlockAttrs]):
                 "padding-block": theme.sizes.m,
                 "padding-inline": theme.sizes.l,
                 "font-size": theme.code.font_size,
+                # The page limits text to the theme's measure, given in ch. A ch
+                # of the smaller monospace font is narrower, so a code block
+                # limited by it would be narrower than the paragraphs around it.
+                "max-inline-size": "none",
             },
         }
     )
