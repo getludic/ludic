@@ -527,3 +527,29 @@ def test_code_block_is_not_limited_by_the_measure() -> None:
     rules = {line.split(" {")[0]: line for line in css.splitlines() if " {" in line}
     assert "max-inline-size: none;" in rules[".code-block"]
     assert "max-inline-size: none;" in rules["div.code-block > pre"]
+
+
+def test_button_colors_from_theme() -> None:
+    from ludic.catalog.buttons import Button
+    from ludic.html import style
+    from ludic.styles.types import Color
+
+    def button_rules(theme: themes.Theme) -> dict[str, str]:
+        css = style.from_components(Button, theme=theme).to_html()
+        return {line.split(" {")[0]: line for line in css.splitlines() if " {" in line}
+
+    default = button_rules(themes.LightTheme())
+    assert "background-color: #f2f2f2;" in default[".btn"]
+    assert "color: #222;" in default[".btn"]
+
+    soft = button_rules(
+        themes.LightTheme(
+            name="soft",
+            buttons=themes.Buttons(
+                color=Color("#0b5f59"), background_color=Color("#ccfbf1")
+            ),
+        )
+    )
+    assert "background-color: #ccfbf1;" in soft[".btn"]
+    assert "color: #0b5f59;" in soft[".btn"]
+    assert "background-color: #ccfbf1;" in soft[":not(a).btn"]

@@ -183,6 +183,8 @@ assert 'media="(prefers-color-scheme: dark)"' in page.to_html()
 
 Both themes must have different names, because the styles are cached per theme name. Put colors in `styles` rather than in inline `style={...}` attributes, because inline styles do not switch with the theme.
 
+To restyle catalog components, change the theme instead of writing CSS for them. Besides `colors`, `fonts` and `sizes`, a theme configures some components directly: `code=CodeBlock(...)` for code blocks, `buttons=Buttons(color=..., background_color=...)` for the default `Button` and `ButtonLink`, and `layouts=Layouts(...)` for the layouts. All of these classes are in `ludic.styles.themes`.
+
 ## A complete worked example
 
 ```python

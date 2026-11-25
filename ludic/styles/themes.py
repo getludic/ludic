@@ -190,6 +190,21 @@ class CodeBlock:
 
 
 @dataclass
+class Buttons:
+    """Button config for a theme.
+
+    The colors apply to the default :class:`ludic.catalog.buttons.Button` and
+    to :class:`ludic.catalog.buttons.ButtonLink`. Without them, the default
+    button has the background of ``colors.light`` and the text of
+    ``colors.black``. The other buttons, such as ``ButtonPrimary``, take their
+    colors from ``colors``.
+    """
+
+    color: Color | None = None
+    background_color: Color | None = None
+
+
+@dataclass
 class Theme(metaclass=ABCMeta):
     """An abstract base class for theme configuration."""
 
@@ -212,6 +227,7 @@ class Theme(metaclass=ABCMeta):
 
     layouts: Layouts = field(default_factory=Layouts)
     code: CodeBlock = field(default_factory=CodeBlock)
+    buttons: Buttons = field(default_factory=Buttons)
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Theme) and self.name == other.name
