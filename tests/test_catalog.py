@@ -293,3 +293,12 @@ def test_quote_paragraphs() -> None:
           "<blockquote><p><i>a</i></p><p><i>b</i></p></blockquote>"
         "</div>"
     )  # fmt: skip
+
+
+def test_code_block_is_not_limited_by_the_measure() -> None:
+    from ludic.catalog.typography import CodeBlock
+    from ludic.html import style
+
+    css = style.from_components(CodeBlock, theme=themes.LightTheme()).to_html()
+    rules = {line.split(" {")[0]: line for line in css.splitlines() if " {" in line}
+    assert "max-inline-size: none;" in rules[".code-block"]
