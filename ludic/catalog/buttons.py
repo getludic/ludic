@@ -11,7 +11,8 @@ from .typography import Link
 class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
     """Simple component creating an HTML button.
 
-    The component creates a button.
+    The component creates a button. A theme can set its colors with
+    :class:`ludic.styles.themes.Buttons`.
     """
 
     classes = ["btn"]
@@ -20,8 +21,10 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
             ".btn": {
                 "display": "inline-block",
                 "text-decoration": "none",
-                "background-color": theme.colors.light,
-                "color": theme.colors.black,
+                "background-color": (
+                    theme.buttons.background_color or theme.colors.light
+                ),
+                "color": theme.buttons.color or theme.colors.black,
                 "padding": f"{theme.sizes.xxxxs * 0.8} {theme.sizes.xs}",
                 "border": "none",
                 "border-radius": theme.rounding.normal,
@@ -32,7 +35,9 @@ class Button(ComponentStrict[PrimitiveChildren, ButtonAttrs]):
                 "cursor": "pointer",
             },
             ":not(a).btn": {
-                "background-color": theme.colors.light.darken(2),
+                "background-color": (
+                    theme.buttons.background_color or theme.colors.light.darken(2)
+                ),
             },
             (".btn:hover", ".btn:focus"): {
                 "filter": "brightness(85%)",
