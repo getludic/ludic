@@ -517,3 +517,13 @@ def test_code_block_wrapper_styles() -> None:
     assert "div.code-block > pre { padding-block:" in css
     assert "color: inherit;" in css
     assert "div.code-block:has(> .copy-button) > pre {" in css
+
+
+def test_code_block_is_not_limited_by_the_measure() -> None:
+    from ludic.catalog.typography import CodeBlock
+    from ludic.html import style
+
+    css = style.from_components(CodeBlock, theme=themes.LightTheme()).to_html()
+    rules = {line.split(" {")[0]: line for line in css.splitlines() if " {" in line}
+    assert "max-inline-size: none;" in rules[".code-block"]
+    assert "max-inline-size: none;" in rules["div.code-block > pre"]
