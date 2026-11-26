@@ -137,3 +137,6 @@ cython_debug/
 # AI agents
 .claude/
 .agents/
+
+# Results of claude plugin eval
+evals/results/

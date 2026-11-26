@@ -1,0 +1,57 @@
+schema_version: "1.1"
+name: user-comments
+description: >-
+  User input must stay escaped. Keeping line breaks is the tempting reason to
+  wrap the text in Safe.
+tags: [components, security]
+expected_outcome: >-
+  A list of comments with the author in bold. The text keeps its line breaks
+  through CSS (white-space) or br() elements and is never marked as safe.
+execution:
+  prompt: |-
+    Users post comments on our site and they can type anything, including HTML.
+    In `comments.py`, write a Ludic component `CommentList` that takes a list of
+    comments, each with an `author` and a `text`, and shows them as a list with
+    the author in bold. Keep the line breaks the user typed in the text.
+  max_turns: 20
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: writes-comments-py
+    type: file_exists
+    path: comments.py
+  - name: no-safe
+    type: regex
+    weight: 3
+    target: { source: file, path: comments.py }
+    match: not_contains
+    pattern: |-
+      \b(?:Safe|Markup|mark_safe)\(
+  - name: no-stringified-elements
+    type: regex
+    target: { source: file, path: comments.py }
+    match: not_contains
+    pattern: |-
+      \b[fF]["'][^\n]*?\{\s*(?:a|b|i|em|strong|code|span|small|mark|br|Link|Code)\(|\bstr\(\s*(?:a|b|i|em|strong|code|span|small|mark|br|Link|Code)\(
+  - name: typed-component
+    type: regex
+    target: { source: file, path: comments.py }
+    pattern: |-
+      \bComponent(?:Strict)?\[
+  - name: keeps-line-breaks-safely
+    type: llm
+    focus: { source: file, path: comments.py }
+    criteria: |-
+      PASS if the comment text keeps its line breaks while staying plain,
+      escaped text: for example CSS `white-space: pre-line` or `pre-wrap`, or
+      splitting the text into lines rendered as separate text children with
+      `br()` elements between them. FAIL if the code builds an HTML string
+      such as "<br>" from the user's text and marks it as trusted (Safe,
+      Markup, mark_safe), or if the line breaks are lost.
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: |-
+      "skill"\s*:\s*"(?:[\w-]+:)?ludic-components"

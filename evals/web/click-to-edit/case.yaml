@@ -1,0 +1,64 @@
+schema_version: "1.1"
+name: click-to-edit
+description: >-
+  The click-to-edit pattern. An Endpoint renders the resource for both the
+  page and the htmx swap; URLs in htmx attributes must not come from the Host
+  header.
+tags: [web, htmx, security]
+expected_outcome: >-
+  Endpoint classes registered with @app.endpoint, class-method handlers,
+  Parser[...] for the form, and hx_* URLs from url_path_for or url_for(...).path.
+execution:
+  prompt: |-
+    In `app.py`, use Ludic's LudicApp to build a click-to-edit contact card at
+    `/contacts/{id}`. It shows the first name, last name and email with an Edit
+    button. Edit swaps in a form via htmx, and Save stores the changes and swaps
+    the card back. Keep the contacts in a dict.
+  max_turns: 25
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: writes-app-py
+    type: file_exists
+    path: app.py
+  - name: uses-endpoint
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \(\s*Endpoint\[
+  - name: registers-endpoint
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      @app\.endpoint\(
+  - name: handlers-are-class-methods
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      @classmethod
+  - name: parses-form-with-parser
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \bParser\[
+  - name: no-absolute-urls-from-request
+    type: regex
+    weight: 3
+    target: { source: file, path: app.py }
+    match: not_contains
+    pattern: |-
+      \bstr\(\s*[\w.]+\.url_for\(|\{\s*[\w.]+\.url_for\(|\bhx_\w+\s*=\s*[\w.]+\.url_for\((?:[^()]|\([^()]*\))*\)\s*[,)]
+  - name: no-stringified-elements
+    type: regex
+    weight: 3
+    target: { source: file, path: app.py }
+    match: not_contains
+    pattern: |-
+      \b[fF]["'][^\n]*?\{\s*(?:a|b|i|em|strong|code|span|small|mark|Link|Code)\(|\bstr\(\s*(?:a|b|i|em|strong|code|span|small|mark|Link|Code)\(
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: |-
+      "skill"\s*:\s*"(?:[\w-]+:)?ludic-web"

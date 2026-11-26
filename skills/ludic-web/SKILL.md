@@ -31,6 +31,8 @@ Ludic's web layer is a thin wrapper around [Starlette](https://www.starlette.io/
 
 Ludic 1.x needs Python 3.14+ and writes text mixed with elements as t-strings (`t"..."`). A project on Ludic 0.5.x (Python 3.12 or 3.13) uses f-strings instead; the `ludic-components` skill explains the difference.
 
+Build the HTML that handlers return from the catalog components, as the `ludic-components` skill describes: `HtmlPage` for a whole page, `Form` with `InputField` for a form, `Table` for a table, `Stack` and the other layouts for the structure. They get their styles from the theme. Raw elements such as `form`, `input` or `table` render without styles.
+
 ## The basic shape
 
 ```python
@@ -101,7 +103,8 @@ So one class renders the resource both inside a full page and in the htmx respon
 from typing import Self, override
 
 from ludic.attrs import Attrs
-from ludic.html import button, form, input, span
+from ludic.catalog.buttons import ButtonPrimary
+from ludic.catalog.forms import Form, InputField
 from ludic.web import Endpoint, LudicApp
 from ludic.web.exceptions import NotFoundError
 from ludic.web.parsers import Parser
@@ -136,11 +139,10 @@ class Item(Endpoint[ItemAttrs]):
         return cls(**ITEMS[id])
 
     @override
-    def render(self) -> form:
-        return form(
-            span(t"Item {self.attrs['id']}"),
-            input(name="name", value=self.attrs["name"]),
-            button("Save", type="submit"),
+    def render(self) -> Form:
+        return Form(
+            InputField(label="Name", name="name", value=self.attrs["name"]),
+            ButtonPrimary("Save", type="submit"),
             hx_put=self.url_for(Item).path,
             hx_swap="outerHTML",
         )
@@ -301,7 +303,7 @@ async def home() -> p:
     return p("Hello from FastAPI + Ludic")
 ```
 
-The `[fastapi]` extra installs the dependency: `pip install "ludic[fastapi]"`. The host-header poisoning advice above applies identically here.
+Handlers return the same pages and fragments as in a `LudicApp`, built from the catalog components. The `[fastapi]` extra installs the dependency: `pip install "ludic[fastapi]"`. The host-header poisoning advice above applies identically here.
 
 ## Django integration
 

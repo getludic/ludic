@@ -1,0 +1,46 @@
+schema_version: "1.1"
+name: fastapi-page
+description: >-
+  Ludic in an existing FastAPI app. LudicRoute renders returned elements, so
+  there is no HTMLResponse or to_html() by hand.
+tags: [web, fastapi]
+expected_outcome: >-
+  The route class is LudicRoute, the handler returns a Ludic page with a
+  catalog Table, and the JSON endpoints still work.
+execution:
+  prompt: |-
+    Add an HTML page at `/` to our FastAPI app in `main.py`, built with Ludic:
+    a heading "Products" and a table of the products in `PRODUCTS`.
+  max_turns: 20
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: uses-ludic-route
+    type: regex
+    target: { source: file, path: main.py }
+    pattern: |-
+      \bLudicRoute\b
+  - name: uses-catalog-table
+    type: regex
+    target: { source: file, path: main.py }
+    pattern: |-
+      from ludic\.catalog\.tables import
+  - name: no-html-response
+    type: regex
+    target: { source: file, path: main.py }
+    match: not_contains
+    pattern: |-
+      \bHTMLResponse\b
+  - name: no-manual-render
+    type: regex
+    target: { source: file, path: main.py }
+    match: not_contains
+    pattern: |-
+      \.to_html\(\)
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: |-
+      "skill"\s*:\s*"(?:[\w-]+:)?ludic-web"

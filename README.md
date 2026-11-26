@@ -103,6 +103,8 @@ Elements from `ludic.html` are checked by plain type hints, so mypy and pyright 
 plugins = ["ludic.mypy_plugin"]
 ```
 
+mypy supports t-strings since version 2.0. Older versions report every t-string as an error.
+
 ## Use It With Your Framework
 
 Ludic does not enforce any frontend or backend framework. Pick the integration that matches your stack:

@@ -1,0 +1,49 @@
+schema_version: "1.1"
+name: form-validation
+description: >-
+  Form parsing with a type conversion. Parser converts a key annotated with
+  Annotated[int, int] and answers 400 when validation fails.
+tags: [web, forms]
+expected_outcome: >-
+  Fields from ludic.catalog.forms, Parser[...] with age as Annotated[int, int],
+  data.validate() on POST.
+execution:
+  prompt: |-
+    In `app.py`, add a signup page with Ludic's LudicApp. The form has a name
+    (text) and an age (a number). Posting it to `/signup` validates the data,
+    converts the age to an int, and answers 400 when the age is not a number.
+    On success, show a thank-you message.
+  max_turns: 20
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: writes-app-py
+    type: file_exists
+    path: app.py
+  - name: parses-form-with-parser
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \bParser\[
+  - name: converts-age-with-annotated
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \bAnnotated\[\s*int\s*,\s*int\s*\]
+  - name: validates
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \.validate\(\)
+  - name: uses-catalog-forms
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      from ludic\.catalog\.forms import
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: |-
+      "skill"\s*:\s*"(?:[\w-]+:)?ludic-web"
