@@ -183,7 +183,53 @@ assert 'media="(prefers-color-scheme: dark)"' in page.to_html()
 
 Both themes must have different names, because the styles are cached per theme name. Put colors in `styles` rather than in inline `style={...}` attributes, because inline styles do not switch with the theme.
 
-To restyle catalog components, change the theme instead of writing CSS for them. Besides `colors`, `fonts` and `sizes`, a theme configures some components directly: `code=CodeBlock(...)` for code blocks, `buttons=Buttons(color=..., background_color=...)` for the default `Button` and `ButtonLink`, and `layouts=Layouts(...)` for the layouts. All of these classes are in `ludic.styles.themes`.
+To restyle catalog components, change the theme instead of writing CSS for them. Make your theme the default with `set_default_theme` when the app starts. `Head(theme=...)` alone changes only the collected CSS; the styles that components compute in `render()`, such as the highlighting in `CodeBlock`, come from the default theme.
+
+```python
+from dataclasses import dataclass, field
+
+from ludic.styles import themes
+from ludic.styles.types import Color, ColorRange
+
+
+@dataclass
+class BrandTheme(themes.LightTheme):
+    name: str = "brand"
+    colors: themes.Colors = field(
+        default_factory=lambda: themes.Colors(
+            primary=ColorRange(["#1e3a8a", "#1d4ed8", "#dbeafe"]),
+        )
+    )
+    fonts: themes.Fonts = field(
+        default_factory=lambda: themes.Fonts(secondary="Georgia, serif")
+    )
+    layouts: themes.Layouts = field(
+        default_factory=lambda: themes.Layouts(
+            sidebar=themes.Sidebar(side_width="18rem")
+        )
+    )
+    code: themes.CodeBlock = field(
+        default_factory=lambda: themes.CodeBlock(
+            color=Color("#e2e8f0"),
+            background_color=Color("#0f172a"),
+            style="github-dark",
+        )
+    )
+
+
+themes.set_default_theme(BrandTheme())
+```
+
+What the fields change:
+
+- `colors`: `primary` colors links and `ButtonPrimary`; `secondary`, `success`, `info`, `warning` and `danger` color the button and message variants; `white` is the page background, `dark` the text, `light` the background of default buttons and inline code. A `ColorRange` lists the shades from the darkest to the lightest, and `darken()` / `lighten()` step through them.
+- `fonts`: `primary` for text, `secondary` for headings, `monospace` for code, `size` for the base font size.
+- `layouts`: `sidebar.side_width`, `switcher.threshold`, `grid.cell_size`, `cover.min_height` and the other settings of the catalog layouts.
+- `code`: the colors, line numbers and Pygments `style` of `CodeBlock`. Import the theme's class through the module, as `themes.CodeBlock`, because the catalog's `CodeBlock` has the same name.
+- `buttons`: the `color` and `background_color` of the default `Button` and `ButtonLink`.
+- `measure`, `line_height`, `sizes`, `borders`, `rounding` and `headers`, which sets the size of each heading and whether `H1`–`H4` get an anchor.
+
+Give every theme its own `name`. The [Themes page](https://getludic.dev/docs/themes.md) describes every setting.
 
 ## A complete worked example
 
