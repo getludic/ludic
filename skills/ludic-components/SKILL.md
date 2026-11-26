@@ -232,6 +232,8 @@ plugins = ["ludic.mypy_plugin"]
 mypy path/to/your/package
 ```
 
+Use mypy 2.0 or newer. Older versions do not support t-strings and report each one as `PEP 750 template strings are not yet supported`. Upgrade mypy instead of rewriting the t-strings as f-strings.
+
 mypy with the plugin reports:
 
 - unknown or misspelled attributes on elements and components, and missing required attributes on components;
