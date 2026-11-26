@@ -1,0 +1,55 @@
+schema_version: "1.1"
+name: page-layout
+description: >-
+  A whole page with a sidebar. The catalog has HtmlPage, Head, Body and the
+  layouts, so the page needs no hand-written document or layout CSS.
+tags: [components, catalog]
+expected_outcome: >-
+  HtmlPage with Head and Body(htmx_version=...), the sidebar built with
+  WithSidebar or Sidebar from ludic.catalog.layouts.
+execution:
+  prompt: |-
+    Create `app.py` with a LudicApp that serves `/`: a whole HTML page titled
+    "Dashboard" with a sidebar menu (Home, Reports, Settings) on the left and
+    the main content on the right, a heading and a short paragraph. The page
+    should load htmx.
+  max_turns: 20
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: writes-app-py
+    type: file_exists
+    path: app.py
+  - name: uses-html-page
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \bHtmlPage\(
+  - name: loads-htmx-with-body
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \bhtmx_version\s*=
+  - name: uses-catalog-layouts
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      from ludic\.catalog\.layouts import
+  - name: uses-sidebar-layout
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \b(?:WithSidebar|Sidebar)\(
+  - name: no-hand-written-layout-css
+    type: regex
+    target: { source: file, path: app.py }
+    match: not_contains
+    pattern: |-
+      ["'](?:display|flex|flex-direction|grid-template-columns)["']\s*:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: |-
+      "skill"\s*:\s*"(?:[\w-]+:)?ludic-components"

@@ -1,0 +1,41 @@
+schema_version: "1.1"
+name: ludic-05-fstrings
+description: >-
+  The project is on Ludic 0.5 and Python 3.12, where t-strings do not exist.
+  The skill is written for 1.x and says to check the version first.
+tags: [components, versions]
+expected_outcome: >-
+  The component is written without t-strings: f-strings with elements (which
+  Ludic 0.5 renders correctly) or separate children.
+execution:
+  prompt: |-
+    In `components.py`, write a Ludic component `PriceTag` that takes a `price`
+    attribute and renders one paragraph: "Only <price> today. Buy now", with
+    the price in bold and "Buy now" as a link to /checkout.
+  max_turns: 20
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: writes-components-py
+    type: file_exists
+    path: components.py
+  - name: no-t-strings
+    type: regex
+    weight: 3
+    target: { source: file, path: components.py }
+    match: not_contains
+    pattern: |-
+      (?<![\w'"])[tT]["']
+  - name: no-safe
+    type: regex
+    target: { source: file, path: components.py }
+    match: not_contains
+    pattern: |-
+      \b(?:Safe|Markup|mark_safe)\(
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: |-
+      "skill"\s*:\s*"(?:[\w-]+:)?ludic-components"

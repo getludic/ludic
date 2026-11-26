@@ -1,0 +1,49 @@
+schema_version: "1.1"
+name: fix-escaped-bold
+description: >-
+  A bug report caused by f-strings in Ludic 1.x. The fix is a t-string or
+  separate children, not Safe.
+tags: [components, t-strings, debugging]
+expected_outcome: >-
+  The f-strings are replaced by a t-string (or separate children), the b and
+  Link elements stay elements, and nothing is wrapped in Safe.
+execution:
+  prompt: |-
+    The welcome message from `components.py` shows "Welcome back,
+    &lt;b&gt;Ada&lt;/b&gt;!" on the page instead of the name in bold, and the
+    inbox link shows up as text too. Fix it.
+  max_turns: 20
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: no-stringified-elements
+    type: regex
+    weight: 3
+    target: { source: file, path: components.py }
+    match: not_contains
+    pattern: |-
+      \b[fF]["'][^\n]*?\{\s*(?:a|b|i|em|strong|code|span|small|mark|Link|Code)\(|\bstr\(\s*(?:a|b|i|em|strong|code|span|small|mark|Link|Code)\(
+  - name: no-safe
+    type: regex
+    weight: 3
+    target: { source: file, path: components.py }
+    match: not_contains
+    pattern: |-
+      \b(?:Safe|Markup|mark_safe)\(
+  - name: keeps-bold-element
+    type: regex
+    target: { source: file, path: components.py }
+    pattern: |-
+      \bb\(
+  - name: keeps-link-element
+    type: regex
+    target: { source: file, path: components.py }
+    pattern: |-
+      \b(?:Link|a)\(
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: |-
+      "skill"\s*:\s*"(?:[\w-]+:)?ludic-components"

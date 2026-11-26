@@ -1,0 +1,63 @@
+schema_version: "1.1"
+name: todo-htmx
+description: >-
+  A small htmx app on LudicApp: a form posted with htmx, parsed with Parser,
+  answered with a fragment.
+tags: [web, htmx]
+expected_outcome: >-
+  GET / returns a whole page that loads htmx; the form posts with hx_post to
+  /todos, which parses the form with Parser[...] and returns the new item.
+execution:
+  prompt: |-
+    In `app.py`, build a small todo app with Ludic's LudicApp and htmx: `/`
+    shows the todos and a form with a title field. Submitting the form posts
+    to `/todos` and appends the new todo to the list without reloading the
+    page. Keep the todos in memory.
+  max_turns: 20
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: writes-app-py
+    type: file_exists
+    path: app.py
+  - name: uses-ludic-app
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \bLudicApp\(
+  - name: posts-with-htmx
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \bhx_post\s*=
+  - name: parses-form-with-parser
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \bParser\[
+  - name: loads-htmx
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \bhtmx_version\s*=|htmx\.org|unpkg\.com/htmx|jsdelivr\.net/npm/htmx
+  - name: no-absolute-urls-from-request
+    type: regex
+    weight: 3
+    target: { source: file, path: app.py }
+    match: not_contains
+    pattern: |-
+      \bstr\(\s*[\w.]+\.url_for\(|\{\s*[\w.]+\.url_for\(|\bhx_\w+\s*=\s*[\w.]+\.url_for\((?:[^()]|\([^()]*\))*\)\s*[,)]
+  - name: no-stringified-elements
+    type: regex
+    weight: 3
+    target: { source: file, path: app.py }
+    match: not_contains
+    pattern: |-
+      \b[fF]["'][^\n]*?\{\s*(?:a|b|i|em|strong|code|span|small|mark|li|Link|Code)\(|\bstr\(\s*(?:a|b|i|em|strong|code|span|small|mark|li|Link|Code)\(
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: |-
+      "skill"\s*:\s*"(?:[\w-]+:)?ludic-web"

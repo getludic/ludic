@@ -1,0 +1,53 @@
+schema_version: "1.1"
+name: theme-buttons
+description: >-
+  Restyling catalog components. The theme configures buttons
+  (themes.Buttons) and code blocks (themes.CodeBlock), so no CSS is needed.
+tags: [components, theming]
+expected_outcome: >-
+  A theme with buttons=Buttons(...) and code=CodeBlock(...), applied with
+  Head(theme=...) or set_default_theme, and no CSS for .btn or .code-block.
+execution:
+  prompt: |-
+    Our brand color is #1d4ed8. On the page in `app.py`, make the default
+    buttons use a light blue background (#dbeafe) with #1d4ed8 text, and make
+    the code blocks dark: background #0f172a, text #e2e8f0. Keep the changes
+    in `app.py`.
+  max_turns: 20
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: configures-buttons-in-theme
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \bButtons\(
+  - name: configures-code-block-in-theme
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \bCodeBlock\((?:[^()]|\([^()]*\))*\bbackground_color\s*=
+  - name: applies-theme
+    type: regex
+    target: { source: file, path: app.py }
+    pattern: |-
+      \bset_default_theme\(|\bHead\((?:[^()]|\([^()]*\))*\btheme\s*=|(?<!style)\.use\(
+  - name: no-button-css
+    type: regex
+    target: { source: file, path: app.py }
+    match: not_contains
+    pattern: |-
+      ["'][^"'\n]*\.btn\b
+  - name: no-code-block-css
+    type: regex
+    target: { source: file, path: app.py }
+    match: not_contains
+    pattern: |-
+      ["'][^"'\n]*\.code-block\b
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: |-
+      "skill"\s*:\s*"(?:[\w-]+:)?ludic-components"

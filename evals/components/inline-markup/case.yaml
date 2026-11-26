@@ -1,0 +1,51 @@
+schema_version: "1.1"
+name: inline-markup
+description: >-
+  Text mixed with elements. In Ludic 1.x it is a t-string or separate
+  children; an f-string or str() turns the elements into escaped text.
+tags: [components, t-strings]
+expected_outcome: >-
+  A typed component whose paragraph renders the name in <b> and "Sign out"
+  as <a href="/logout">, without stringifying the elements.
+execution:
+  prompt: |-
+    In `components.py`, write a Ludic component `SignedInNotice` that takes a
+    `name` attribute and renders one paragraph: "Signed in as <name>. Sign out",
+    with the name in bold and "Sign out" as a link to /logout.
+  max_turns: 20
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: writes-components-py
+    type: file_exists
+    path: components.py
+  - name: no-stringified-elements
+    type: regex
+    weight: 3
+    target: { source: file, path: components.py }
+    match: not_contains
+    pattern: |-
+      \b[fF]["'][^\n]*?\{\s*(?:a|b|i|em|strong|code|span|small|mark|Link|Code)\(|\bstr\(\s*(?:a|b|i|em|strong|code|span|small|mark|Link|Code)\(
+  - name: no-safe
+    type: regex
+    target: { source: file, path: components.py }
+    match: not_contains
+    pattern: |-
+      \b(?:Safe|Markup|mark_safe)\(
+  - name: typed-component
+    type: regex
+    target: { source: file, path: components.py }
+    pattern: |-
+      \bComponent(?:Strict)?\[
+  - name: declares-attrs
+    type: regex
+    target: { source: file, path: components.py }
+    pattern: |-
+      \((?:Global)?Attrs\)\s*:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: |-
+      "skill"\s*:\s*"(?:[\w-]+:)?ludic-components"
