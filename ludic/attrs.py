@@ -294,7 +294,24 @@ class HeadLinkAttrs(HtmlAttrs, total=False):
         "unsafe-url",
     ]
     rel: Literal[
-        "canonical", "alternate", "stylesheet", "icon", "apple-touch-icon", "preconnect"
+        "alternate",
+        "apple-touch-icon",
+        "author",
+        "canonical",
+        "dns-prefetch",
+        "help",
+        "icon",
+        "license",
+        "manifest",
+        "me",
+        "modulepreload",
+        "next",
+        "preconnect",
+        "prefetch",
+        "preload",
+        "prev",
+        "search",
+        "stylesheet",
     ]
     sizes: str
     type: str
