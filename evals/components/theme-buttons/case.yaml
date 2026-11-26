@@ -5,8 +5,10 @@ description: >-
   (themes.Buttons) and code blocks (themes.CodeBlock), so no CSS is needed.
 tags: [components, theming]
 expected_outcome: >-
-  A theme with buttons=Buttons(...) and code=CodeBlock(...), applied with
-  Head(theme=...) or set_default_theme, and no CSS for .btn or .code-block.
+  A theme with buttons=Buttons(...) and code=CodeBlock(...), made the default
+  with set_default_theme, and no CSS for .btn or .code-block. Head(theme=...)
+  alone is not enough: CodeBlock reads the highlighting style and the color of
+  line numbers from the default theme while it renders.
   The theme's CodeBlock is often imported under another name, e.g.
   CodeBlockConfig, because the catalog's CodeBlock is imported too.
 execution:
@@ -31,11 +33,11 @@ graders:
     target: { source: file, path: app.py }
     pattern: |-
       \b\w*CodeBlock\w*\((?:[^()]|\([^()]*\))*\bbackground_color\s*=
-  - name: applies-theme
+  - name: sets-default-theme
     type: regex
     target: { source: file, path: app.py }
     pattern: |-
-      \bset_default_theme\(|\bHead\((?:[^()]|\([^()]*\))*\btheme\s*=|(?<!style)\.use\(
+      \bset_default_theme\(
   - name: no-button-css
     type: regex
     target: { source: file, path: app.py }
