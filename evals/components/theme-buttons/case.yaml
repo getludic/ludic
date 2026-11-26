@@ -7,6 +7,8 @@ tags: [components, theming]
 expected_outcome: >-
   A theme with buttons=Buttons(...) and code=CodeBlock(...), applied with
   Head(theme=...) or set_default_theme, and no CSS for .btn or .code-block.
+  The theme's CodeBlock is often imported under another name, e.g.
+  CodeBlockConfig, because the catalog's CodeBlock is imported too.
 execution:
   prompt: |-
     Our brand color is #1d4ed8. On the page in `app.py`, make the default
@@ -28,7 +30,7 @@ graders:
     type: regex
     target: { source: file, path: app.py }
     pattern: |-
-      \bCodeBlock\((?:[^()]|\([^()]*\))*\bbackground_color\s*=
+      \b\w*CodeBlock\w*\((?:[^()]|\([^()]*\))*\bbackground_color\s*=
   - name: applies-theme
     type: regex
     target: { source: file, path: app.py }
