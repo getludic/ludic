@@ -12,6 +12,8 @@ from typing import Any
 
 import pytest
 
+from ludic.styles.themes import get_default_theme, set_default_theme
+
 SKILLS_DIR = Path(__file__).parent.parent / "skills"
 PYTHON_BLOCK = re.compile(r"^```python\n(.*?)^```", re.DOTALL | re.MULTILINE)
 
@@ -31,4 +33,9 @@ def test_skills_have_python_examples() -> None:
 
 @pytest.mark.parametrize(("name", "code"), python_blocks())
 def test_skill_example_runs(name: str, code: str) -> None:
-    exec(compile(code, name, "exec"), {"__name__": "skill_example"})  # noqa: S102
+    default_theme = get_default_theme()
+    try:
+        exec(compile(code, name, "exec"), {"__name__": "skill_example"})  # noqa: S102
+    finally:
+        # An example may set its own default theme.
+        set_default_theme(default_theme)
